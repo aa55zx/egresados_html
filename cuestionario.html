@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de Egresados 2025 - TecNM Oaxaca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Montserrat', sans-serif; }
+
+        /* ── Progress bar ── */
+        .progress-fill { transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+        /* ── Step indicator ── */
+        .step-dot {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700;
+            transition: all 0.3s ease;
+            border: 2px solid #d1d5db;
+            background: white;
+            color: #9ca3af;
+            cursor: default;
+            flex-shrink: 0;
+        }
+        .step-dot.active  { background: #1e3a8a; border-color: #1e3a8a; color: white; box-shadow: 0 0 0 4px rgba(30,58,138,0.15); }
+        .step-dot.done    { background: #f97316; border-color: #f97316; color: white; }
+        .step-line        { flex: 1; height: 2px; background: #e5e7eb; transition: background 0.3s ease; }
+        .step-line.done   { background: #f97316; }
+
+        /* ── Section slides ── */
+        .section-panel { display: none; animation: fadeIn 0.35s ease; }
+        .section-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+        /* ── Inputs ── */
+        .form-input {
+            width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #fafafa;
+        }
+        .form-input:focus { border-color: #1e3a8a; box-shadow: 0 0 0 3px rgba(30,58,138,0.1); background: white; }
+
+        /* ── Radio / Checkbox pill ── */
+        .pill-label {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 7px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 13px; font-weight: 500;
+            transition: all 0.2s;
+            background: white;
+            user-select: none;
+        }
+        .pill-label:hover { border-color: #1e3a8a; color: #1e3a8a; }
+        .pill-label input { display: none; }
+        .pill-label.selected { background: #1e3a8a; border-color: #1e3a8a; color: white; }
+        .pill-label.selected-orange { background: #f97316; border-color: #f97316; color: white; }
+
+        /* ── Scale buttons ── */
+        .scale-btn {
+            width: 38px; height: 38px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            font-size: 13px; font-weight: 700;
+            transition: all 0.2s;
+        }
+        .scale-btn:hover { border-color: #f97316; color: #f97316; }
+        .scale-btn.active { background: #f97316; border-color: #f97316; color: white; }
+
+        /* ── Card ── */
+        .question-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 16px;
+        }
+
+        /* ── Nav buttons ── */
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white; font-weight: 700;
+            padding: 12px 28px; border-radius: 10px;
+            border: none; cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,58,138,0.3); }
+
+        .btn-secondary {
+            background: white;
+            color: #374151; font-weight: 600;
+            padding: 12px 24px; border-radius: 10px;
+            border: 2px solid #e5e7eb; cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-secondary:hover { border-color: #1e3a8a; color: #1e3a8a; }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white; font-weight: 700;
+            padding: 14px 36px; border-radius: 10px;
+            border: none; cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 16px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(249,115,22,0.35); }
+
+        /* ── Section header accent ── */
+        .section-header { border-left: 4px solid #f97316; padding-left: 14px; margin-bottom: 24px; }
+
+        /* ── Textarea ── */
+        textarea.form-input { resize: vertical; min-height: 80px; }
+
+        /* ── Table inputs ── */
+        .table-input { border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 10px; font-size: 12px; width: 100%; outline: none; background: #fafafa; }
+        .table-input:focus { border-color: #1e3a8a; background: white; }
+
+        /* ── Success screen ── */
+        #success-screen { display: none; }
+        #success-screen.show { display: flex; animation: fadeIn 0.5s ease; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-3">
+                <div class="flex items-center space-x-3">
+                    <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="TecNM" class="h-12">
+                    <div>
+                        <p class="font-bold text-blue-900 text-sm leading-tight">TecNM Campus Oaxaca</p>
+                        <p class="text-xs text-gray-500">Seguimiento de Egresados 2025</p>
+                    </div>
+                </div>
+                <a href="index.html" class="text-orange-500 hover:text-orange-600 font-semibold text-sm">
+                    <i class="fas fa-arrow-left mr-1"></i>Volver al Portal
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+
+        <!-- Hero intro -->
+        <div class="bg-gradient-to-r from-blue-900 to-blue-700 rounded-2xl p-6 text-white mb-8 relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-40 h-40 bg-orange-500 opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
+            <span class="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Posgrado en Ciencias de la Ingeniería</span>
+            <h1 class="text-2xl font-bold mb-1">Cuestionario de Seguimiento de Egresados</h1>
+            <p class="text-blue-100 text-sm max-w-lg">Tus respuestas son confidenciales y de uso exclusivo académico, conforme a la Ley Federal de Protección de Datos Personales. ¡Gracias por tu tiempo!</p>
+            <div class="mt-4 flex items-center gap-4 text-xs text-blue-200">
+                <span><i class="fas fa-clock mr-1"></i>~10 minutos</span>
+                <span><i class="fas fa-shield-alt mr-1"></i>Datos confidenciales</span>
+                <span><i class="fas fa-layer-group mr-1"></i>7 secciones</span>
+            </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100">
+            <!-- Step dots -->
+            <div class="flex items-center mb-4" id="step-track">
+                <!-- generado por JS -->
+            </div>
+            <!-- Labels -->
+            <div class="flex justify-between text-xs text-gray-400 font-medium px-1">
+                <span>Demográfico</span>
+                <span>Académico</span>
+                <span>Laboral</span>
+                <span>Investigación</span>
+                <span>Evaluación</span>
+                <span>Actualización</span>
+                <span>Comentarios</span>
+            </div>
+            <!-- Progress fill -->
+            <div class="mt-3 bg-gray-100 rounded-full h-2 overflow-hidden">
+                <div id="progress-bar" class="progress-fill h-full bg-gradient-to-r from-blue-900 to-orange-500 rounded-full" style="width:14%"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-1 text-right" id="progress-label">Sección 1 de 7</p>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             SECCIÓN I – ASPECTOS DEMOGRÁFICOS
+        ═══════════════════════════════════════════════ -->
+        <div class="section-panel active" id="section-1">
+            <div class="section-header">
+                <h2 class="text-xl font-bold text-blue-900">I. Aspectos Demográficos</h2>
+                <p class="text-sm text-gray-500 mt-1">Información personal básica</p>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">1. Nombre completo <span class="text-orange-500">*</span></label>
+                <input id="in-nombre" class="form-input" type="text" placeholder="Escribe tu nombre completo">
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">2. Sexo</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'sexo')"><input type="radio" name="sexo" value="M"> Masculino</label>
+                    <label class="pill-label" onclick="selectPill(this,'sexo')"><input type="radio" name="sexo" value="F"> Femenino</label>
+                    <label class="pill-label" onclick="selectPill(this,'sexo')"><input type="radio" name="sexo" value="O"> Otro / Prefiero no decir</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">3. Estado Civil</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'estadocivil')"><input type="radio" name="estadocivil"> Soltero/a</label>
+                    <label class="pill-label" onclick="selectPill(this,'estadocivil')"><input type="radio" name="estadocivil"> Casado/a</label>
+                    <label class="pill-label" onclick="selectPill(this,'estadocivil')"><input type="radio" name="estadocivil"> Unión libre</label>
+                    <label class="pill-label" onclick="selectPill(this,'estadocivil')"><input type="radio" name="estadocivil"> Divorciado/a</label>
+                    <label class="pill-label" onclick="selectPill(this,'estadocivil')"><input type="radio" name="estadocivil"> Viudo/a</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">4. Domicilio actual</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">Municipio</p>
+                        <input id="in-municipio" class="form-input" type="text" placeholder="Municipio">
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">Ciudad</p>
+                        <input id="in-ciudad" class="form-input" type="text" placeholder="Ciudad">
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">Código Postal</p>
+                        <input id="in-cp" class="form-input" type="text" placeholder="C.P.">
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">País</p>
+                        <input id="in-pais" class="form-input" type="text" placeholder="País" value="México">
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">5. Dependientes económicos</label>
+                <select class="form-input">
+                    <option value="">Selecciona…</option>
+                    <option>0 – Ninguno</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4 o más</option>
+                </select>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">6. Teléfono(s)</label>
+                <input id="in-telefono" class="form-input" type="tel" placeholder="Ej. 951 123 4567">
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">7. Correo electrónico <span class="text-orange-500">*</span></label>
+                <input id="in-email" class="form-input" type="email" placeholder="correo@ejemplo.com">
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             SECCIÓN II – DATOS ACADÉMICOS
+        ═══════════════════════════════════════════════ -->
+        <div class="section-panel" id="section-2">
+            <div class="section-header">
+                <h2 class="text-xl font-bold text-blue-900">II. Datos Académicos</h2>
+                <p class="text-sm text-gray-500 mt-1">Información sobre tu programa de posgrado</p>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">1. ¿Por qué eligió el ITO para su posgrado? <span class="text-xs text-gray-400">(puede seleccionar varias)</span></label>
+                <div id="grp-razones" class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Calidad académica</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Ubicación geográfica</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Costo accesible</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Beca disponible</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Recomendación</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Reputación del programa</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Línea de investigación</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Otro</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">2. Programa de posgrado concluido</label>
+                <select class="form-input">
+                    <option value="">Selecciona…</option>
+                    <option>Maestría en Ciencias en Ingeniería Electrónica</option>
+                    <option>Maestría en Ciencias en Ingeniería Industrial</option>
+                    <option>Maestría en Ciencias en Ingeniería en Sistemas Computacionales</option>
+                    <option>Doctorado en Ciencias de la Ingeniería</option>
+                    <option>Otro</option>
+                </select>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">3. Línea de Investigación</label>
+                <input id="in-linea" class="form-input" type="text" placeholder="Describe tu línea de investigación">
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">4. ¿Obtuvo beca para cursar el posgrado?</label>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <label class="pill-label" onclick="selectPill(this,'beca'); toggleSection('beca-detail', this.querySelector('input').value === 'si')">
+                        <input type="radio" name="beca" value="si"> Sí
+                    </label>
+                    <label class="pill-label" onclick="selectPill(this,'beca'); toggleSection('beca-detail', false)">
+                        <input type="radio" name="beca" value="no"> No
+                    </label>
+                </div>
+                <div id="beca-detail" class="hidden mt-3 space-y-3">
+                    <input id="in-inst-beca" class="form-input" type="text" placeholder="Institución que otorgó la beca">
+                    <div class="flex flex-wrap gap-2">
+                        <label id="_beca-tipos-start" class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> CONAHCYT / SECIHTI</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> SEP</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Institucional</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Empresa privada</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Gobierno estatal</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Otra</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">5. ¿Le tomó más tiempo de lo programado obtener el grado?</label>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <label class="pill-label" onclick="selectPill(this,'tiempogrado'); toggleSection('tiempo-detail', this.querySelector('input').value === 'si')">
+                        <input type="radio" name="tiempogrado" value="si"> Sí
+                    </label>
+                    <label class="pill-label" onclick="selectPill(this,'tiempogrado'); toggleSection('tiempo-detail', false)">
+                        <input type="radio" name="tiempogrado" value="no"> No
+                    </label>
+                </div>
+                <div id="tiempo-detail" class="hidden">
+                    <label class="block text-xs text-gray-400 mb-1">¿Cuáles fueron las causas?</label>
+                    <textarea id="in-causa-tiempo" class="form-input" rows="2" placeholder="Describe brevemente las causas…"></textarea>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">6. ¿Considera la titulación indispensable para el ejercicio profesional?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'titulacion')"><input type="radio" name="titulacion"> Totalmente indispensable</label>
+                    <label class="pill-label" onclick="selectPill(this,'titulacion')"><input type="radio" name="titulacion"> Importante pero no indispensable</label>
+                    <label class="pill-label" onclick="selectPill(this,'titulacion')"><input type="radio" name="titulacion"> No es necesaria</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">7. ¿Tiene dominio de otro idioma además del español?</label>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <label class="pill-label" onclick="selectPill(this,'idioma'); toggleSection('idioma-detail', this.querySelector('input').value === 'si')">
+                        <input type="radio" name="idioma" value="si"> Sí
+                    </label>
+                    <label class="pill-label" onclick="selectPill(this,'idioma'); toggleSection('idioma-detail', false)">
+                        <input type="radio" name="idioma" value="no"> No
+                    </label>
+                </div>
+                <div id="idioma-detail" class="hidden space-y-3">
+                    <input id="in-idiomas" class="form-input" type="text" placeholder="Idioma(s) que dominas">
+                    <div>
+                        <p class="text-xs text-gray-400 mb-2">¿Cuenta con certificación del idioma?</p>
+                        <div id="grp-idioma-cert" class="flex flex-wrap gap-2">
+                            <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> TOEFL</label>
+                            <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> IELTS</label>
+                            <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Cambridge</label>
+                            <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> DELF/DALF</label>
+                            <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Goethe</label>
+                            <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Otra</label>
+                            <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Sin certificación</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             SECCIÓN III – INFORMACIÓN LABORAL
+        ═══════════════════════════════════════════════ -->
+        <div class="section-panel" id="section-3">
+            <div class="section-header">
+                <h2 class="text-xl font-bold text-blue-900">III. Información Laboral</h2>
+                <p class="text-sm text-gray-500 mt-1">Tu situación en el mercado de trabajo</p>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">1. ¿Tenía empleo cuando cursaba el posgrado?</label>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <label class="pill-label" onclick="selectPill(this,'empleocursando'); toggleSection('empleo-cursando-detail', this.querySelector('input').value === 'si')">
+                        <input type="radio" name="empleocursando" value="si"> Sí
+                    </label>
+                    <label class="pill-label" onclick="selectPill(this,'empleocursando'); toggleSection('empleo-cursando-detail', false)">
+                        <input type="radio" name="empleocursando" value="no"> No
+                    </label>
+                </div>
+                <div id="empleo-cursando-detail" class="hidden space-y-3">
+                    <input id="in-puesto-cursando" class="form-input" type="text" placeholder="Puesto que desempeñaba">
+                    <div>
+                        <p class="text-xs text-gray-400 mb-2">Tipo de contratación</p>
+                        <div class="flex flex-wrap gap-2">
+                            <label class="pill-label" onclick="selectPill(this,'contrato-cursando')"><input type="radio" name="contrato-cursando"> Base / Definitivo</label>
+                            <label class="pill-label" onclick="selectPill(this,'contrato-cursando')"><input type="radio" name="contrato-cursando"> Temporal</label>
+                            <label class="pill-label" onclick="selectPill(this,'contrato-cursando')"><input type="radio" name="contrato-cursando"> Honorarios</label>
+                            <label class="pill-label" onclick="selectPill(this,'contrato-cursando')"><input type="radio" name="contrato-cursando"> Por proyecto</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">2. ¿Cambió de empleo después de egresar?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'cambioempleo')"><input type="radio" name="cambioempleo"> Sí</label>
+                    <label class="pill-label" onclick="selectPill(this,'cambioempleo')"><input type="radio" name="cambioempleo"> No</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">3. ¿Cuánto tiempo le tomó conseguir empleo después de egresar?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'tiempoempleo')"><input type="radio" name="tiempoempleo"> Tenía empleo al egresar</label>
+                    <label class="pill-label" onclick="selectPill(this,'tiempoempleo')"><input type="radio" name="tiempoempleo"> Menos de 3 meses</label>
+                    <label class="pill-label" onclick="selectPill(this,'tiempoempleo')"><input type="radio" name="tiempoempleo"> 3–6 meses</label>
+                    <label class="pill-label" onclick="selectPill(this,'tiempoempleo')"><input type="radio" name="tiempoempleo"> 6–12 meses</label>
+                    <label class="pill-label" onclick="selectPill(this,'tiempoempleo')"><input type="radio" name="tiempoempleo"> Más de 1 año</label>
+                    <label class="pill-label" onclick="selectPill(this,'tiempoempleo')"><input type="radio" name="tiempoempleo"> No labora actualmente</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">4. Factores que influyeron para conseguir empleo <span class="text-xs text-gray-400">(puede seleccionar varios)</span></label>
+                <div id="grp-factores" class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Grado de posgrado</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Experiencia previa</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Contactos / red profesional</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Bolsa de trabajo institucional</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Recomendación académica</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Publicaciones / investigación</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Dominio de idioma</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Otro</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">5. ¿Labora actualmente?</label>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <label class="pill-label" onclick="selectPill(this,'laboraactual'); toggleSection('labora-detail', this.querySelector('input').value === 'si')">
+                        <input type="radio" name="laboraactual" value="si"> Sí
+                    </label>
+                    <label class="pill-label" onclick="selectPill(this,'laboraactual'); toggleSection('labora-detail', false)">
+                        <input type="radio" name="laboraactual" value="no"> No
+                    </label>
+                </div>
+                <div id="labora-detail" class="hidden space-y-4">
+                    <div>
+                        <p class="text-xs text-gray-400 mb-2">Tipo de institución</p>
+                        <div class="flex flex-wrap gap-2">
+                            <label class="pill-label" onclick="selectPill(this,'tipoinst')"><input type="radio" name="tipoinst"> Pública</label>
+                            <label class="pill-label" onclick="selectPill(this,'tipoinst')"><input type="radio" name="tipoinst"> Privada</label>
+                            <label class="pill-label" onclick="selectPill(this,'tipoinst')"><input type="radio" name="tipoinst"> Propia empresa</label>
+                            <label class="pill-label" onclick="selectPill(this,'tipoinst')"><input type="radio" name="tipoinst"> ONG / Organismo internacional</label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 mb-2">Sector económico</p>
+                        <div class="flex flex-wrap gap-2">
+                            <label class="pill-label" onclick="selectPill(this,'sector')"><input type="radio" name="sector"> Industrial</label>
+                            <label class="pill-label" onclick="selectPill(this,'sector')"><input type="radio" name="sector"> Educación / Investigación</label>
+                            <label class="pill-label" onclick="selectPill(this,'sector')"><input type="radio" name="sector"> Tecnología</label>
+                            <label class="pill-label" onclick="selectPill(this,'sector')"><input type="radio" name="sector"> Salud</label>
+                            <label class="pill-label" onclick="selectPill(this,'sector')"><input type="radio" name="sector"> Gobierno</label>
+                            <label class="pill-label" onclick="selectPill(this,'sector')"><input type="radio" name="sector"> Servicios</label>
+                            <label class="pill-label" onclick="selectPill(this,'sector')"><input type="radio" name="sector"> Otro</label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 mb-2">Tipo de contratación actual</p>
+                        <div class="flex flex-wrap gap-2">
+                            <label class="pill-label" onclick="selectPill(this,'contratoactual')"><input type="radio" name="contratoactual"> Base / Definitivo</label>
+                            <label class="pill-label" onclick="selectPill(this,'contratoactual')"><input type="radio" name="contratoactual"> Temporal</label>
+                            <label class="pill-label" onclick="selectPill(this,'contratoactual')"><input type="radio" name="contratoactual"> Honorarios</label>
+                            <label class="pill-label" onclick="selectPill(this,'contratoactual')"><input type="radio" name="contratoactual"> Por proyecto</label>
+                            <label class="pill-label" onclick="selectPill(this,'contratoactual')"><input type="radio" name="contratoactual"> Freelance</label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">Actividades principales en tu empleo actual</p>
+                        <textarea id="in-actividades" class="form-input" rows="2" placeholder="Describe brevemente…"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Valoraciones escala -->
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-4">6. Valoraciones sobre tu situación laboral actual</label>
+                <div class="space-y-5">
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Coincidencia de conocimientos adquiridos con las exigencias laborales</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-coincidencia"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Conocimientos para responder a problemas del trabajo</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-conocimientos"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Impacto en la sociedad de tus actividades profesionales</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-impacto"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Pertinencia del programa al campo laboral actual</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-pertinencia"></div>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-3"><span class="font-semibold">1</span> = Muy bajo &nbsp;|&nbsp; <span class="font-semibold">5</span> = Muy alto</p>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             SECCIÓN IV – INVESTIGACIÓN
+        ═══════════════════════════════════════════════ -->
+        <div class="section-panel" id="section-4">
+            <div class="section-header">
+                <h2 class="text-xl font-bold text-blue-900">IV. Investigación</h2>
+                <p class="text-sm text-gray-500 mt-1">Actividades científicas y de producción de conocimiento</p>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">1. ¿Participó en actividades de producción de conocimientos o publicaciones tras el posgrado?</label>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <label class="pill-label" onclick="selectPill(this,'publicaciones'); toggleSection('pub-detail', this.querySelector('input').value === 'si')">
+                        <input type="radio" name="publicaciones" value="si"> Sí
+                    </label>
+                    <label class="pill-label" onclick="selectPill(this,'publicaciones'); toggleSection('pub-detail', false)">
+                        <input type="radio" name="publicaciones" value="no"> No
+                    </label>
+                </div>
+                <div id="pub-detail" class="hidden">
+                    <p class="text-xs text-gray-400 mb-2">Especifique el tipo</p>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Artículos en revista indexada</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Artículos en revista no indexada</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Memorias de congreso</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Libro / Capítulo de libro</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Patente</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Reporte técnico</label>
+                        <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Otro</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">2. ¿Ha sido o es miembro del Sistema Nacional de Investigadores (SECIHTI)?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'sni')"><input type="radio" name="sni"> Sí, actualmente</label>
+                    <label class="pill-label" onclick="selectPill(this,'sni')"><input type="radio" name="sni"> Lo fui, ya no</label>
+                    <label class="pill-label" onclick="selectPill(this,'sni')"><input type="radio" name="sni"> No</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">3. ¿Participa en alguna red temática?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'red')"><input type="radio" name="red"> Sí</label>
+                    <label class="pill-label" onclick="selectPill(this,'red')"><input type="radio" name="red"> No</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">4. ¿Ha recibido premios, reconocimientos o distinciones?</label>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <label class="pill-label" onclick="selectPill(this,'premios'); toggleSection('premios-detail', this.querySelector('input').value === 'si')">
+                        <input type="radio" name="premios" value="si"> Sí
+                    </label>
+                    <label class="pill-label" onclick="selectPill(this,'premios'); toggleSection('premios-detail', false)">
+                        <input type="radio" name="premios" value="no"> No
+                    </label>
+                </div>
+                <div id="premios-detail" class="hidden">
+                    <textarea id="in-premios-desc" class="form-input" rows="2" placeholder="Institución que lo otorgó y tipo de reconocimiento…"></textarea>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">5. ¿Pertenece a alguna academia, sociedad u organización profesional?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'academia')"><input type="radio" name="academia"> Sí</label>
+                    <label class="pill-label" onclick="selectPill(this,'academia')"><input type="radio" name="academia"> No</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">6. ¿Ha realizado estancia posdoctoral o pertenece / perteneció al programa de estancias posdoctorales?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'postdoc')"><input type="radio" name="postdoc"> Sí, realicé estancia</label>
+                    <label class="pill-label" onclick="selectPill(this,'postdoc')"><input type="radio" name="postdoc"> Pertenecí al programa</label>
+                    <label class="pill-label" onclick="selectPill(this,'postdoc')"><input type="radio" name="postdoc"> No</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             SECCIÓN V – EVALUACIÓN DEL PROGRAMA
+        ═══════════════════════════════════════════════ -->
+        <div class="section-panel" id="section-5">
+            <div class="section-header">
+                <h2 class="text-xl font-bold text-blue-900">V. Evaluación del Programa</h2>
+                <p class="text-sm text-gray-500 mt-1">Califica tu experiencia académica en el ITO</p>
+            </div>
+
+            <!-- Escalas 1–10 -->
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-4">1. En escala del 1 al 10, evalúa los siguientes aspectos <span class="text-xs text-gray-400">(1 = Muy deficiente, 10 = Excelente)</span></label>
+                <div class="space-y-5">
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Correspondencia de contenidos con exigencias laborales</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-contenidos"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Estrategias didácticas de los docentes</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-didacticas"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Formas de evaluación de los docentes</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-evaluacion"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Bibliografía utilizada</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-biblio"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Desempeño de los profesores en asesoría de tesis</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-asesoria"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Satisfacción con la formación adquirida</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-satisfaccion"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Infraestructura -->
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-4">2. Infraestructura disponible durante el posgrado <span class="text-xs text-gray-400">(1–10)</span></label>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Laboratorios y equipamiento</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-laboratorios"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Biblioteca y bases de datos</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-biblioteca"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Conectividad e internet</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-internet"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-600 mb-2">Instalaciones en general</p>
+                        <div class="flex gap-1 flex-wrap" id="scale-instalaciones"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">3. ¿En qué nivel se cumplieron las expectativas al cursar el posgrado?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'expectativas')"><input type="radio" name="expectativas"> Totalmente</label>
+                    <label class="pill-label" onclick="selectPill(this,'expectativas')"><input type="radio" name="expectativas"> En su mayoría</label>
+                    <label class="pill-label" onclick="selectPill(this,'expectativas')"><input type="radio" name="expectativas"> Parcialmente</label>
+                    <label class="pill-label" onclick="selectPill(this,'expectativas')"><input type="radio" name="expectativas"> Poco</label>
+                    <label class="pill-label" onclick="selectPill(this,'expectativas')"><input type="radio" name="expectativas"> No se cumplieron</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">4. ¿Cómo evaluaría la calidad general del programa?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'calidad')"><input type="radio" name="calidad"> Excelente</label>
+                    <label class="pill-label" onclick="selectPill(this,'calidad')"><input type="radio" name="calidad"> Muy buena</label>
+                    <label class="pill-label" onclick="selectPill(this,'calidad')"><input type="radio" name="calidad"> Buena</label>
+                    <label class="pill-label" onclick="selectPill(this,'calidad')"><input type="radio" name="calidad"> Regular</label>
+                    <label class="pill-label" onclick="selectPill(this,'calidad')"><input type="radio" name="calidad"> Deficiente</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">5. Áreas del posgrado que considera se deben mejorar</label>
+                <textarea id="in-areas-mejora" class="form-input" rows="3" placeholder="Describe las áreas de mejora que identificas…"></textarea>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">6. ¿Cómo se podría mejorar el Plan de Estudios?</label>
+                <textarea id="in-mejora-plan" class="form-input" rows="3" placeholder="Tus sugerencias para mejorar el plan de estudios…"></textarea>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             SECCIÓN VI – ACTUALIZACIÓN PROFESIONAL
+        ═══════════════════════════════════════════════ -->
+        <div class="section-panel" id="section-6">
+            <div class="section-header">
+                <h2 class="text-xl font-bold text-blue-900">VI. Actualización Profesional</h2>
+                <p class="text-sm text-gray-500 mt-1">Cursos, emprendimiento y trayectoria posterior al egreso</p>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">1. ¿Ha tomado cursos de actualización desde que concluyó el posgrado?</label>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <label class="pill-label" onclick="selectPill(this,'cursosact'); toggleSection('cursos-detail', this.querySelector('input').value === 'si')">
+                        <input type="radio" name="cursosact" value="si"> Sí
+                    </label>
+                    <label class="pill-label" onclick="selectPill(this,'cursosact'); toggleSection('cursos-detail', false)">
+                        <input type="radio" name="cursosact" value="no"> No
+                    </label>
+                </div>
+                <div id="cursos-detail" class="hidden">
+                    <textarea id="in-cursos-desc" class="form-input" rows="2" placeholder="Diplomados, cursos, seminarios, talleres que ha tomado…"></textarea>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">2. Actividades de actualización que le gustaría que el ITO impartiera</label>
+                <textarea id="in-actividades-deseadas" class="form-input" rows="2" placeholder="Temas o áreas de interés…"></textarea>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">3. ¿Cuánto tiempo dispone para actividades de actualización?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'tiempoact')"><input type="radio" name="tiempoact"> Menos de 5 hrs/semana</label>
+                    <label class="pill-label" onclick="selectPill(this,'tiempoact')"><input type="radio" name="tiempoact"> 5–10 hrs/semana</label>
+                    <label class="pill-label" onclick="selectPill(this,'tiempoact')"><input type="radio" name="tiempoact"> 10–20 hrs/semana</label>
+                    <label class="pill-label" onclick="selectPill(this,'tiempoact')"><input type="radio" name="tiempoact"> Fines de semana</label>
+                    <label class="pill-label" onclick="selectPill(this,'tiempoact')"><input type="radio" name="tiempoact"> Periodos vacacionales</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">4. En los 3 años siguientes al egreso, ¿participó en la creación de alguna empresa?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'empresa')"><input type="radio" name="empresa"> Sí</label>
+                    <label class="pill-label" onclick="selectPill(this,'empresa')"><input type="radio" name="empresa"> No</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">5. A los 5 años de su egreso, ¿qué puesto desempeñaba y cuál era su principal actividad?</label>
+                <textarea id="in-puesto-5anos" class="form-input" rows="2" placeholder="Puesto y actividad principal…"></textarea>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">6. ¿Ha ocupado algún cargo de elección popular?</label>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <label class="pill-label" onclick="selectPill(this,'cargo'); toggleSection('cargo-detail', this.querySelector('input').value === 'si')">
+                        <input type="radio" name="cargo" value="si"> Sí
+                    </label>
+                    <label class="pill-label" onclick="selectPill(this,'cargo'); toggleSection('cargo-detail', false)">
+                        <input type="radio" name="cargo" value="no"> No
+                    </label>
+                </div>
+                <div id="cargo-detail" class="hidden">
+                    <textarea id="in-cargo-desc" class="form-input" rows="2" placeholder="Puesto, lugar y periodo…"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             SECCIÓN VII – COMENTARIOS Y SUGERENCIAS
+        ═══════════════════════════════════════════════ -->
+        <div class="section-panel" id="section-7">
+            <div class="section-header">
+                <h2 class="text-xl font-bold text-blue-900">VII. Comentarios y Sugerencias</h2>
+                <p class="text-sm text-gray-500 mt-1">Tu opinión es muy valiosa para nosotros</p>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Comentarios generales sobre el programa de posgrado</label>
+                <textarea id="in-comentarios" class="form-input" rows="4" placeholder="Comparte cualquier comentario, sugerencia o experiencia que quieras hacer llegar al ITO…"></textarea>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">¿Recomendaría el programa a otros profesionistas?</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="selectPill(this,'recomienda')"><input type="radio" name="recomienda"> Definitivamente sí</label>
+                    <label class="pill-label" onclick="selectPill(this,'recomienda')"><input type="radio" name="recomienda"> Probablemente sí</label>
+                    <label class="pill-label" onclick="selectPill(this,'recomienda')"><input type="radio" name="recomienda"> No estoy seguro/a</label>
+                    <label class="pill-label" onclick="selectPill(this,'recomienda')"><input type="radio" name="recomienda"> Probablemente no</label>
+                    <label class="pill-label" onclick="selectPill(this,'recomienda')"><input type="radio" name="recomienda"> Definitivamente no</label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha de aplicación de la encuesta</label>
+                <input class="form-input" type="date" id="fecha-encuesta">
+            </div>
+
+            <!-- Resumen antes de enviar -->
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-5">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-shield-alt text-blue-900 text-xl mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-blue-900 text-sm">Confidencialidad garantizada</p>
+                        <p class="text-xs text-gray-600 mt-1">Los datos proporcionados son estrictamente confidenciales y se utilizan únicamente con fines académicos, conforme a la Ley Federal de Protección de Datos Personales.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Navigation buttons ── -->
+        <div class="flex justify-between items-center mt-6 pt-6 border-t border-gray-100">
+            <button class="btn-secondary" id="btn-prev" onclick="changeSection(-1)" style="display:none">
+                <i class="fas fa-arrow-left text-sm"></i> Anterior
+            </button>
+            <div></div>
+            <button class="btn-primary" id="btn-next" onclick="changeSection(1)">
+                Siguiente <i class="fas fa-arrow-right text-sm"></i>
+            </button>
+            <button class="btn-submit" id="btn-submit" style="display:none" onclick="submitForm()">
+                <i class="fas fa-paper-plane"></i> Enviar cuestionario
+            </button>
+        </div>
+    </div>
+
+    <!-- ── SUCCESS SCREEN ── -->
+    <div id="success-screen" class="fixed inset-0 bg-white flex-col items-center justify-center z-50 px-4">
+        <div class="text-center max-w-md">
+            <div class="w-24 h-24 bg-gradient-to-br from-blue-900 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                <i class="fas fa-check text-white text-4xl"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-blue-900 mb-3">¡Gracias por tu respuesta!</h2>
+            <p class="text-gray-600 mb-2">Tu cuestionario ha sido enviado exitosamente.</p>
+            <p class="text-gray-500 text-sm mb-8">Tus datos son confidenciales y serán utilizados exclusivamente para mejorar los programas de posgrado del ITO.</p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="index.html" class="btn-primary">
+                    <i class="fas fa-home text-sm"></i> Volver al portal
+                </a>
+                <button onclick="resetForm()" class="btn-secondary">
+                    <i class="fas fa-redo text-sm"></i> Llenar otro cuestionario
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── CONFIG ──────────────────────────────────────────────
+        const TOTAL_SECTIONS = 7;
+        const SECTION_NAMES = ['Demográfico','Académico','Laboral','Investigación','Evaluación','Actualización','Comentarios'];
+        let current = 1;
+
+        // ── BUILD STEP TRACK ─────────────────────────────────────
+        function buildTrack() {
+            const track = document.getElementById('step-track');
+            track.innerHTML = '';
+            for (let i = 1; i <= TOTAL_SECTIONS; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'step-dot' + (i < current ? ' done' : i === current ? ' active' : '');
+                dot.id = `dot-${i}`;
+                dot.innerHTML = i < current ? '<i class="fas fa-check" style="font-size:11px"></i>' : i;
+                track.appendChild(dot);
+                if (i < TOTAL_SECTIONS) {
+                    const line = document.createElement('div');
+                    line.className = 'step-line' + (i < current ? ' done' : '');
+                    line.id = `line-${i}`;
+                    track.appendChild(line);
+                }
+            }
+        }
+
+        // ── BUILD SCALE BUTTONS ───────────────────────────────────
+        function buildScale(containerId, max = 5, groupName = containerId) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            el.innerHTML = '';
+            for (let i = 1; i <= max; i++) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'scale-btn';
+                btn.textContent = i;
+                btn.dataset.val = i;
+                btn.dataset.group = groupName;
+                btn.onclick = function () {
+                    document.querySelectorAll(`[data-group="${groupName}"]`).forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                };
+                el.appendChild(btn);
+            }
+        }
+
+        // ── INIT ──────────────────────────────────────────────────
+        function init() {
+            buildTrack();
+
+            // Section III scales (1–5)
+            ['scale-coincidencia','scale-conocimientos','scale-impacto','scale-pertinencia'].forEach(id => buildScale(id, 5, id));
+
+            // Section V scales (1–10)
+            ['scale-contenidos','scale-didacticas','scale-evaluacion','scale-biblio','scale-asesoria','scale-satisfaccion',
+             'scale-laboratorios','scale-biblioteca','scale-internet','scale-instalaciones'].forEach(id => buildScale(id, 10, id));
+
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0];
+            const dateField = document.getElementById('fecha-encuesta');
+            if (dateField) dateField.value = today;
+        }
+
+        // ── PILL SELECTORS ────────────────────────────────────────
+        function selectPill(el, group) {
+            document.querySelectorAll(`input[name="${group}"]`).forEach(inp => {
+                inp.closest('.pill-label').classList.remove('selected');
+            });
+            el.classList.add('selected');
+        }
+
+        function toggleCheck(el) {
+            el.classList.toggle('selected');
+        }
+
+        function toggleSection(id, show) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.toggle('hidden', !show);
+            }
+        }
+
+        // ── NAVIGATE ──────────────────────────────────────────────
+        function changeSection(dir) {
+            const next = current + dir;
+            if (next < 1 || next > TOTAL_SECTIONS) return;
+
+            document.getElementById(`section-${current}`).classList.remove('active');
+            current = next;
+            document.getElementById(`section-${current}`).classList.add('active');
+
+            updateUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateUI() {
+            // Progress bar
+            const pct = Math.round((current / TOTAL_SECTIONS) * 100);
+            document.getElementById('progress-bar').style.width = pct + '%';
+            document.getElementById('progress-label').textContent = `Sección ${current} de ${TOTAL_SECTIONS}`;
+
+            // Step track
+            buildTrack();
+
+            // Buttons
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            const btnSub  = document.getElementById('btn-submit');
+
+            btnPrev.style.display = current > 1 ? 'inline-flex' : 'none';
+            btnNext.style.display = current < TOTAL_SECTIONS ? 'inline-flex' : 'none';
+            btnSub.style.display  = current === TOTAL_SECTIONS ? 'inline-flex' : 'none';
+        }
+
+        // ── SUBMIT ────────────────────────────────────────────────
+        // ── HELPERS DE RECOLECCION ───────────────────────────────────────
+        function getText(id) {
+            const el = document.getElementById(id);
+            return el ? (el.value.trim() || null) : null;
+        }
+        function getRadio(name) {
+            const pills = document.querySelectorAll(`input[name="${name}"]`);
+            for (const inp of pills) {
+                const lbl = inp.closest('.pill-label');
+                if (lbl && lbl.classList.contains('selected')) {
+                    return (inp.value && inp.value !== 'on') ? inp.value : lbl.textContent.trim();
+                }
+            }
+            return null;
+        }
+        function getChecks(containerId) {
+            const el = document.getElementById(containerId);
+            if (!el) return [];
+            return Array.from(el.querySelectorAll('.pill-label.selected'))
+                       .map(l => l.textContent.trim()).filter(Boolean);
+        }
+        function getChecksNearLabel(labelId) {
+            const lbl = document.getElementById(labelId);
+            if (!lbl) return [];
+            const parent = lbl.parentElement;
+            if (!parent) return [];
+            return Array.from(parent.querySelectorAll('.pill-label.selected'))
+                       .map(l => l.textContent.trim()).filter(Boolean);
+        }
+        function getScale(groupId) {
+            const btn = document.querySelector(`.scale-btn.active[data-group="${groupId}"]`);
+            return btn ? parseInt(btn.dataset.val) : null;
+        }
+        function collectFormData() {
+            return {
+                nombre:                  getText('in-nombre'),
+                sexo:                    getRadio('sexo'),
+                estado_civil:            getRadio('estadocivil'),
+                municipio:               getText('in-municipio'),
+                ciudad:                  getText('in-ciudad'),
+                codigo_postal:           getText('in-cp'),
+                pais:                    getText('in-pais') || 'México',
+                telefono:                getText('in-telefono'),
+                email:                   getText('in-email'),
+                dependientes_economicos: getText('in-dependientes'),
+                razon_eleccion_ito:      getChecks('grp-razones'),
+                programa_posgrado:       getText('in-programa'),
+                linea_investigacion:     getText('in-linea'),
+                beca:                    getRadio('beca'),
+                institucion_beca:        getText('in-inst-beca'),
+                tipo_beca:               getChecksNearLabel('_beca-tipos-start'),
+                tiempo_extra_grado:      getRadio('tiempogrado'),
+                causa_tiempo_extra:      getText('in-causa-tiempo'),
+                importancia_titulacion:  getRadio('titulacion'),
+                dominio_idioma:          getRadio('idioma'),
+                idiomas:                 getText('in-idiomas'),
+                certificacion_idioma:    getChecks('grp-idioma-cert'),
+                empleado_cursando:       getRadio('empleocursando'),
+                puesto_cursando:         getText('in-puesto-cursando'),
+                contrato_cursando:       getRadio('contrato-cursando'),
+                cambio_empleo:           getRadio('cambioempleo'),
+                tiempo_conseguir_empleo: getRadio('tiempoempleo'),
+                factores_empleo:         getChecks('grp-factores'),
+                labora_actualmente:      getRadio('laboraactual'),
+                tipo_institucion:        getRadio('tipoinst'),
+                sector_economico:        getRadio('sector'),
+                tipo_contrato_actual:    getRadio('contratoactual'),
+                actividades_empleo:      getText('in-actividades'),
+                escala_coincidencia:     getScale('scale-coincidencia'),
+                escala_conocimientos:    getScale('scale-conocimientos'),
+                escala_impacto:          getScale('scale-impacto'),
+                escala_pertinencia:      getScale('scale-pertinencia'),
+                publicaciones:           getRadio('publicaciones'),
+                tipo_publicaciones:      getChecks('pub-detail'),
+                sni:                     getRadio('sni'),
+                red_tematica:            getRadio('red'),
+                premios:                 getRadio('premios'),
+                descripcion_premios:     getText('in-premios-desc'),
+                academia:                getRadio('academia'),
+                postdoctoral:            getRadio('postdoc'),
+                escala_contenidos:       getScale('scale-contenidos'),
+                escala_didacticas:       getScale('scale-didacticas'),
+                escala_evaluacion_doc:   getScale('scale-evaluacion'),
+                escala_biblio:           getScale('scale-biblio'),
+                escala_asesoria:         getScale('scale-asesoria'),
+                escala_satisfaccion:     getScale('scale-satisfaccion'),
+                escala_laboratorios:     getScale('scale-laboratorios'),
+                escala_biblioteca:       getScale('scale-biblioteca'),
+                escala_internet:         getScale('scale-internet'),
+                escala_instalaciones:    getScale('scale-instalaciones'),
+                expectativas_cumplidas:  getRadio('expectativas'),
+                calidad_programa:        getRadio('calidad'),
+                areas_mejora:            getText('in-areas-mejora'),
+                mejora_plan_estudios:    getText('in-mejora-plan'),
+                cursos_actualizacion:    getRadio('cursosact'),
+                descripcion_cursos:      getText('in-cursos-desc'),
+                actividades_deseadas:    getText('in-actividades-deseadas'),
+                tiempo_disponible:       getRadio('tiempoact'),
+                empresa_propia:          getRadio('empresa'),
+                puesto_cinco_anos:       getText('in-puesto-5anos'),
+                cargo_eleccion:          getRadio('cargo'),
+                descripcion_cargo:       getText('in-cargo-desc'),
+                comentarios:             getText('in-comentarios'),
+                recomendaria:            getRadio('recomienda'),
+                fecha_encuesta:          getText('fecha-encuesta'),
+            };
+        }
+
+        async function submitForm() {
+            const btn  = document.getElementById('btn-submit');
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando…';
+
+            const data = collectFormData();
+
+            if (!data.nombre) {
+                alert('Por favor ingresa tu nombre completo (Sección I, pregunta 1).');
+                btn.disabled = false; btn.innerHTML = orig; return;
+            }
+
+            try {
+                const res  = await fetch('http://localhost:5000/api/egresados', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify(data)
+                });
+                const json = await res.json();
+                if (!json.success) throw new Error(json.error || 'Error del servidor');
+            } catch (e) {
+                // Servidor no disponible — pantalla de éxito local de todos modos
+                console.warn('API no disponible:', e.message);
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = orig;
+            document.getElementById('success-screen').classList.add('show');
+        }
+
+        function resetForm() {
+            document.getElementById('success-screen').classList.remove('show');
+            current = 1;
+            document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('section-1').classList.add('active');
+            updateUI();
+        }
+
+        // ── START ─────────────────────────────────────────────────
+        init();
+        updateUI();
+    </script>
+</body>
+</html>

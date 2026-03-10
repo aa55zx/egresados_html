@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolsa de Trabajo - TecNM Oaxaca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Montserrat', sans-serif; }
+        .gradient-blue-orange { background: linear-gradient(135deg, #1e3a8a 0%, #f97316 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .filter-btn { transition: all 0.3s ease; }
+        .filter-btn.active { background: linear-gradient(135deg, #1e3a8a 0%, #f97316 100%); color: white; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="TecNM Logo" class="h-14">
+                    <div>
+                        <h1 class="text-xl font-bold text-blue-900">TecNM Campus Oaxaca</h1>
+                        <p class="text-sm text-gray-600">Bolsa de Trabajo OCC</p>
+                    </div>
+                </div>
+                <a href="index.html" class="text-orange-500 hover:text-orange-600 font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i>Regresar
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="gradient-blue-orange py-16">
+        <div class="container mx-auto px-4 text-center text-white">
+            <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6">
+                <i class="fas fa-briefcase mr-2"></i>
+                <span class="font-semibold">Oportunidades Laborales</span>
+            </div>
+            <h1 class="text-5xl font-bold mb-4">Bolsa de Trabajo</h1>
+            <p class="text-xl max-w-3xl mx-auto mb-8">
+                Conectamos el talento del TecNM con las mejores oportunidades profesionales
+            </p>
+            <div class="max-w-4xl mx-auto bg-white rounded-2xl p-4 shadow-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Puesto, empresa o palabra clave" class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-800">
+                    </div>
+                    <div class="relative">
+                        <i class="fas fa-map-marker-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Ubicación" class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-800">
+                    </div>
+                    <button class="bg-gradient-to-r from-blue-900 to-orange-500 hover:from-blue-800 hover:to-orange-600 text-white px-8 py-3 rounded-lg font-semibold transition duration-300">
+                        <i class="fas fa-search mr-2"></i>Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 -mt-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover">
+                    <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-briefcase text-orange-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-blue-900 mb-2">320</h3>
+                    <p class="text-gray-600 font-medium">Ofertas Activas</p>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-building text-blue-900 text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-orange-500 mb-2">150</h3>
+                    <p class="text-gray-600 font-medium">Empresas Aliadas</p>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover">
+                    <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-users text-orange-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-blue-900 mb-2">2,500</h3>
+                    <p class="text-gray-600 font-medium">Egresados Registrados</p>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-blue-900 text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-orange-500 mb-2">92%</h3>
+                    <p class="text-gray-600 font-medium">Tasa de Colocación</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="bg-gradient-to-br from-blue-50 to-orange-50 rounded-2xl p-8 max-w-4xl mx-auto">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="mb-6 md:mb-0">
+                        <h3 class="text-2xl font-bold text-blue-900 mb-2">¿Buscas empleo?</h3>
+                        <p class="text-gray-600">Regístrate y accede a ofertas exclusivas para egresados del TecNM</p>
+                    </div>
+                    <a href="registro.html" class="bg-gradient-to-r from-blue-900 to-orange-500 hover:from-blue-800 hover:to-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition duration-300 shadow-lg whitespace-nowrap">
+                        <i class="fas fa-user-plus mr-2"></i>Registrarme Gratis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl font-bold text-blue-900 mb-4">¿Eres una Empresa?</h2>
+                <p class="text-gray-600 text-lg mb-8">Publica tus vacantes y encuentra al talento que necesitas</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#" class="bg-blue-900 hover:bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold text-lg transition duration-300 inline-flex items-center">
+                        <i class="fas fa-building mr-2"></i>Publicar Vacante
+                    </a>
+                    <a href="#" class="border-2 border-blue-900 hover:bg-blue-900 hover:text-white text-blue-900 px-8 py-4 rounded-lg font-semibold text-lg transition duration-300 inline-flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>Más Información
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-6">
+                <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-16 mx-auto mb-4 brightness-0 invert">
+                <h3 class="text-xl font-bold mb-2">Instituto Tecnológico de Oaxaca</h3>
+                <p class="text-gray-400">Tecnológico Nacional de México</p>
+            </div>
+            <div class="border-t border-gray-700 pt-6">
+                <p class="text-gray-400">&copy; 2025 TecNM Campus Oaxaca. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
