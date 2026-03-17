@@ -9,184 +9,170 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
         * { font-family: 'Montserrat', sans-serif; }
-        .gradient-blue-orange { background: linear-gradient(135deg, #1e3a8a 0%, #f97316 100%); }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-        .credential-card {
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-            border: 3px solid #f97316;
-            position: relative;
-            overflow: hidden;
-        }
-        .credential-card::before {
-            content: '';
-            position: absolute;
-            top: -50%; right: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(249,115,22,0.1) 0%, transparent 70%);
-            animation: pulse 3s ease-in-out infinite;
-        }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .req-card { transition: border-color 0.2s; }
+        .req-card:hover { border-color: #f97316; }
     </style>
 </head>
 <body class="bg-gray-50">
-    <nav class="bg-white shadow-lg">
+    <nav class="bg-white border-b border-gray-200">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-4">
-                    <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="TecNM Logo" class="h-14">
+                    <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="TecNM Logo" class="h-12">
                     <div>
-                        <h1 class="text-xl font-bold text-blue-900">TecNM Campus Oaxaca</h1>
-                        <p class="text-sm text-gray-600">Credencial de Egresado</p>
+                        <h1 class="text-lg font-bold text-blue-900">TecNM Campus Oaxaca</h1>
+                        <p class="text-xs text-gray-500">Credencial de Egresado</p>
                     </div>
                 </div>
-                <a href="index.html" class="text-orange-500 hover:text-orange-600 font-semibold">
+                <a href="index.html" class="text-orange-500 hover:text-orange-600 font-semibold text-sm">
                     <i class="fas fa-arrow-left mr-2"></i>Regresar
                 </a>
             </div>
         </div>
     </nav>
 
-    <section class="gradient-blue-orange py-16">
+    <section class="bg-blue-900 py-16">
         <div class="container mx-auto px-4 text-center text-white">
-            <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6">
-                <i class="fas fa-id-card mr-2"></i>
-                <span class="font-semibold">Solicitud de Credencial</span>
-            </div>
-            <h1 class="text-5xl font-bold mb-4">Credencial de Egresado</h1>
-            <p class="text-xl max-w-3xl mx-auto">Obtén tu identificación oficial como egresado del Tecnológico Nacional de México Campus Oaxaca</p>
+            <p class="text-orange-400 font-semibold text-xs uppercase tracking-widest mb-3">Solicitud de Credencial</p>
+            <h1 class="text-4xl font-bold mb-3">Credencial de Egresado</h1>
+            <p class="text-blue-200 max-w-2xl mx-auto text-sm">Obtén tu identificación oficial como egresado del Tecnológico Nacional de México Campus Oaxaca</p>
         </div>
     </section>
 
+    <!-- Preview + beneficios -->
     <section class="py-16">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-                <div class="flex items-center justify-center">
-                    <div class="credential-card rounded-2xl p-8 w-full max-w-md shadow-2xl">
-                        <div class="relative z-10">
-                            <div class="flex justify-between items-start mb-6">
-                                <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-16 brightness-0 invert">
-                                <div class="text-right text-white">
-                                    <p class="text-sm font-semibold">TECNOLÓGICO NACIONAL</p>
-                                    <p class="text-xs">DE MÉXICO</p>
-                                </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 mb-16 items-center">
+                <!-- Credencial preview -->
+                <div class="flex justify-center">
+                    <div class="bg-blue-900 rounded-xl p-7 w-full max-w-sm border-2 border-orange-500">
+                        <div class="flex justify-between items-start mb-5">
+                            <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-14 brightness-0 invert">
+                            <div class="text-right text-white text-xs">
+                                <p class="font-semibold">TECNOLÓGICO NACIONAL</p>
+                                <p class="text-blue-300">DE MÉXICO</p>
                             </div>
-                            <div class="bg-white rounded-lg p-1 mb-4 inline-block">
-                                <div class="w-24 h-32 bg-gray-200 rounded flex items-center justify-center">
-                                    <i class="fas fa-user text-gray-400 text-4xl"></i>
-                                </div>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-1 mb-5 inline-block border border-white/20">
+                            <div class="w-20 h-28 bg-white/20 rounded flex items-center justify-center">
+                                <i class="fas fa-user text-white/60 text-3xl"></i>
                             </div>
-                            <div class="text-white space-y-2">
+                        </div>
+                        <div class="text-white space-y-2">
+                            <div>
+                                <p class="text-xs text-orange-400 font-semibold uppercase tracking-wide">Nombre</p>
+                                <p class="font-bold">JUAN PÉREZ GARCÍA</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-orange-400 font-semibold uppercase tracking-wide">Carrera</p>
+                                <p class="text-sm">ING. EN SISTEMAS COMPUTACIONALES</p>
+                            </div>
+                            <div class="flex justify-between pt-1">
                                 <div>
-                                    <p class="text-xs text-orange-300 font-semibold">NOMBRE</p>
-                                    <p class="text-lg font-bold">JUAN PÉREZ GARCÍA</p>
+                                    <p class="text-xs text-orange-400 font-semibold uppercase tracking-wide">Matrícula</p>
+                                    <p class="text-sm font-mono">19080XXX</p>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-orange-300 font-semibold">CARRERA</p>
-                                    <p class="text-sm">ING. EN SISTEMAS COMPUTACIONALES</p>
-                                </div>
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="text-xs text-orange-300 font-semibold">MATRÍCULA</p>
-                                        <p class="text-sm font-mono">19080XXX</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-orange-300 font-semibold">GENERACIÓN</p>
-                                        <p class="text-sm">2019-2023</p>
-                                    </div>
+                                    <p class="text-xs text-orange-400 font-semibold uppercase tracking-wide">Generación</p>
+                                    <p class="text-sm">2019–2023</p>
                                 </div>
                             </div>
-                            <div class="mt-6 pt-4 border-t border-white/30">
-                                <p class="text-xs text-white/80 text-center">Instituto Tecnológico de Oaxaca</p>
-                            </div>
+                        </div>
+                        <div class="mt-5 pt-4 border-t border-white/20">
+                            <p class="text-xs text-white/60 text-center">Instituto Tecnológico de Oaxaca</p>
                         </div>
                     </div>
                 </div>
 
+                <!-- Beneficios -->
                 <div>
-                    <h2 class="text-3xl font-bold text-blue-900 mb-6">Beneficios de tu Credencial</h2>
-                    <div class="space-y-4 mb-8">
-                        <div class="flex items-start bg-orange-50 rounded-lg p-4">
-                            <div class="bg-orange-500 rounded-lg p-3 mr-4"><i class="fas fa-check text-white text-xl"></i></div>
-                            <div><h3 class="font-bold text-gray-800 mb-1">Identificación Oficial</h3><p class="text-gray-600 text-sm">Documento que te identifica como egresado del TecNM</p></div>
+                    <p class="text-orange-500 font-semibold text-xs uppercase tracking-widest mb-2">¿Para qué sirve?</p>
+                    <h2 class="text-2xl font-bold text-blue-900 mb-6">Beneficios de tu Credencial</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4 p-4 border border-gray-200 rounded-lg">
+                            <div class="bg-orange-500 w-10 h-10 rounded flex items-center justify-center flex-shrink-0"><i class="fas fa-check text-white text-sm"></i></div>
+                            <div><h3 class="font-semibold text-gray-900 text-sm mb-0.5">Identificación Oficial</h3><p class="text-gray-500 text-xs">Documento que te identifica como egresado del TecNM</p></div>
                         </div>
-                        <div class="flex items-start bg-blue-50 rounded-lg p-4">
-                            <div class="bg-blue-900 rounded-lg p-3 mr-4"><i class="fas fa-building text-white text-xl"></i></div>
-                            <div><h3 class="font-bold text-gray-800 mb-1">Acceso a Instalaciones</h3><p class="text-gray-600 text-sm">Ingreso a biblioteca, laboratorios y áreas deportivas</p></div>
+                        <div class="flex items-start gap-4 p-4 border border-gray-200 rounded-lg">
+                            <div class="bg-blue-900 w-10 h-10 rounded flex items-center justify-center flex-shrink-0"><i class="fas fa-building text-white text-sm"></i></div>
+                            <div><h3 class="font-semibold text-gray-900 text-sm mb-0.5">Acceso a Instalaciones</h3><p class="text-gray-500 text-xs">Ingreso a biblioteca, laboratorios y áreas deportivas</p></div>
                         </div>
-                        <div class="flex items-start bg-orange-50 rounded-lg p-4">
-                            <div class="bg-orange-500 rounded-lg p-3 mr-4"><i class="fas fa-percentage text-white text-xl"></i></div>
-                            <div><h3 class="font-bold text-gray-800 mb-1">Descuentos Exclusivos</h3><p class="text-gray-600 text-sm">Beneficios en comercios afiliados y eventos del TecNM</p></div>
+                        <div class="flex items-start gap-4 p-4 border border-gray-200 rounded-lg">
+                            <div class="bg-orange-500 w-10 h-10 rounded flex items-center justify-center flex-shrink-0"><i class="fas fa-percentage text-white text-sm"></i></div>
+                            <div><h3 class="font-semibold text-gray-900 text-sm mb-0.5">Descuentos Exclusivos</h3><p class="text-gray-500 text-xs">Beneficios en comercios afiliados y eventos del TecNM</p></div>
                         </div>
-                        <div class="flex items-start bg-blue-50 rounded-lg p-4">
-                            <div class="bg-blue-900 rounded-lg p-3 mr-4"><i class="fas fa-users text-white text-xl"></i></div>
-                            <div><h3 class="font-bold text-gray-800 mb-1">Red de Egresados</h3><p class="text-gray-600 text-sm">Conexión con la comunidad de ex alumnos del instituto</p></div>
+                        <div class="flex items-start gap-4 p-4 border border-gray-200 rounded-lg">
+                            <div class="bg-blue-900 w-10 h-10 rounded flex items-center justify-center flex-shrink-0"><i class="fas fa-users text-white text-sm"></i></div>
+                            <div><h3 class="font-semibold text-gray-900 text-sm mb-0.5">Red de Egresados</h3><p class="text-gray-500 text-xs">Conexión con la comunidad de ex alumnos del instituto</p></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
-                <h2 class="text-3xl font-bold text-blue-900 mb-8 text-center">Requisitos para Solicitar tu Credencial</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-orange-50 rounded-xl card-hover">
-                        <div class="bg-blue-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-file-alt text-white text-2xl"></i></div>
-                        <h3 class="font-bold text-gray-800 mb-2">Solicitud</h3>
-                        <p class="text-gray-600 text-sm">Formato de solicitud debidamente llenado</p>
-                    </div>
-                    <div class="text-center p-6 bg-gradient-to-br from-orange-50 to-blue-50 rounded-xl card-hover">
-                        <div class="bg-orange-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-id-card text-white text-2xl"></i></div>
-                        <h3 class="font-bold text-gray-800 mb-2">Identificación</h3>
-                        <p class="text-gray-600 text-sm">Copia de identificación oficial vigente (INE/Pasaporte)</p>
-                    </div>
-                    <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-orange-50 rounded-xl card-hover">
-                        <div class="bg-blue-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-camera text-white text-2xl"></i></div>
-                        <h3 class="font-bold text-gray-800 mb-2">Fotografías</h3>
-                        <p class="text-gray-600 text-sm">2 fotografías tamaño credencial, fondo blanco, recientes</p>
-                    </div>
-                    <div class="text-center p-6 bg-gradient-to-br from-orange-50 to-blue-50 rounded-xl card-hover">
-                        <div class="bg-orange-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-graduation-cap text-white text-2xl"></i></div>
-                        <h3 class="font-bold text-gray-800 mb-2">Certificado</h3>
-                        <p class="text-gray-600 text-sm">Copia del certificado de estudios o carta de terminación</p>
-                    </div>
-                    <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-orange-50 rounded-xl card-hover">
-                        <div class="bg-blue-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-money-bill-wave text-white text-2xl"></i></div>
-                        <h3 class="font-bold text-gray-800 mb-2">Pago</h3>
-                        <p class="text-gray-600 text-sm">Comprobante de pago de derechos ($150.00 MXN)</p>
-                    </div>
-                    <div class="text-center p-6 bg-gradient-to-br from-orange-50 to-blue-50 rounded-xl card-hover">
-                        <div class="bg-orange-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-envelope text-white text-2xl"></i></div>
-                        <h3 class="font-bold text-gray-800 mb-2">Comprobante</h3>
-                        <p class="text-gray-600 text-sm">Comprobante de domicilio no mayor a 3 meses</p>
-                    </div>
+            <!-- Requisitos -->
+            <div class="border-t border-gray-100 pt-14">
+                <div class="text-center mb-10">
+                    <p class="text-orange-500 font-semibold text-xs uppercase tracking-widest mb-2">Documentación</p>
+                    <h2 class="text-2xl font-bold text-blue-900">Requisitos para Solicitar tu Credencial</h2>
                 </div>
-            </div>
-
-            <div class="bg-gradient-to-br from-blue-900 to-orange-500 rounded-2xl p-12 text-center text-white">
-                <i class="fas fa-file-download text-6xl mb-6 opacity-80"></i>
-                <h2 class="text-3xl font-bold mb-4">Descarga el Formato</h2>
-                <p class="text-xl mb-8 max-w-2xl mx-auto">Obtén el formato de solicitud de credencial y comienza tu trámite hoy mismo</p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <a href="#" class="bg-white hover:bg-gray-100 text-blue-900 px-8 py-4 rounded-lg font-semibold text-lg transition duration-300 inline-flex items-center">
-                        <i class="fas fa-file-pdf mr-2"></i>Descargar Formato PDF
-                    </a>
-                    <a href="index.html#contacto" class="border-2 border-white hover:bg-white hover:text-blue-900 text-white px-8 py-4 rounded-lg font-semibold text-lg transition duration-300 inline-flex items-center">
-                        <i class="fas fa-envelope mr-2"></i>Contactar
-                    </a>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="req-card bg-white border border-gray-200 rounded-lg p-5 text-center">
+                        <div class="bg-blue-900 w-12 h-12 rounded flex items-center justify-center mx-auto mb-3"><i class="fas fa-file-alt text-white"></i></div>
+                        <h3 class="font-semibold text-gray-900 text-sm mb-1">Solicitud</h3>
+                        <p class="text-gray-500 text-xs">Formato de solicitud debidamente llenado</p>
+                    </div>
+                    <div class="req-card bg-white border border-gray-200 rounded-lg p-5 text-center">
+                        <div class="bg-orange-500 w-12 h-12 rounded flex items-center justify-center mx-auto mb-3"><i class="fas fa-id-card text-white"></i></div>
+                        <h3 class="font-semibold text-gray-900 text-sm mb-1">Identificación</h3>
+                        <p class="text-gray-500 text-xs">Copia de identificación oficial vigente (INE/Pasaporte)</p>
+                    </div>
+                    <div class="req-card bg-white border border-gray-200 rounded-lg p-5 text-center">
+                        <div class="bg-blue-900 w-12 h-12 rounded flex items-center justify-center mx-auto mb-3"><i class="fas fa-camera text-white"></i></div>
+                        <h3 class="font-semibold text-gray-900 text-sm mb-1">Fotografías</h3>
+                        <p class="text-gray-500 text-xs">2 fotografías tamaño credencial, fondo blanco, recientes</p>
+                    </div>
+                    <div class="req-card bg-white border border-gray-200 rounded-lg p-5 text-center">
+                        <div class="bg-orange-500 w-12 h-12 rounded flex items-center justify-center mx-auto mb-3"><i class="fas fa-graduation-cap text-white"></i></div>
+                        <h3 class="font-semibold text-gray-900 text-sm mb-1">Certificado</h3>
+                        <p class="text-gray-500 text-xs">Copia del certificado de estudios o carta de terminación</p>
+                    </div>
+                    <div class="req-card bg-white border border-gray-200 rounded-lg p-5 text-center">
+                        <div class="bg-blue-900 w-12 h-12 rounded flex items-center justify-center mx-auto mb-3"><i class="fas fa-money-bill-wave text-white"></i></div>
+                        <h3 class="font-semibold text-gray-900 text-sm mb-1">Pago</h3>
+                        <p class="text-gray-500 text-xs">Comprobante de pago de derechos ($150.00 MXN)</p>
+                    </div>
+                    <div class="req-card bg-white border border-gray-200 rounded-lg p-5 text-center">
+                        <div class="bg-orange-500 w-12 h-12 rounded flex items-center justify-center mx-auto mb-3"><i class="fas fa-envelope text-white"></i></div>
+                        <h3 class="font-semibold text-gray-900 text-sm mb-1">Comprobante</h3>
+                        <p class="text-gray-500 text-xs">Comprobante de domicilio no mayor a 3 meses</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="container mx-auto px-4 text-center">
-            <div class="mb-6">
-                <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-16 mx-auto mb-4 brightness-0 invert">
-                <h3 class="text-xl font-bold mb-2">Instituto Tecnológico de Oaxaca</h3>
-                <p class="text-gray-400">Tecnológico Nacional de México</p>
+    <!-- CTA descarga -->
+    <section class="py-16 bg-blue-900">
+        <div class="container mx-auto px-4 text-center text-white">
+            <h2 class="text-2xl font-bold mb-3">Descarga el Formato</h2>
+            <p class="text-blue-200 text-sm mb-7 max-w-lg mx-auto">Obtén el formato de solicitud de credencial y comienza tu trámite hoy mismo.</p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="#" class="bg-white hover:bg-gray-100 text-blue-900 px-7 py-3 rounded font-semibold text-sm transition inline-flex items-center">
+                    <i class="fas fa-file-pdf mr-2"></i>Descargar Formato PDF
+                </a>
+                <a href="index.html#contacto" class="border border-white/50 hover:border-white text-white px-7 py-3 rounded font-semibold text-sm transition inline-flex items-center">
+                    <i class="fas fa-envelope mr-2"></i>Contactar
+                </a>
             </div>
-            <div class="border-t border-gray-700 pt-6">
-                <p class="text-gray-400">&copy; 2025 TecNM Campus Oaxaca. Todos los derechos reservados.</p>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 text-white py-10">
+        <div class="container mx-auto px-4 text-center">
+            <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-14 mx-auto mb-4 brightness-0 invert">
+            <p class="text-gray-400 text-sm mb-1">Instituto Tecnológico de Oaxaca</p>
+            <div class="border-t border-gray-800 mt-6 pt-6">
+                <p class="text-gray-500 text-xs">&copy; 2025 TecNM Campus Oaxaca. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>

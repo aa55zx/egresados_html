@@ -9,52 +9,46 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
         * { font-family: 'Montserrat', sans-serif; }
-        .gradient-blue-orange { background: linear-gradient(135deg, #1e3a8a 0%, #f97316 100%); }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-        .filter-btn { transition: all 0.3s ease; }
-        .filter-btn.active { background: linear-gradient(135deg, #1e3a8a 0%, #f97316 100%); color: white; }
+        .job-card { transition: border-color 0.2s; }
+        .job-card:hover { border-color: #1e3a8a; }
+        .filter-btn { transition: all 0.2s; border: 1px solid #e5e7eb; }
+        .filter-btn.active, .filter-btn:hover { background: #1e3a8a; color: white; border-color: #1e3a8a; }
     </style>
 </head>
 <body class="bg-gray-50">
-    <nav class="bg-white shadow-lg">
+    <nav class="bg-white border-b border-gray-200">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-4">
-                    <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="TecNM Logo" class="h-14">
+                    <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="TecNM Logo" class="h-12">
                     <div>
-                        <h1 class="text-xl font-bold text-blue-900">TecNM Campus Oaxaca</h1>
-                        <p class="text-sm text-gray-600">Bolsa de Trabajo OCC</p>
+                        <h1 class="text-lg font-bold text-blue-900">TecNM Campus Oaxaca</h1>
+                        <p class="text-xs text-gray-500">Bolsa de Trabajo OCC</p>
                     </div>
                 </div>
-                <a href="index.html" class="text-orange-500 hover:text-orange-600 font-semibold">
+                <a href="index.html" class="text-orange-500 hover:text-orange-600 font-semibold text-sm">
                     <i class="fas fa-arrow-left mr-2"></i>Regresar
                 </a>
             </div>
         </div>
     </nav>
 
-    <section class="gradient-blue-orange py-16">
+    <section class="bg-blue-900 py-16">
         <div class="container mx-auto px-4 text-center text-white">
-            <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6">
-                <i class="fas fa-briefcase mr-2"></i>
-                <span class="font-semibold">Oportunidades Laborales</span>
-            </div>
-            <h1 class="text-5xl font-bold mb-4">Bolsa de Trabajo</h1>
-            <p class="text-xl max-w-3xl mx-auto mb-8">
-                Conectamos el talento del TecNM con las mejores oportunidades profesionales
-            </p>
-            <div class="max-w-4xl mx-auto bg-white rounded-2xl p-4 shadow-2xl">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <p class="text-orange-400 font-semibold text-xs uppercase tracking-widest mb-3">Oportunidades Laborales</p>
+            <h1 class="text-4xl font-bold mb-3">Bolsa de Trabajo</h1>
+            <p class="text-blue-200 max-w-2xl mx-auto text-sm mb-8">Conectamos el talento del TecNM con las mejores oportunidades profesionales</p>
+            <div class="max-w-3xl mx-auto bg-white rounded-lg p-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div class="relative">
-                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" placeholder="Puesto, empresa o palabra clave" class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-800">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="text" placeholder="Puesto, empresa o palabra clave" class="w-full pl-9 pr-4 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm text-gray-800">
                     </div>
                     <div class="relative">
-                        <i class="fas fa-map-marker-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" placeholder="Ubicación" class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-800">
+                        <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="text" placeholder="Ubicación" class="w-full pl-9 pr-4 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm text-gray-800">
                     </div>
-                    <button class="bg-gradient-to-r from-blue-900 to-orange-500 hover:from-blue-800 hover:to-orange-600 text-white px-8 py-3 rounded-lg font-semibold transition duration-300">
+                    <button class="bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded font-semibold text-sm transition">
                         <i class="fas fa-search mr-2"></i>Buscar
                     </button>
                 </div>
@@ -62,83 +56,170 @@
         </div>
     </section>
 
-    <section class="py-12 -mt-6">
+    <!-- Stats -->
+    <section class="py-8 bg-white border-b border-gray-100">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover">
-                    <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-briefcase text-orange-500 text-2xl"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-blue-900 mb-2">320</h3>
-                    <p class="text-gray-600 font-medium">Ofertas Activas</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-gray-200">
+                <div class="text-center px-4">
+                    <h3 class="text-3xl font-bold text-blue-900">320</h3>
+                    <p class="text-gray-500 text-xs mt-1">Ofertas Activas</p>
                 </div>
-                <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover">
-                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-building text-blue-900 text-2xl"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-orange-500 mb-2">150</h3>
-                    <p class="text-gray-600 font-medium">Empresas Aliadas</p>
+                <div class="text-center px-4">
+                    <h3 class="text-3xl font-bold text-orange-500">150</h3>
+                    <p class="text-gray-500 text-xs mt-1">Empresas Aliadas</p>
                 </div>
-                <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover">
-                    <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-users text-orange-500 text-2xl"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-blue-900 mb-2">2,500</h3>
-                    <p class="text-gray-600 font-medium">Egresados Registrados</p>
+                <div class="text-center px-4">
+                    <h3 class="text-3xl font-bold text-blue-900">2,500</h3>
+                    <p class="text-gray-500 text-xs mt-1">Egresados Registrados</p>
                 </div>
-                <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover">
-                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-chart-line text-blue-900 text-2xl"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-orange-500 mb-2">92%</h3>
-                    <p class="text-gray-600 font-medium">Tasa de Colocación</p>
+                <div class="text-center px-4">
+                    <h3 class="text-3xl font-bold text-orange-500">92%</h3>
+                    <p class="text-gray-500 text-xs mt-1">Tasa de Colocación</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-12 bg-white">
+    <!-- CTA registro -->
+    <section class="py-8 bg-gray-50 border-b border-gray-100">
         <div class="container mx-auto px-4">
-            <div class="bg-gradient-to-br from-blue-50 to-orange-50 rounded-2xl p-8 max-w-4xl mx-auto">
-                <div class="flex flex-col md:flex-row items-center justify-between">
-                    <div class="mb-6 md:mb-0">
-                        <h3 class="text-2xl font-bold text-blue-900 mb-2">¿Buscas empleo?</h3>
-                        <p class="text-gray-600">Regístrate y accede a ofertas exclusivas para egresados del TecNM</p>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-blue-900 mb-1">¿Buscas empleo?</h3>
+                    <p class="text-gray-500 text-sm">Regístrate y accede a ofertas exclusivas para egresados del TecNM</p>
+                </div>
+                <a href="registro.html" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded font-semibold text-sm transition whitespace-nowrap">
+                    <i class="fas fa-user-plus mr-2"></i>Registrarme Gratis
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filtros de categoría -->
+    <section class="py-6 bg-white border-b border-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap gap-2">
+                <button class="filter-btn active px-4 py-1.5 rounded text-sm font-medium">Todos</button>
+                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600">Tecnología</button>
+                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600">Industrial</button>
+                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600">Electrónica</button>
+                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600">Gestión</button>
+                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600">Mecatrónica</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ofertas -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-orange-500 rounded-lg p-5">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-orange-50 w-11 h-11 rounded flex items-center justify-center"><i class="fas fa-code text-orange-500"></i></div>
+                            <div><h3 class="font-bold text-gray-900">Desarrollador Full Stack</h3><p class="text-gray-500 text-xs">TechSolutions SA de CV</p></div>
+                        </div>
+                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Nuevo</span>
                     </div>
-                    <a href="registro.html" class="bg-gradient-to-r from-blue-900 to-orange-500 hover:from-blue-800 hover:to-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition duration-300 shadow-lg whitespace-nowrap">
-                        <i class="fas fa-user-plus mr-2"></i>Registrarme Gratis
-                    </a>
+                    <p class="text-gray-600 text-sm mb-3">Desarrollador con experiencia en React, Node.js y bases de datos SQL/NoSQL.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-3">
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">React</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Node.js</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">MongoDB</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-gray-500">
+                        <div class="flex gap-3"><span><i class="fas fa-map-marker-alt mr-1"></i>Oaxaca</span><span><i class="fas fa-dollar-sign mr-1"></i>$25k–$35k</span></div>
+                        <button class="text-orange-500 font-semibold">Ver detalles →</button>
+                    </div>
                 </div>
+
+                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-blue-900 rounded-lg p-5">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-50 w-11 h-11 rounded flex items-center justify-center"><i class="fas fa-industry text-blue-900"></i></div>
+                            <div><h3 class="font-bold text-gray-900">Ingeniero Industrial</h3><p class="text-gray-500 text-xs">Manufactura del Sureste</p></div>
+                        </div>
+                        <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-semibold">Urgente</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">Optimización de procesos y gestión de calidad en planta industrial.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-3">
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Six Sigma</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Lean</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">ISO 9001</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-gray-500">
+                        <div class="flex gap-3"><span><i class="fas fa-map-marker-alt mr-1"></i>Salina Cruz</span><span><i class="fas fa-dollar-sign mr-1"></i>$28k–$38k</span></div>
+                        <button class="text-blue-900 font-semibold">Ver detalles →</button>
+                    </div>
+                </div>
+
+                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-orange-500 rounded-lg p-5">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-orange-50 w-11 h-11 rounded flex items-center justify-center"><i class="fas fa-shield-alt text-orange-500"></i></div>
+                            <div><h3 class="font-bold text-gray-900">Analista de Ciberseguridad</h3><p class="text-gray-500 text-xs">SecureNet MX</p></div>
+                        </div>
+                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">Remoto</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">Monitoreo y respuesta a incidentes de seguridad en infraestructura crítica.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-3">
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">SIEM</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Pentesting</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Python</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-gray-500">
+                        <div class="flex gap-3"><span><i class="fas fa-map-marker-alt mr-1"></i>Remoto</span><span><i class="fas fa-dollar-sign mr-1"></i>$30k–$45k</span></div>
+                        <button class="text-orange-500 font-semibold">Ver detalles →</button>
+                    </div>
+                </div>
+
+                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-blue-900 rounded-lg p-5">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-50 w-11 h-11 rounded flex items-center justify-center"><i class="fas fa-robot text-blue-900"></i></div>
+                            <div><h3 class="font-bold text-gray-900">Ingeniero Mecatrónico</h3><p class="text-gray-500 text-xs">AutoTech Oaxaca</p></div>
+                        </div>
+                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Nuevo</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">Diseño y mantenimiento de sistemas automatizados en líneas de producción.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-3">
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">PLC</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Robótica</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">AutoCAD</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-gray-500">
+                        <div class="flex gap-3"><span><i class="fas fa-map-marker-alt mr-1"></i>Oaxaca</span><span><i class="fas fa-dollar-sign mr-1"></i>$22k–$32k</span></div>
+                        <button class="text-blue-900 font-semibold">Ver detalles →</button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <section class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto text-center">
-                <h2 class="text-4xl font-bold text-blue-900 mb-4">¿Eres una Empresa?</h2>
-                <p class="text-gray-600 text-lg mb-8">Publica tus vacantes y encuentra al talento que necesitas</p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <a href="#" class="bg-blue-900 hover:bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold text-lg transition duration-300 inline-flex items-center">
-                        <i class="fas fa-building mr-2"></i>Publicar Vacante
-                    </a>
-                    <a href="#" class="border-2 border-blue-900 hover:bg-blue-900 hover:text-white text-blue-900 px-8 py-4 rounded-lg font-semibold text-lg transition duration-300 inline-flex items-center">
-                        <i class="fas fa-info-circle mr-2"></i>Más Información
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="bg-gray-900 text-white py-12">
+    <!-- Empresas -->
+    <section class="py-16 bg-gray-50 border-t border-gray-100">
         <div class="container mx-auto px-4 text-center">
-            <div class="mb-6">
-                <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-16 mx-auto mb-4 brightness-0 invert">
-                <h3 class="text-xl font-bold mb-2">Instituto Tecnológico de Oaxaca</h3>
-                <p class="text-gray-400">Tecnológico Nacional de México</p>
+            <h2 class="text-2xl font-bold text-blue-900 mb-3">¿Eres una Empresa?</h2>
+            <p class="text-gray-500 text-sm mb-6 max-w-md mx-auto">Publica tus vacantes y encuentra el talento que necesitas entre nuestros egresados.</p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="#" class="bg-blue-900 hover:bg-blue-800 text-white px-7 py-3 rounded font-semibold text-sm transition inline-flex items-center">
+                    <i class="fas fa-building mr-2"></i>Publicar Vacante
+                </a>
+                <a href="#" class="border border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white px-7 py-3 rounded font-semibold text-sm transition inline-flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>Más Información
+                </a>
             </div>
-            <div class="border-t border-gray-700 pt-6">
-                <p class="text-gray-400">&copy; 2025 TecNM Campus Oaxaca. Todos los derechos reservados.</p>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 text-white py-10">
+        <div class="container mx-auto px-4 text-center">
+            <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-14 mx-auto mb-4 brightness-0 invert">
+            <p class="text-gray-400 text-sm mb-1">Instituto Tecnológico de Oaxaca</p>
+            <div class="border-t border-gray-800 mt-6 pt-6">
+                <p class="text-gray-500 text-xs">&copy; 2025 TecNM Campus Oaxaca. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
