@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="auth.js"></script>
     <style>
         * { font-family: 'Montserrat', sans-serif; }
 
@@ -63,9 +64,10 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <a href="index.html" class="text-orange-500 hover:text-orange-600 font-semibold text-sm">
-                    <i class="fas fa-arrow-left mr-1"></i>Regresar al Portal
+                <a href="index.html" class="text-gray-500 hover:text-orange-500 font-semibold text-sm">
+                    <i class="fas fa-arrow-left mr-1"></i>Portal
                 </a>
+                <div id="nav-auth-area"></div>
             </div>
         </div>
     </div>
@@ -573,8 +575,13 @@ document.getElementById('modal-overlay').addEventListener('click', function(e) {
 // ──────────────────────────────────────────────────────────────────────────────
 // Init
 // ──────────────────────────────────────────────────────────────────────────────
-loadStats();
-loadEgresados(1);
+// ── Auth init ──────────────────────────────────────
+(async () => {
+    const user = await requireAuth(
+        () => { loadStats(); loadEgresados(1); },
+        null
+    );
+})();
 </script>
 </body>
 </html>

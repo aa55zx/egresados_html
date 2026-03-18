@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - TecNM Oaxaca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Montserrat', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Nav -->
+    <nav class="bg-white border-b border-gray-200 fixed w-full z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center gap-4">
+                    <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-11">
+                    <div>
+                        <h1 class="text-base font-bold text-blue-900">TecNM Campus Oaxaca</h1>
+                        <p class="text-xs text-gray-400">Panel de Administración</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="text-gray-500 hover:text-orange-500 text-sm font-medium flex items-center gap-1.5">
+                        <i class="fas fa-arrow-left text-xs"></i>Portal
+                    </a>
+                    <div id="nav-auth-area"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido protegido -->
+    <div id="protected-content" class="hidden pt-20">
+
+        <!-- Header -->
+        <div class="bg-blue-900 py-10">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="text-white">
+                        <p class="text-orange-400 text-xs font-semibold uppercase tracking-widest mb-1">Administración</p>
+                        <h1 class="text-3xl font-bold">Panel de Control</h1>
+                        <p class="text-blue-300 text-sm mt-1">Gestión de usuarios y accesos al portal</p>
+                    </div>
+                    <button onclick="openCreateModal()"
+                        class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded font-semibold text-sm transition flex items-center gap-2 self-start md:self-auto">
+                        <i class="fas fa-user-plus"></i>Nuevo Usuario
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats rápidas -->
+        <div class="bg-white border-b border-gray-100">
+            <div class="container mx-auto px-4 py-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-gray-200">
+                    <div class="text-center px-4">
+                        <p id="stat-total" class="text-3xl font-bold text-blue-900">–</p>
+                        <p class="text-gray-500 text-xs mt-0.5">Usuarios totales</p>
+                    </div>
+                    <div class="text-center px-4">
+                        <p id="stat-egresados" class="text-3xl font-bold text-orange-500">–</p>
+                        <p class="text-gray-500 text-xs mt-0.5">Egresados</p>
+                    </div>
+                    <div class="text-center px-4">
+                        <p id="stat-admins" class="text-3xl font-bold text-blue-900">–</p>
+                        <p class="text-gray-500 text-xs mt-0.5">Administradores</p>
+                    </div>
+                    <div class="text-center px-4">
+                        <p id="stat-encuestas" class="text-3xl font-bold text-orange-500">–</p>
+                        <p class="text-gray-500 text-xs mt-0.5">Encuestas registradas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de usuarios -->
+        <div class="container mx-auto px-4 py-10">
+
+            <!-- Filtros / búsqueda -->
+            <div class="flex flex-col md:flex-row gap-3 mb-6">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input id="search-users" type="text" placeholder="Buscar por nombre o usuario..."
+                        class="w-full pl-9 pr-4 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm"
+                        oninput="filterUsers()">
+                </div>
+                <select id="filter-role" onchange="filterUsers()"
+                    class="px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
+                    <option value="">Todos los roles</option>
+                    <option value="admin">Administrador</option>
+                    <option value="egresado">Egresado</option>
+                </select>
+                <button onclick="loadUsers()" class="border border-gray-200 hover:border-blue-900 text-gray-600 hover:text-blue-900 px-4 py-2.5 rounded text-sm font-medium transition flex items-center gap-2">
+                    <i class="fas fa-rotate-right"></i>Actualizar
+                </button>
+            </div>
+
+            <!-- Tabla -->
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Usuario</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Email</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rol</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Registro</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
+                            <th class="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <tr><td colspan="7" class="text-center py-10 text-gray-400">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Cargando usuarios...
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ─────── MODAL: Crear / Editar Usuario ─────── -->
+    <div id="user-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/50" onclick="closeUserModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-md p-8 z-10 max-h-[90vh] overflow-y-auto">
+
+            <div class="flex items-center gap-3 mb-6">
+                <div id="modal-icon" class="bg-blue-900 w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-user-plus text-white"></i>
+                </div>
+                <div>
+                    <h2 id="modal-title" class="text-xl font-bold text-blue-900">Nuevo Usuario</h2>
+                    <p class="text-xs text-gray-400">Completa los datos del usuario</p>
+                </div>
+                <button onclick="closeUserModal()" class="ml-auto text-gray-300 hover:text-gray-500"><i class="fas fa-times text-lg"></i></button>
+            </div>
+
+            <!-- Error -->
+            <div id="modal-error" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center gap-2">
+                <i class="fas fa-exclamation-circle text-red-500"></i>
+                <span id="modal-error-msg"></span>
+            </div>
+
+            <input type="hidden" id="modal-user-id">
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Nombre Completo <span class="text-red-500">*</span></label>
+                    <input id="modal-nombre" type="text" placeholder="Nombre del egresado"
+                        class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Usuario <span class="text-red-500">*</span></label>
+                    <input id="modal-username" type="text" placeholder="Ej: jperez2024"
+                        class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
+                    <p class="text-xs text-gray-400 mt-1">Sin espacios ni caracteres especiales</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">
+                        Contraseña <span id="password-required-label" class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <input id="modal-password" type="password" placeholder="Contraseña segura"
+                            class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm pr-10">
+                        <button type="button" onclick="toggleModalPassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i id="modal-eye" class="fas fa-eye text-sm"></i>
+                        </button>
+                    </div>
+                    <p id="edit-password-hint" class="text-xs text-gray-400 mt-1 hidden">Deja vacío para no cambiar la contraseña</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Correo Electrónico</label>
+                    <input id="modal-email" type="email" placeholder="correo@ejemplo.com"
+                        class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Rol <span class="text-red-500">*</span></label>
+                    <select id="modal-role"
+                        class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
+                        <option value="egresado">Egresado</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div id="modal-activo-group" class="hidden">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input id="modal-activo" type="checkbox" checked class="w-4 h-4 accent-blue-900">
+                        <span class="text-sm text-gray-700 font-medium">Cuenta activa</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-7">
+                <button onclick="closeUserModal()"
+                    class="flex-1 border border-gray-200 text-gray-600 hover:border-gray-400 py-2.5 rounded-lg font-semibold text-sm transition">
+                    Cancelar
+                </button>
+                <button id="modal-submit-btn" onclick="submitUserModal()"
+                    class="flex-1 bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2">
+                    <i class="fas fa-check"></i>
+                    <span id="modal-submit-text">Crear Usuario</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─────── MODAL: Confirmar eliminación ─────── -->
+    <div id="delete-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/50" onclick="closeDeleteModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-7 z-10 text-center">
+            <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-trash-alt text-red-500 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">¿Eliminar usuario?</h3>
+            <p class="text-gray-500 text-sm mb-1">Estás a punto de eliminar al usuario:</p>
+            <p id="delete-user-name" class="font-bold text-gray-900 mb-5"></p>
+            <p class="text-xs text-gray-400 mb-6">Esta acción no se puede deshacer.</p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()"
+                    class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg font-semibold text-sm transition hover:border-gray-400">
+                    Cancelar
+                </button>
+                <button id="delete-confirm-btn" onclick="confirmDelete()"
+                    class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-lg font-semibold text-sm transition">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+    const API = 'http://localhost:5000/api';
+    let allUsers     = [];
+    let deleteUserId = null;
+
+    // ── Init ──────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async () => {
+        await requireAdmin(
+            (user) => {
+                document.getElementById('protected-content').classList.remove('hidden');
+                loadUsers();
+                loadStats();
+            },
+            () => { window.location.href = 'index.html'; }
+        );
+    });
+
+    // ── Cargar usuarios ────────────────────────────────────────
+    async function loadUsers() {
+        const tbody = document.getElementById('users-tbody');
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Cargando...</td></tr>`;
+        try {
+            const res  = await fetch(`${API}/users`, { credentials: 'include' });
+            const data = await res.json();
+            if (data.success) {
+                allUsers = data.data;
+                renderUsers(allUsers);
+                updateStats();
+            }
+        } catch(e) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-red-500 text-sm">Error al cargar usuarios.</td></tr>`;
+        }
+    }
+
+    function renderUsers(users) {
+        const tbody = document.getElementById('users-tbody');
+        if (!users.length) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-gray-400 text-sm">No hay usuarios registrados.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = users.map(u => `
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                <td class="px-5 py-3.5">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold
+                            ${u.role === 'admin' ? 'bg-blue-900' : 'bg-orange-500'}">
+                            ${u.nombre.charAt(0).toUpperCase()}
+                        </div>
+                        <span class="font-mono text-xs text-gray-600">${u.username}</span>
+                    </div>
+                </td>
+                <td class="px-5 py-3.5 font-medium text-gray-900 text-sm">${u.nombre}</td>
+                <td class="px-5 py-3.5 text-gray-500 text-xs hidden md:table-cell">${u.email || '—'}</td>
+                <td class="px-5 py-3.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold
+                        ${u.role === 'admin' ? 'bg-blue-100 text-blue-900' : 'bg-orange-100 text-orange-700'}">
+                        <i class="fas ${u.role === 'admin' ? 'fa-shield-halved' : 'fa-user-graduate'} text-xs"></i>
+                        ${u.role === 'admin' ? 'Admin' : 'Egresado'}
+                    </span>
+                </td>
+                <td class="px-5 py-3.5 text-gray-400 text-xs hidden lg:table-cell">${formatDate(u.created_at)}</td>
+                <td class="px-5 py-3.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold
+                        ${u.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">
+                        <span class="w-1.5 h-1.5 rounded-full ${u.activo ? 'bg-green-500' : 'bg-gray-400'}"></span>
+                        ${u.activo ? 'Activo' : 'Inactivo'}
+                    </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                    <div class="flex items-center justify-end gap-1">
+                        <button onclick="openEditModal(${u.id})"
+                            class="w-8 h-8 rounded border border-gray-200 hover:border-blue-900 hover:text-blue-900 text-gray-500 flex items-center justify-center transition"
+                            title="Editar">
+                            <i class="fas fa-pen text-xs"></i>
+                        </button>
+                        ${u.username !== 'admin' ? `
+                        <button onclick="openDeleteModal(${u.id}, '${escapeHtml(u.nombre)}')"
+                            class="w-8 h-8 rounded border border-gray-200 hover:border-red-400 hover:text-red-500 text-gray-500 flex items-center justify-center transition"
+                            title="Eliminar">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>` : ''}
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function filterUsers() {
+        const q    = document.getElementById('search-users').value.toLowerCase();
+        const role = document.getElementById('filter-role').value;
+        const filtered = allUsers.filter(u => {
+            const matchQ    = !q || u.nombre.toLowerCase().includes(q) || u.username.toLowerCase().includes(q);
+            const matchRole = !role || u.role === role;
+            return matchQ && matchRole;
+        });
+        renderUsers(filtered);
+    }
+
+    // ── Stats ──────────────────────────────────────────────────
+    async function loadStats() {
+        try {
+            const res  = await fetch(`${API}/stats`, { credentials: 'include' });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('stat-encuestas').textContent = data.data.total ?? 0;
+            }
+        } catch(e) {}
+    }
+
+    function updateStats() {
+        document.getElementById('stat-total').textContent    = allUsers.length;
+        document.getElementById('stat-egresados').textContent = allUsers.filter(u => u.role === 'egresado').length;
+        document.getElementById('stat-admins').textContent   = allUsers.filter(u => u.role === 'admin').length;
+    }
+
+    // ── Modal Crear ────────────────────────────────────────────
+    function openCreateModal() {
+        document.getElementById('modal-user-id').value      = '';
+        document.getElementById('modal-title').textContent  = 'Nuevo Usuario';
+        document.getElementById('modal-submit-text').textContent = 'Crear Usuario';
+        document.getElementById('modal-nombre').value       = '';
+        document.getElementById('modal-username').value     = '';
+        document.getElementById('modal-password').value     = '';
+        document.getElementById('modal-email').value        = '';
+        document.getElementById('modal-role').value         = 'egresado';
+        document.getElementById('modal-activo-group').classList.add('hidden');
+        document.getElementById('edit-password-hint').classList.add('hidden');
+        document.getElementById('password-required-label').classList.remove('hidden');
+        document.getElementById('modal-username').disabled  = false;
+        document.getElementById('modal-error').classList.add('hidden');
+        document.getElementById('user-modal').classList.remove('hidden');
+    }
+
+    function openEditModal(id) {
+        const u = allUsers.find(x => x.id === id);
+        if (!u) return;
+        document.getElementById('modal-user-id').value      = u.id;
+        document.getElementById('modal-title').textContent  = 'Editar Usuario';
+        document.getElementById('modal-submit-text').textContent = 'Guardar Cambios';
+        document.getElementById('modal-nombre').value       = u.nombre;
+        document.getElementById('modal-username').value     = u.username;
+        document.getElementById('modal-password').value     = '';
+        document.getElementById('modal-email').value        = u.email || '';
+        document.getElementById('modal-role').value         = u.role;
+        document.getElementById('modal-activo').checked     = !!u.activo;
+        document.getElementById('modal-activo-group').classList.remove('hidden');
+        document.getElementById('edit-password-hint').classList.remove('hidden');
+        document.getElementById('password-required-label').classList.add('hidden');
+        document.getElementById('modal-username').disabled  = u.username === 'admin';
+        document.getElementById('modal-error').classList.add('hidden');
+        document.getElementById('user-modal').classList.remove('hidden');
+    }
+
+    function closeUserModal() {
+        document.getElementById('user-modal').classList.add('hidden');
+    }
+
+    async function submitUserModal() {
+        const uid    = document.getElementById('modal-user-id').value;
+        const isEdit = !!uid;
+        const btn    = document.getElementById('modal-submit-btn');
+
+        const payload = {
+            nombre:   document.getElementById('modal-nombre').value.trim(),
+            username: document.getElementById('modal-username').value.trim(),
+            password: document.getElementById('modal-password').value,
+            email:    document.getElementById('modal-email').value.trim(),
+            role:     document.getElementById('modal-role').value,
+        };
+        if (isEdit) payload.activo = document.getElementById('modal-activo').checked ? 1 : 0;
+
+        if (!payload.nombre || (!isEdit && !payload.password) || !payload.username) {
+            showModalError('Nombre, usuario y contraseña son requeridos.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+        try {
+            const url    = isEdit ? `${API}/users/${uid}` : `${API}/users`;
+            const method = isEdit ? 'PUT' : 'POST';
+            const res    = await fetch(url, {
+                method,
+                headers:     { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body:        JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                closeUserModal();
+                loadUsers();
+            } else {
+                showModalError(data.error || 'Error al guardar.');
+            }
+        } catch(e) {
+            showModalError('Error de conexión.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-check"></i> <span id="modal-submit-text">${isEdit ? 'Guardar Cambios' : 'Crear Usuario'}</span>`;
+        }
+    }
+
+    function showModalError(msg) {
+        document.getElementById('modal-error-msg').textContent = msg;
+        document.getElementById('modal-error').classList.remove('hidden');
+    }
+
+    // ── Modal Eliminar ─────────────────────────────────────────
+    function openDeleteModal(id, nombre) {
+        deleteUserId = id;
+        document.getElementById('delete-user-name').textContent = nombre;
+        document.getElementById('delete-modal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        deleteUserId = null;
+        document.getElementById('delete-modal').classList.add('hidden');
+    }
+
+    async function confirmDelete() {
+        if (!deleteUserId) return;
+        const btn = document.getElementById('delete-confirm-btn');
+        btn.disabled = true;
+        btn.textContent = 'Eliminando...';
+        try {
+            const res  = await fetch(`${API}/users/${deleteUserId}`, { method: 'DELETE', credentials: 'include' });
+            const data = await res.json();
+            if (data.success) {
+                closeDeleteModal();
+                loadUsers();
+            }
+        } catch(e) {}
+        btn.disabled = false;
+        btn.textContent = 'Eliminar';
+    }
+
+    // ── Helpers ────────────────────────────────────────────────
+    function toggleModalPassword() {
+        const inp  = document.getElementById('modal-password');
+        const icon = document.getElementById('modal-eye');
+        if (inp.type === 'password') { inp.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
+        else { inp.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
+    }
+
+    function formatDate(ts) {
+        if (!ts) return '—';
+        return new Date(ts).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    function escapeHtml(str) {
+        return (str || '').replace(/['"<>&]/g, c => ({'\'':'&#39;','"':'&quot;','<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+    }
+    </script>
+</body>
+</html>
