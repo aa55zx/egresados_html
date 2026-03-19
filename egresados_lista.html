@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="auth.js"></script>
+    <link rel="stylesheet" href="colores.css">
     <style>
         * { font-family: 'Montserrat', sans-serif; }
 
@@ -72,6 +73,8 @@
         </div>
     </div>
 </nav>
+
+<div id="protected-content">
 
 <!-- ─── Hero ─── -->
 <section class="bg-blue-900 pt-28 pb-10">
@@ -211,17 +214,19 @@
     </div>
 </footer>
 
+</div><!-- /#protected-content -->
+
 <script>
 // ──────────────────────────────────────────────────────────────────────────────
 // Config
 // ──────────────────────────────────────────────────────────────────────────────
-const API = 'http://localhost:5000/api';
+// API y getToken() vienen de auth.js
 let currentPage = 1;
 let searchTimer = null;
 
 // Paleta para avatares
 const AVATAR_COLORS = [
-    '#1e3a8a','#1d4ed8','#f97316','#ea580c',
+    '#1A3A5C','#1e4f7a','#E8A020','#c07818',
     '#0f766e','#7c3aed','#be123c','#15803d'
 ];
 
@@ -260,7 +265,7 @@ function yesno(v) {
 // ──────────────────────────────────────────────────────────────────────────────
 async function loadStats() {
     try {
-        const res  = await fetch(`${API}/stats`);
+        const res  = await fetch(`${API}/stats`, { headers: { 'X-Auth-Token': getToken() } });
         const json = await res.json();
         if (!json.success) return;
         const d = json.data;
@@ -397,7 +402,7 @@ async function loadEgresados(page = 1) {
     pagDiv.classList.add('hidden');
 
     try {
-        const res  = await fetch(`${API}/egresados?${params}`);
+        const res  = await fetch(`${API}/egresados?${params}`, { headers: { 'X-Auth-Token': getToken() } });
         const json = await res.json();
 
         skel.classList.add('hidden');
@@ -482,7 +487,7 @@ async function openModal(id) {
     overlay.classList.add('show');
 
     try {
-        const res  = await fetch(`${API}/egresados/${id}`);
+        const res  = await fetch(`${API}/egresados/${id}`, { headers: { 'X-Auth-Token': getToken() } });
         const json = await res.json();
         if (!json.success) throw new Error('not found');
         const e     = json.data;
@@ -575,13 +580,13 @@ document.getElementById('modal-overlay').addEventListener('click', function(e) {
 // ──────────────────────────────────────────────────────────────────────────────
 // Init
 // ──────────────────────────────────────────────────────────────────────────────
-// ── Auth init ──────────────────────────────────────
-(async () => {
-    const user = await requireAuth(
-        () => { loadStats(); loadEgresados(1); },
-        null
-    );
-})();
+// Directorio es público — no requiere login
+document.getElementById('protected-content').classList.remove('hidden');
+loadStats();
+loadEgresados(1);
+
+// Actualizar navbar si hay sesión activa
+checkSession();
 </script>
 </body>
 </html>

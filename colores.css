@@ -1,0 +1,110 @@
+/*
+ * colores.css — Paleta oficial TecNM Campus Oaxaca
+ * Azul:   #1A3A5C
+ * Naranja: #E8A020
+ *
+ * Sobreescribe las clases de Tailwind CDN con !important
+ */
+
+:root {
+  --azul:        #1A3A5C;
+  --azul-hover:  #142d48;
+  --azul-claro:  #e6edf4;
+  --azul-100:    #d0dde9;
+  --azul-200:    #a8c0d6;
+  --azul-300:    #7fa3c4;
+  --naranja:     #E8A020;
+  --naranja-hover: #c07818;
+  --naranja-claro: #fdf5e3;
+  --naranja-100:   #fbe5b0;
+}
+
+/* ── AZUL (reemplaza blue-900 y variantes) ───────────────────────── */
+.bg-blue-900             { background-color: #1A3A5C !important; }
+.text-blue-900           { color:            #1A3A5C !important; }
+.border-blue-900         { border-color:     #1A3A5C !important; }
+.border-t-blue-900       { border-top-color:    #1A3A5C !important; }
+.border-l-blue-900       { border-left-color:   #1A3A5C !important; }
+.border-b-blue-900       { border-bottom-color: #1A3A5C !important; }
+.border-r-blue-900       { border-right-color:  #1A3A5C !important; }
+.outline-blue-900        { outline-color:    #1A3A5C !important; }
+.ring-blue-900           { --tw-ring-color:  #1A3A5C !important; }
+.accent-blue-900         { accent-color:     #1A3A5C !important; }
+
+/* hover */
+.hover\:bg-blue-900:hover      { background-color: #1A3A5C !important; }
+.hover\:bg-blue-800:hover      { background-color: #142d48 !important; }
+.hover\:text-blue-900:hover    { color:            #1A3A5C !important; }
+.hover\:border-blue-900:hover  { border-color:     #1A3A5C !important; }
+
+/* focus */
+.focus\:border-blue-900:focus  { border-color:     #1A3A5C !important; }
+.focus\:outline-blue-900:focus { outline-color:    #1A3A5C !important; }
+
+/* tints */
+.bg-blue-50  { background-color: #e6edf4 !important; }
+.bg-blue-100 { background-color: #d0dde9 !important; }
+.text-blue-100 { color: #d0dde9 !important; }
+.text-blue-200 { color: #a8c0d6 !important; }
+.text-blue-300 { color: #7fa3c4 !important; }
+.text-blue-700 { color: #1e4f7a !important; }
+.text-blue-800 { color: #163d5e !important; }
+.border-blue-100 { border-color: #d0dde9 !important; }
+
+/* blue-700 usado en gradientes originales */
+.bg-blue-700  { background-color: #1e4f7a !important; }
+.from-blue-700 { --tw-gradient-from: #1e4f7a !important; }
+.to-blue-700   { --tw-gradient-to:   #1e4f7a !important; }
+
+/* gradientes */
+.from-blue-900 { --tw-gradient-from: #1A3A5C !important; }
+.to-blue-900   { --tw-gradient-to:   #1A3A5C !important; }
+.via-blue-900  { --tw-gradient-stops: var(--tw-gradient-from), #1A3A5C, var(--tw-gradient-to) !important; }
+
+/* ── NARANJA (reemplaza orange-500 y variantes) ────────────────────── */
+.bg-orange-500             { background-color: #E8A020 !important; }
+.text-orange-500           { color:            #E8A020 !important; }
+.border-orange-500         { border-color:     #E8A020 !important; }
+.border-t-orange-500       { border-top-color:    #E8A020 !important; }
+.border-l-orange-500       { border-left-color:   #E8A020 !important; }
+.border-b-orange-500       { border-bottom-color: #E8A020 !important; }
+.border-2.border-orange-500 { border-color:    #E8A020 !important; }
+.ring-orange-500           { --tw-ring-color:  #E8A020 !important; }
+
+/* hover */
+.hover\:bg-orange-500:hover    { background-color: #E8A020 !important; }
+.hover\:bg-orange-600:hover    { background-color: #c07818 !important; }
+.hover\:text-orange-500:hover  { color:            #E8A020 !important; }
+.hover\:text-orange-600:hover  { color:            #c07818 !important; }
+.hover\:border-orange-500:hover { border-color:    #E8A020 !important; }
+.hover\:border-orange-600:hover { border-color:    #c07818 !important; }
+
+/* focus */
+.focus\:border-orange-500:focus { border-color:   #E8A020 !important; }
+
+/* tints */
+.bg-orange-50  { background-color: #fdf5e3 !important; }
+.bg-orange-100 { background-color: #fbe5b0 !important; }
+.text-orange-100 { color: #fbe5b0 !important; }
+.text-orange-200 { color: #f5cf80 !important; }
+.text-orange-300 { color: #f0b94a !important; }
+.text-orange-400 { color: #eca830 !important; }
+.text-orange-600 { color: #c07818 !important; }
+.text-orange-700 { color: #a06010 !important; }
+.text-orange-800 { color: #804808 !important; }
+.border-orange-100 { border-color: #fbe5b0 !important; }
+
+/* gradientes */
+.from-orange-500 { --tw-gradient-from: #E8A020 !important; }
+.to-orange-500   { --tw-gradient-to:   #E8A020 !important; }
+.to-orange-400   { --tw-gradient-to:   #f0b84a !important; }
+.from-orange-400 { --tw-gradient-from: #f0b84a !important; }
+.via-orange-500  { --tw-gradient-stops: var(--tw-gradient-from), #E8A020, var(--tw-gradient-to) !important; }
+
+/* ── Corrección de sombras con colores ──────────────────────────── */
+/* box-shadow personalizado que usaba rgba(30,58,138,...) */
+/* no se puede sobreescribir con sólo CSS class; se sobreescribe en cada archivo */
+
+/* ── Tabla admin: badges ──────────────────────────────────────────── */
+.bg-blue-100.text-blue-900 { background-color: #d0dde9 !important; color: #1A3A5C !important; }
+.bg-orange-100.text-orange-700 { background-color: #fbe5b0 !important; color: #a06010 !important; }

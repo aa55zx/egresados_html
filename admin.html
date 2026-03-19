@@ -6,487 +6,804 @@
     <title>Panel de Administración - TecNM Oaxaca</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="colores.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
         * { font-family: 'Montserrat', sans-serif; }
+
+        /* Animación modal */
+        .modal-enter { animation: fadeIn .18s ease; }
+        @keyframes fadeIn { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:scale(1); } }
+
+        /* Toast */
+        #toast { transition: opacity .3s, transform .3s; }
+        #toast.hide { opacity:0; transform:translateY(-12px); pointer-events:none; }
+
+        /* Fila tabla hover */
+        tbody tr { transition: background .12s; }
+
+        /* Toggle switch */
+        .toggle-checkbox:checked { right: 0; border-color: #1e3a5f; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #1e3a5f; }
+        .toggle-checkbox { right: 1rem; }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 min-h-screen">
 
-    <!-- Nav -->
-    <nav class="bg-white border-b border-gray-200 fixed w-full z-50">
+<!-- ── Toast ──────────────────────────────────────────────────────── -->
+<div id="toast" class="hide fixed top-5 right-5 z-[200] flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold text-white min-w-[220px]">
+    <i id="toast-icon" class="text-base"></i>
+    <span id="toast-msg"></span>
+</div>
+
+<!-- ── Navbar ─────────────────────────────────────────────────────── -->
+<nav class="bg-white border-b border-gray-200 fixed w-full z-50 shadow-sm">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-3.5">
+            <div class="flex items-center gap-3">
+                <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-10">
+                <div>
+                    <h1 class="text-sm font-bold text-blue-900 leading-tight">TecNM Campus Oaxaca</h1>
+                    <p class="text-xs text-gray-400">Panel de Administración</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="text-gray-500 hover:text-orange-500 text-xs font-medium flex items-center gap-1.5 transition">
+                    <i class="fas fa-arrow-left text-xs"></i>Volver al Portal
+                </a>
+                <div id="nav-auth-area"></div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Contenido protegido ────────────────────────────────────────── -->
+<div id="protected-content" class="hidden pt-[64px]">
+
+    <!-- Header hero -->
+    <div class="bg-gradient-to-br from-blue-900 to-blue-800 py-10">
         <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center gap-4">
-                    <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-11">
-                    <div>
-                        <h1 class="text-base font-bold text-blue-900">TecNM Campus Oaxaca</h1>
-                        <p class="text-xs text-gray-400">Panel de Administración</p>
-                    </div>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="text-white">
+                    <p class="text-orange-400 text-xs font-semibold uppercase tracking-widest mb-1">
+                        <i class="fas fa-shield-halved mr-1"></i>Administración del Sistema
+                    </p>
+                    <h1 class="text-3xl font-bold">Gestión de Usuarios</h1>
+                    <p class="text-blue-300 text-sm mt-1">Crea, edita y administra los accesos al portal de egresados</p>
                 </div>
-                <div class="flex items-center gap-4">
-                    <a href="index.html" class="text-gray-500 hover:text-orange-500 text-sm font-medium flex items-center gap-1.5">
-                        <i class="fas fa-arrow-left text-xs"></i>Portal
-                    </a>
-                    <div id="nav-auth-area"></div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Contenido protegido -->
-    <div id="protected-content" class="hidden pt-20">
-
-        <!-- Header -->
-        <div class="bg-blue-900 py-10">
-            <div class="container mx-auto px-4">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="text-white">
-                        <p class="text-orange-400 text-xs font-semibold uppercase tracking-widest mb-1">Administración</p>
-                        <h1 class="text-3xl font-bold">Panel de Control</h1>
-                        <p class="text-blue-300 text-sm mt-1">Gestión de usuarios y accesos al portal</p>
-                    </div>
-                    <button onclick="openCreateModal()"
-                        class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded font-semibold text-sm transition flex items-center gap-2 self-start md:self-auto">
-                        <i class="fas fa-user-plus"></i>Nuevo Usuario
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats rápidas -->
-        <div class="bg-white border-b border-gray-100">
-            <div class="container mx-auto px-4 py-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-gray-200">
-                    <div class="text-center px-4">
-                        <p id="stat-total" class="text-3xl font-bold text-blue-900">–</p>
-                        <p class="text-gray-500 text-xs mt-0.5">Usuarios totales</p>
-                    </div>
-                    <div class="text-center px-4">
-                        <p id="stat-egresados" class="text-3xl font-bold text-orange-500">–</p>
-                        <p class="text-gray-500 text-xs mt-0.5">Egresados</p>
-                    </div>
-                    <div class="text-center px-4">
-                        <p id="stat-admins" class="text-3xl font-bold text-blue-900">–</p>
-                        <p class="text-gray-500 text-xs mt-0.5">Administradores</p>
-                    </div>
-                    <div class="text-center px-4">
-                        <p id="stat-encuestas" class="text-3xl font-bold text-orange-500">–</p>
-                        <p class="text-gray-500 text-xs mt-0.5">Encuestas registradas</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tabla de usuarios -->
-        <div class="container mx-auto px-4 py-10">
-
-            <!-- Filtros / búsqueda -->
-            <div class="flex flex-col md:flex-row gap-3 mb-6">
-                <div class="relative flex-1">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                    <input id="search-users" type="text" placeholder="Buscar por nombre o usuario..."
-                        class="w-full pl-9 pr-4 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm"
-                        oninput="filterUsers()">
-                </div>
-                <select id="filter-role" onchange="filterUsers()"
-                    class="px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
-                    <option value="">Todos los roles</option>
-                    <option value="admin">Administrador</option>
-                    <option value="egresado">Egresado</option>
-                </select>
-                <button onclick="loadUsers()" class="border border-gray-200 hover:border-blue-900 text-gray-600 hover:text-blue-900 px-4 py-2.5 rounded text-sm font-medium transition flex items-center gap-2">
-                    <i class="fas fa-rotate-right"></i>Actualizar
+                <button onclick="openCreateModal()"
+                    class="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-lg shadow-orange-500/30 flex items-center gap-2 self-start md:self-auto">
+                    <i class="fas fa-user-plus"></i>Nuevo Usuario
                 </button>
             </div>
+        </div>
+    </div>
 
-            <!-- Tabla -->
-            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+    <!-- Stats -->
+    <div class="bg-white border-b border-gray-100 shadow-sm">
+        <div class="container mx-auto px-4 py-5">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-gray-100">
+                <div class="text-center px-4 py-1">
+                    <p id="stat-total" class="text-3xl font-bold text-blue-900">–</p>
+                    <p class="text-gray-400 text-xs mt-0.5 font-medium">Usuarios totales</p>
+                </div>
+                <div class="text-center px-4 py-1">
+                    <p id="stat-egresados" class="text-3xl font-bold text-orange-500">–</p>
+                    <p class="text-gray-400 text-xs mt-0.5 font-medium">Egresados</p>
+                </div>
+                <div class="text-center px-4 py-1">
+                    <p id="stat-admins" class="text-3xl font-bold text-blue-900">–</p>
+                    <p class="text-gray-400 text-xs mt-0.5 font-medium">Administradores</p>
+                </div>
+                <div class="text-center px-4 py-1">
+                    <p id="stat-encuestas" class="text-3xl font-bold text-orange-500">–</p>
+                    <p class="text-gray-400 text-xs mt-0.5 font-medium">Encuestas registradas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla principal -->
+    <div class="container mx-auto px-4 py-8">
+
+        <!-- Barra de filtros -->
+        <div class="flex flex-col sm:flex-row gap-3 mb-5">
+            <div class="relative flex-1">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input id="search-users" type="text" placeholder="Buscar por nombre o usuario..."
+                    class="w-full pl-8 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition"
+                    oninput="filterUsers()">
+            </div>
+            <select id="filter-role" onchange="filterUsers()"
+                class="px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition bg-white">
+                <option value="">Todos los roles</option>
+                <option value="admin">Administrador</option>
+                <option value="egresado">Egresado</option>
+            </select>
+            <select id="filter-status" onchange="filterUsers()"
+                class="px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition bg-white">
+                <option value="">Todos los estados</option>
+                <option value="1">Activos</option>
+                <option value="0">Inactivos</option>
+            </select>
+            <button onclick="loadUsers()"
+                class="border border-gray-200 hover:border-blue-900 text-gray-500 hover:text-blue-900 px-4 py-2.5 rounded-lg text-sm font-medium transition flex items-center gap-2 bg-white">
+                <i class="fas fa-rotate-right text-xs"></i>Actualizar
+            </button>
+        </div>
+
+        <!-- Tabla -->
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
-                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Usuario</th>
-                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
-                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Email</th>
-                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rol</th>
-                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Registro</th>
-                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
-                            <th class="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
+                            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider w-12">#</th>
+                            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
+                            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Usuario</th>
+                            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Email</th>
+                            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rol</th>
+                            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
+                            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Registro</th>
+                            <th class="text-right px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="users-tbody">
-                        <tr><td colspan="7" class="text-center py-10 text-gray-400">
-                            <i class="fas fa-spinner fa-spin mr-2"></i>Cargando usuarios...
+                        <tr><td colspan="8" class="text-center py-14 text-gray-400">
+                            <i class="fas fa-spinner fa-spin mr-2 text-blue-900"></i>Cargando usuarios...
                         </td></tr>
                     </tbody>
                 </table>
             </div>
 
+            <!-- Footer tabla -->
+            <div id="table-footer" class="hidden px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                <p id="table-count" class="text-xs text-gray-400"></p>
+                <p class="text-xs text-gray-300">Portal Egresados TecNM</p>
+            </div>
         </div>
     </div>
+</div>
 
-    <!-- ─────── MODAL: Crear / Editar Usuario ─────── -->
-    <div id="user-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-        <div class="absolute inset-0 bg-black/50" onclick="closeUserModal()"></div>
-        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-md p-8 z-10 max-h-[90vh] overflow-y-auto">
+<!-- ══════════════════════════════════════════════════════════════════
+     MODAL: Crear / Editar Usuario
+═══════════════════════════════════════════════════════════════════ -->
+<div id="user-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-[2px]" onclick="closeUserModal()"></div>
+    <div class="modal-enter relative bg-white rounded-2xl shadow-2xl w-full max-w-md z-10 overflow-hidden">
 
-            <div class="flex items-center gap-3 mb-6">
-                <div id="modal-icon" class="bg-blue-900 w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-user-plus text-white"></i>
-                </div>
-                <div>
-                    <h2 id="modal-title" class="text-xl font-bold text-blue-900">Nuevo Usuario</h2>
-                    <p class="text-xs text-gray-400">Completa los datos del usuario</p>
-                </div>
-                <button onclick="closeUserModal()" class="ml-auto text-gray-300 hover:text-gray-500"><i class="fas fa-times text-lg"></i></button>
+        <!-- Header modal -->
+        <div id="modal-header" class="bg-blue-900 px-7 py-5 flex items-center gap-3">
+            <div class="bg-white/20 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i id="modal-header-icon" class="fas fa-user-plus text-white"></i>
             </div>
+            <div class="flex-1">
+                <h2 id="modal-title" class="text-lg font-bold text-white">Nuevo Usuario</h2>
+                <p id="modal-subtitle" class="text-blue-300 text-xs">Completa los datos del nuevo usuario</p>
+            </div>
+            <button onclick="closeUserModal()" class="text-white/60 hover:text-white transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
 
-            <!-- Error -->
-            <div id="modal-error" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center gap-2">
-                <i class="fas fa-exclamation-circle text-red-500"></i>
+        <!-- Cuerpo modal -->
+        <div class="px-7 py-6 max-h-[70vh] overflow-y-auto">
+
+            <!-- Alerta error -->
+            <div id="modal-error" class="hidden mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-start gap-2.5">
+                <i class="fas fa-circle-exclamation text-red-500 mt-0.5 flex-shrink-0"></i>
                 <span id="modal-error-msg"></span>
             </div>
 
             <input type="hidden" id="modal-user-id">
 
             <div class="space-y-4">
+
+                <!-- Nombre -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Nombre Completo <span class="text-red-500">*</span></label>
-                    <input id="modal-nombre" type="text" placeholder="Nombre del egresado"
-                        class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Nombre Completo <span class="text-red-500">*</span>
+                    </label>
+                    <input id="modal-nombre" type="text" placeholder="Ej: Juan Pérez García"
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition">
                 </div>
+
+                <!-- Username -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Usuario <span class="text-red-500">*</span></label>
-                    <input id="modal-username" type="text" placeholder="Ej: jperez2024"
-                        class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
-                    <p class="text-xs text-gray-400 mt-1">Sin espacios ni caracteres especiales</p>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Nombre de Usuario <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-mono">@</span>
+                        <input id="modal-username" type="text" placeholder="jperez2024"
+                            class="w-full pl-8 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm font-mono transition">
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
+                        <i class="fas fa-circle-info text-blue-400"></i>
+                        Sin espacios. Se usa para iniciar sesión.
+                    </p>
                 </div>
+
+                <!-- Contraseña -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                         Contraseña <span id="password-required-label" class="text-red-500">*</span>
                     </label>
                     <div class="relative">
-                        <input id="modal-password" type="password" placeholder="Contraseña segura"
-                            class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm pr-10">
-                        <button type="button" onclick="toggleModalPassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <input id="modal-password" type="password" placeholder="Mínimo 6 caracteres"
+                            class="w-full px-4 py-2.5 pr-11 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition">
+                        <button type="button" onclick="toggleModalPassword()"
+                            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
                             <i id="modal-eye" class="fas fa-eye text-sm"></i>
                         </button>
                     </div>
-                    <p id="edit-password-hint" class="text-xs text-gray-400 mt-1 hidden">Deja vacío para no cambiar la contraseña</p>
+                    <p id="edit-password-hint" class="hidden text-xs text-gray-400 mt-1.5 flex items-center gap-1">
+                        <i class="fas fa-lock-open text-yellow-400"></i>
+                        Deja vacío para no cambiar la contraseña actual.
+                    </p>
                 </div>
+
+                <!-- Email -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Correo Electrónico</label>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Correo Electrónico
+                    </label>
                     <input id="modal-email" type="email" placeholder="correo@ejemplo.com"
-                        class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition">
                 </div>
+
+                <!-- Rol -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Rol <span class="text-red-500">*</span></label>
-                    <select id="modal-role"
-                        class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
-                        <option value="egresado">Egresado</option>
-                        <option value="admin">Administrador</option>
-                    </select>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        Rol <span class="text-red-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-2 gap-3" id="role-selector">
+                        <label class="role-option flex items-center gap-3 border-2 border-gray-200 rounded-xl px-4 py-3 cursor-pointer transition hover:border-orange-300 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50">
+                            <input type="radio" name="modal-role-radio" value="egresado" checked class="accent-orange-500">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">Egresado</p>
+                                <p class="text-xs text-gray-400">Acceso al cuestionario</p>
+                            </div>
+                        </label>
+                        <label class="role-option flex items-center gap-3 border-2 border-gray-200 rounded-xl px-4 py-3 cursor-pointer transition hover:border-blue-300 has-[:checked]:border-blue-900 has-[:checked]:bg-blue-50">
+                            <input type="radio" name="modal-role-radio" value="admin" class="accent-blue-900">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">Admin</p>
+                                <p class="text-xs text-gray-400">Acceso total</p>
+                            </div>
+                        </label>
+                    </div>
                 </div>
+
+                <!-- Estado activo (solo en edición) -->
                 <div id="modal-activo-group" class="hidden">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input id="modal-activo" type="checkbox" checked class="w-4 h-4 accent-blue-900">
-                        <span class="text-sm text-gray-700 font-medium">Cuenta activa</span>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Estado de la Cuenta</label>
+                    <label class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-blue-300 transition" id="activo-toggle-wrap">
+                        <div class="flex items-center gap-3">
+                            <div id="activo-icon-wrap" class="w-9 h-9 rounded-lg flex items-center justify-center bg-green-100">
+                                <i id="activo-icon" class="fas fa-check text-green-600 text-sm"></i>
+                            </div>
+                            <div>
+                                <p id="activo-label" class="text-sm font-semibold text-gray-800">Cuenta Activa</p>
+                                <p id="activo-desc"  class="text-xs text-gray-400">El usuario puede iniciar sesión</p>
+                            </div>
+                        </div>
+                        <!-- Toggle visual -->
+                        <div class="relative inline-block w-11 align-middle select-none">
+                            <input id="modal-activo" type="checkbox" checked
+                                class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer transition-all duration-200 top-0.5 left-0.5"
+                                onchange="updateActivoUI()">
+                            <label for="modal-activo"
+                                class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200"></label>
+                        </div>
                     </label>
                 </div>
-            </div>
 
-            <div class="flex gap-3 mt-7">
-                <button onclick="closeUserModal()"
-                    class="flex-1 border border-gray-200 text-gray-600 hover:border-gray-400 py-2.5 rounded-lg font-semibold text-sm transition">
-                    Cancelar
-                </button>
-                <button id="modal-submit-btn" onclick="submitUserModal()"
-                    class="flex-1 bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2">
-                    <i class="fas fa-check"></i>
-                    <span id="modal-submit-text">Crear Usuario</span>
-                </button>
             </div>
         </div>
-    </div>
 
-    <!-- ─────── MODAL: Confirmar eliminación ─────── -->
-    <div id="delete-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-        <div class="absolute inset-0 bg-black/50" onclick="closeDeleteModal()"></div>
-        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-7 z-10 text-center">
-            <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-trash-alt text-red-500 text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">¿Eliminar usuario?</h3>
-            <p class="text-gray-500 text-sm mb-1">Estás a punto de eliminar al usuario:</p>
-            <p id="delete-user-name" class="font-bold text-gray-900 mb-5"></p>
-            <p class="text-xs text-gray-400 mb-6">Esta acción no se puede deshacer.</p>
-            <div class="flex gap-3">
-                <button onclick="closeDeleteModal()"
-                    class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg font-semibold text-sm transition hover:border-gray-400">
-                    Cancelar
-                </button>
-                <button id="delete-confirm-btn" onclick="confirmDelete()"
-                    class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-lg font-semibold text-sm transition">
-                    Eliminar
-                </button>
-            </div>
+        <!-- Footer modal -->
+        <div class="px-7 py-5 border-t border-gray-100 flex gap-3 bg-gray-50">
+            <button onclick="closeUserModal()"
+                class="flex-1 border border-gray-200 hover:border-gray-400 text-gray-600 py-2.5 rounded-xl font-semibold text-sm transition">
+                Cancelar
+            </button>
+            <button id="modal-submit-btn" onclick="submitUserModal()"
+                class="flex-1 bg-blue-900 hover:bg-blue-800 active:bg-blue-950 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2">
+                <i id="modal-submit-icon" class="fas fa-user-plus text-sm"></i>
+                <span id="modal-submit-text">Crear Usuario</span>
+            </button>
         </div>
     </div>
+</div>
 
-    <script src="auth.js"></script>
-    <script>
-    const API = 'http://localhost:5000/api';
-    let allUsers     = [];
-    let deleteUserId = null;
+<!-- ══════════════════════════════════════════════════════════════════
+     MODAL: Ver detalle de usuario
+═══════════════════════════════════════════════════════════════════ -->
+<div id="view-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-[2px]" onclick="closeViewModal()"></div>
+    <div class="modal-enter relative bg-white rounded-2xl shadow-2xl w-full max-w-sm z-10 overflow-hidden">
+        <div id="view-modal-header" class="px-6 py-5 flex items-center gap-4">
+            <div id="view-avatar" class="w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl font-bold flex-shrink-0"></div>
+            <div class="flex-1 min-w-0">
+                <h3 id="view-nombre" class="text-lg font-bold text-white truncate"></h3>
+                <p id="view-username" class="text-sm text-white/70 font-mono"></p>
+            </div>
+            <button onclick="closeViewModal()" class="text-white/60 hover:text-white transition flex-shrink-0">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="px-6 py-5 space-y-3">
+            <div class="flex justify-between items-center py-2.5 border-b border-gray-100">
+                <span class="text-xs text-gray-400 font-semibold uppercase tracking-wide">Email</span>
+                <span id="view-email" class="text-sm text-gray-700 font-medium text-right"></span>
+            </div>
+            <div class="flex justify-between items-center py-2.5 border-b border-gray-100">
+                <span class="text-xs text-gray-400 font-semibold uppercase tracking-wide">Rol</span>
+                <span id="view-role" class="text-sm font-semibold"></span>
+            </div>
+            <div class="flex justify-between items-center py-2.5 border-b border-gray-100">
+                <span class="text-xs text-gray-400 font-semibold uppercase tracking-wide">Estado</span>
+                <span id="view-activo" class="text-sm font-semibold"></span>
+            </div>
+            <div class="flex justify-between items-center py-2.5">
+                <span class="text-xs text-gray-400 font-semibold uppercase tracking-wide">Registro</span>
+                <span id="view-fecha" class="text-sm text-gray-700"></span>
+            </div>
+        </div>
+        <div class="px-6 pb-5 flex gap-3">
+            <button id="view-edit-btn"
+                class="flex-1 bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2">
+                <i class="fas fa-pen"></i>Editar
+            </button>
+            <button id="view-delete-btn"
+                class="border border-red-200 hover:bg-red-50 text-red-500 hover:border-red-400 px-4 py-2.5 rounded-xl text-sm transition">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
 
-    // ── Init ──────────────────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', async () => {
-        await requireAdmin(
-            (user) => {
-                document.getElementById('protected-content').classList.remove('hidden');
-                loadUsers();
-                loadStats();
-            },
-            () => { window.location.href = 'index.html'; }
-        );
+<!-- ══════════════════════════════════════════════════════════════════
+     MODAL: Confirmar eliminación
+═══════════════════════════════════════════════════════════════════ -->
+<div id="delete-modal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-[2px]" onclick="closeDeleteModal()"></div>
+    <div class="modal-enter relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-7 z-10 text-center">
+        <div class="bg-red-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-trash-alt text-red-500 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">¿Eliminar usuario?</h3>
+        <p class="text-gray-500 text-sm mb-1">Estás a punto de eliminar:</p>
+        <p id="delete-user-name" class="font-bold text-gray-900 text-base mb-2"></p>
+        <p class="text-xs text-red-400 bg-red-50 rounded-lg px-3 py-2 mb-6 inline-block">
+            <i class="fas fa-triangle-exclamation mr-1"></i>Esta acción no se puede deshacer
+        </p>
+        <div class="flex gap-3">
+            <button onclick="closeDeleteModal()"
+                class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl font-semibold text-sm hover:border-gray-400 transition">
+                Cancelar
+            </button>
+            <button id="delete-confirm-btn" onclick="confirmDelete()"
+                class="flex-1 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white py-2.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2">
+                <i class="fas fa-trash-alt"></i>Eliminar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+// Nota: API ya está definida en auth.js
+
+// ── Verificar que se accede por localhost (no file://) ─────────────
+if (location.protocol === 'file:' || (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1')) {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;background:#f9fafb"><div style="text-align:center;max-width:400px;padding:2rem"><div style="font-size:3rem;margin-bottom:1rem">🔗</div><h2 style="color:#1e3a5f;margin-bottom:.5rem">Acceso incorrecto</h2><p style="color:#6b7280;margin-bottom:1.5rem">Debes abrir el portal a través del servidor Flask, no directamente desde el archivo.</p><a href="http://localhost:5000/admin.html" style="background:#1e3a5f;color:white;padding:.75rem 2rem;border-radius:.5rem;text-decoration:none;font-weight:600">Abrir correctamente →</a></div></div>';
+}
+let allUsers     = [];
+let deleteUserId = null;
+
+// ── Toggle activo CSS ──────────────────────────────────────────────
+(function(){
+    var s = document.createElement('style');
+    s.textContent = '.toggle-checkbox:checked{right:0!important;left:auto!important;border-color:#1e3a5f!important}.toggle-checkbox:checked+.toggle-label{background-color:#1e3a5f!important}';
+    document.head.appendChild(s);
+})();
+
+// ── Init ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+    await requireAdmin(
+        () => {
+            document.getElementById('protected-content').classList.remove('hidden');
+            loadUsers();
+            loadStats();
+        },
+        () => { window.location.href = 'index.html'; }
+    );
+});
+
+// ── Toast ──────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    const icon  = document.getElementById('toast-icon');
+    const text  = document.getElementById('toast-msg');
+    toast.className = `fixed top-5 right-5 z-[200] flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold text-white min-w-[220px] ${
+        type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-500' : 'bg-blue-900'
+    }`;
+    icon.className = `fas ${type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-circle-xmark' : 'fa-circle-info'} text-base`;
+    text.textContent = msg;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.add('hide'), 3000);
+}
+
+// ── Cargar usuarios ────────────────────────────────────────────────
+async function loadUsers() {
+    const tbody = document.getElementById('users-tbody');
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-14 text-gray-400"><i class="fas fa-spinner fa-spin mr-2 text-blue-900"></i>Cargando...</td></tr>`;
+    document.getElementById('table-footer').classList.add('hidden');
+    try {
+        const res  = await fetch(`${API}/users`, { headers: { 'X-Auth-Token': getToken() } });
+        const data = await res.json();
+        if (data.success) {
+            allUsers = data.data;
+            filterUsers();
+            updateStats();
+        }
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-14 text-red-400 text-sm">
+            <i class="fas fa-wifi-slash mr-2"></i>Error de conexión. ¿Está corriendo app.py?
+        </td></tr>`;
+    }
+}
+
+function renderUsers(users) {
+    const tbody  = document.getElementById('users-tbody');
+    const footer = document.getElementById('table-footer');
+    const count  = document.getElementById('table-count');
+
+    if (!users.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-14 text-gray-400 text-sm">
+            <i class="fas fa-users-slash mr-2 text-gray-300 text-2xl block mb-2"></i>
+            No se encontraron usuarios con esos filtros.
+        </td></tr>`;
+        footer.classList.add('hidden');
+        return;
+    }
+
+    tbody.innerHTML = users.map((u, i) => `
+        <tr class="border-b border-gray-100 hover:bg-blue-50/30 cursor-pointer" onclick="openViewModal(${u.id})">
+            <td class="px-5 py-3.5 text-xs text-gray-400 font-mono">${i + 1}</td>
+            <td class="px-5 py-3.5">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0
+                        ${u.role === 'admin' ? 'bg-blue-900' : 'bg-orange-500'}">
+                        ${u.nombre.charAt(0).toUpperCase()}
+                    </div>
+                    <span class="font-semibold text-gray-900 text-sm">${escapeHtml(u.nombre)}</span>
+                </div>
+            </td>
+            <td class="px-5 py-3.5">
+                <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg">@${escapeHtml(u.username)}</span>
+            </td>
+            <td class="px-5 py-3.5 text-gray-500 text-xs hidden md:table-cell">${escapeHtml(u.email || '—')}</td>
+            <td class="px-5 py-3.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold
+                    ${u.role === 'admin' ? 'bg-blue-100 text-blue-900' : 'bg-orange-100 text-orange-700'}">
+                    <i class="fas ${u.role === 'admin' ? 'fa-shield-halved' : 'fa-user-graduate'} text-xs"></i>
+                    ${u.role === 'admin' ? 'Admin' : 'Egresado'}
+                </span>
+            </td>
+            <td class="px-5 py-3.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold
+                    ${u.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">
+                    <span class="w-1.5 h-1.5 rounded-full ${u.activo ? 'bg-green-500' : 'bg-gray-400'}"></span>
+                    ${u.activo ? 'Activo' : 'Inactivo'}
+                </span>
+            </td>
+            <td class="px-5 py-3.5 text-gray-400 text-xs hidden lg:table-cell">${formatDate(u.created_at)}</td>
+            <td class="px-5 py-3.5" onclick="event.stopPropagation()">
+                <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="openEditModal(${u.id})"
+                        class="w-8 h-8 rounded-lg border border-gray-200 hover:border-blue-900 hover:bg-blue-50 text-gray-400 hover:text-blue-900 flex items-center justify-center transition"
+                        title="Editar usuario">
+                        <i class="fas fa-pen text-xs"></i>
+                    </button>
+                    ${u.username !== 'admin' ? `
+                    <button onclick="openDeleteModal(${u.id}, '${escapeHtml(u.nombre)}')"
+                        class="w-8 h-8 rounded-lg border border-gray-200 hover:border-red-400 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition"
+                        title="Eliminar usuario">
+                        <i class="fas fa-trash text-xs"></i>
+                    </button>` : `
+                    <span class="w-8 h-8 flex items-center justify-center text-gray-200" title="Usuario protegido">
+                        <i class="fas fa-lock text-xs"></i>
+                    </span>`}
+                </div>
+            </td>
+        </tr>
+    `).join('');
+
+    footer.classList.remove('hidden');
+    count.textContent = `Mostrando ${users.length} de ${allUsers.length} usuario${allUsers.length !== 1 ? 's' : ''}`;
+}
+
+function filterUsers() {
+    const q      = (document.getElementById('search-users').value || '').toLowerCase();
+    const role   = document.getElementById('filter-role').value;
+    const status = document.getElementById('filter-status').value;
+    const filtered = allUsers.filter(u => {
+        const matchQ    = !q || u.nombre.toLowerCase().includes(q) || u.username.toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+        const matchRole = !role   || u.role === role;
+        const matchSt   = status === '' || String(u.activo ? 1 : 0) === status;
+        return matchQ && matchRole && matchSt;
     });
+    renderUsers(filtered);
+}
 
-    // ── Cargar usuarios ────────────────────────────────────────
-    async function loadUsers() {
-        const tbody = document.getElementById('users-tbody');
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Cargando...</td></tr>`;
-        try {
-            const res  = await fetch(`${API}/users`, { credentials: 'include' });
-            const data = await res.json();
-            if (data.success) {
-                allUsers = data.data;
-                renderUsers(allUsers);
-                updateStats();
-            }
-        } catch(e) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-red-500 text-sm">Error al cargar usuarios.</td></tr>`;
+// ── Stats ──────────────────────────────────────────────────────────
+async function loadStats() {
+    try {
+        const res  = await fetch(`${API}/stats`, { headers: { 'X-Auth-Token': getToken() } });
+        const data = await res.json();
+        if (data.success) {
+            animateNumber('stat-encuestas', data.data.total ?? 0);
         }
-    }
+    } catch(e) {}
+}
 
-    function renderUsers(users) {
-        const tbody = document.getElementById('users-tbody');
-        if (!users.length) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-gray-400 text-sm">No hay usuarios registrados.</td></tr>`;
-            return;
-        }
-        tbody.innerHTML = users.map(u => `
-            <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
-                <td class="px-5 py-3.5">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold
-                            ${u.role === 'admin' ? 'bg-blue-900' : 'bg-orange-500'}">
-                            ${u.nombre.charAt(0).toUpperCase()}
-                        </div>
-                        <span class="font-mono text-xs text-gray-600">${u.username}</span>
-                    </div>
-                </td>
-                <td class="px-5 py-3.5 font-medium text-gray-900 text-sm">${u.nombre}</td>
-                <td class="px-5 py-3.5 text-gray-500 text-xs hidden md:table-cell">${u.email || '—'}</td>
-                <td class="px-5 py-3.5">
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold
-                        ${u.role === 'admin' ? 'bg-blue-100 text-blue-900' : 'bg-orange-100 text-orange-700'}">
-                        <i class="fas ${u.role === 'admin' ? 'fa-shield-halved' : 'fa-user-graduate'} text-xs"></i>
-                        ${u.role === 'admin' ? 'Admin' : 'Egresado'}
-                    </span>
-                </td>
-                <td class="px-5 py-3.5 text-gray-400 text-xs hidden lg:table-cell">${formatDate(u.created_at)}</td>
-                <td class="px-5 py-3.5">
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold
-                        ${u.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">
-                        <span class="w-1.5 h-1.5 rounded-full ${u.activo ? 'bg-green-500' : 'bg-gray-400'}"></span>
-                        ${u.activo ? 'Activo' : 'Inactivo'}
-                    </span>
-                </td>
-                <td class="px-5 py-3.5 text-right">
-                    <div class="flex items-center justify-end gap-1">
-                        <button onclick="openEditModal(${u.id})"
-                            class="w-8 h-8 rounded border border-gray-200 hover:border-blue-900 hover:text-blue-900 text-gray-500 flex items-center justify-center transition"
-                            title="Editar">
-                            <i class="fas fa-pen text-xs"></i>
-                        </button>
-                        ${u.username !== 'admin' ? `
-                        <button onclick="openDeleteModal(${u.id}, '${escapeHtml(u.nombre)}')"
-                            class="w-8 h-8 rounded border border-gray-200 hover:border-red-400 hover:text-red-500 text-gray-500 flex items-center justify-center transition"
-                            title="Eliminar">
-                            <i class="fas fa-trash text-xs"></i>
-                        </button>` : ''}
-                    </div>
-                </td>
-            </tr>
-        `).join('');
-    }
+function updateStats() {
+    animateNumber('stat-total',     allUsers.length);
+    animateNumber('stat-egresados', allUsers.filter(u => u.role === 'egresado').length);
+    animateNumber('stat-admins',    allUsers.filter(u => u.role === 'admin').length);
+}
 
-    function filterUsers() {
-        const q    = document.getElementById('search-users').value.toLowerCase();
-        const role = document.getElementById('filter-role').value;
-        const filtered = allUsers.filter(u => {
-            const matchQ    = !q || u.nombre.toLowerCase().includes(q) || u.username.toLowerCase().includes(q);
-            const matchRole = !role || u.role === role;
-            return matchQ && matchRole;
+function animateNumber(id, target) {
+    const el  = document.getElementById(id);
+    const start = 0;
+    const dur   = 400;
+    const t0    = performance.now();
+    const step  = now => {
+        const prog = Math.min((now - t0) / dur, 1);
+        el.textContent = Math.round(start + (target - start) * prog);
+        if (prog < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}
+
+// ── Modal Ver ──────────────────────────────────────────────────────
+let viewUserId = null;
+function openViewModal(id) {
+    const u = allUsers.find(x => x.id === id);
+    if (!u) return;
+    viewUserId = id;
+    const header = document.getElementById('view-modal-header');
+    const avatar = document.getElementById('view-avatar');
+    header.style.background = u.role === 'admin' ? '#1e3a5f' : '#f97316';
+    avatar.textContent = u.nombre.charAt(0).toUpperCase();
+    avatar.style.background = u.role === 'admin' ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.3)';
+    document.getElementById('view-nombre').textContent   = u.nombre;
+    document.getElementById('view-username').textContent = '@' + u.username;
+    document.getElementById('view-email').textContent    = u.email || '—';
+    document.getElementById('view-fecha').textContent    = formatDate(u.created_at);
+    document.getElementById('view-role').innerHTML = `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold
+            ${u.role === 'admin' ? 'bg-blue-100 text-blue-900' : 'bg-orange-100 text-orange-700'}">
+            <i class="fas ${u.role === 'admin' ? 'fa-shield-halved' : 'fa-user-graduate'}"></i>
+            ${u.role === 'admin' ? 'Administrador' : 'Egresado'}
+        </span>`;
+    document.getElementById('view-activo').innerHTML = `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold
+            ${u.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">
+            <span class="w-1.5 h-1.5 rounded-full ${u.activo ? 'bg-green-500' : 'bg-gray-400'}"></span>
+            ${u.activo ? 'Activo' : 'Inactivo'}
+        </span>`;
+    document.getElementById('view-edit-btn').onclick   = () => { closeViewModal(); openEditModal(id); };
+    document.getElementById('view-delete-btn').onclick = u.username !== 'admin'
+        ? () => { closeViewModal(); openDeleteModal(id, u.nombre); }
+        : () => showToast('El usuario admin no puede eliminarse', 'error');
+    document.getElementById('view-modal').classList.remove('hidden');
+}
+function closeViewModal() {
+    document.getElementById('view-modal').classList.add('hidden');
+}
+
+// ── Modal Crear ────────────────────────────────────────────────────
+function openCreateModal() {
+    document.getElementById('modal-user-id').value   = '';
+    document.getElementById('modal-title').textContent    = 'Nuevo Usuario';
+    document.getElementById('modal-subtitle').textContent = 'Completa los datos del nuevo usuario';
+    document.getElementById('modal-header-icon').className = 'fas fa-user-plus text-white';
+    document.getElementById('modal-submit-text').textContent = 'Crear Usuario';
+    document.getElementById('modal-submit-icon').className  = 'fas fa-user-plus text-sm';
+    document.getElementById('modal-nombre').value    = '';
+    document.getElementById('modal-username').value  = '';
+    document.getElementById('modal-password').value  = '';
+    document.getElementById('modal-email').value     = '';
+    document.getElementById('modal-username').disabled = false;
+    setRadioRole('egresado');
+    document.getElementById('modal-activo-group').classList.add('hidden');
+    document.getElementById('edit-password-hint').classList.add('hidden');
+    document.getElementById('password-required-label').classList.remove('hidden');
+    document.getElementById('modal-error').classList.add('hidden');
+    document.getElementById('user-modal').classList.remove('hidden');
+}
+
+// ── Modal Editar ───────────────────────────────────────────────────
+function openEditModal(id) {
+    const u = allUsers.find(x => x.id === id);
+    if (!u) return;
+    document.getElementById('modal-user-id').value   = u.id;
+    document.getElementById('modal-title').textContent    = 'Editar Usuario';
+    document.getElementById('modal-subtitle').textContent = `Modificando cuenta de ${u.username}`;
+    document.getElementById('modal-header-icon').className = 'fas fa-user-pen text-white';
+    document.getElementById('modal-submit-text').textContent = 'Guardar Cambios';
+    document.getElementById('modal-submit-icon').className  = 'fas fa-floppy-disk text-sm';
+    document.getElementById('modal-nombre').value    = u.nombre;
+    document.getElementById('modal-username').value  = u.username;
+    document.getElementById('modal-password').value  = '';
+    document.getElementById('modal-email').value     = u.email || '';
+    document.getElementById('modal-username').disabled = (u.username === 'admin');
+    setRadioRole(u.role);
+    document.getElementById('modal-activo').checked  = !!u.activo;
+    document.getElementById('modal-activo-group').classList.remove('hidden');
+    document.getElementById('edit-password-hint').classList.remove('hidden');
+    document.getElementById('password-required-label').classList.add('hidden');
+    document.getElementById('modal-error').classList.add('hidden');
+    updateActivoUI();
+    document.getElementById('user-modal').classList.remove('hidden');
+}
+
+function closeUserModal() {
+    document.getElementById('user-modal').classList.add('hidden');
+}
+
+function setRadioRole(role) {
+    document.querySelectorAll('input[name="modal-role-radio"]').forEach(r => {
+        r.checked = r.value === role;
+    });
+}
+
+function getRadioRole() {
+    const r = document.querySelector('input[name="modal-role-radio"]:checked');
+    return r ? r.value : 'egresado';
+}
+
+function updateActivoUI() {
+    const checked = document.getElementById('modal-activo').checked;
+    const label   = document.getElementById('activo-label');
+    const desc    = document.getElementById('activo-desc');
+    const iconWrap= document.getElementById('activo-icon-wrap');
+    const icon    = document.getElementById('activo-icon');
+    if (checked) {
+        label.textContent   = 'Cuenta Activa';
+        desc.textContent    = 'El usuario puede iniciar sesión';
+        iconWrap.className  = 'w-9 h-9 rounded-lg flex items-center justify-center bg-green-100';
+        icon.className      = 'fas fa-check text-green-600 text-sm';
+    } else {
+        label.textContent   = 'Cuenta Inactiva';
+        desc.textContent    = 'El usuario no puede iniciar sesión';
+        iconWrap.className  = 'w-9 h-9 rounded-lg flex items-center justify-center bg-gray-100';
+        icon.className      = 'fas fa-ban text-gray-400 text-sm';
+    }
+}
+
+// ── Submit modal ───────────────────────────────────────────────────
+async function submitUserModal() {
+    const uid    = document.getElementById('modal-user-id').value;
+    const isEdit = !!uid;
+    const btn    = document.getElementById('modal-submit-btn');
+
+    const nombre   = document.getElementById('modal-nombre').value.trim();
+    const username = document.getElementById('modal-username').value.trim();
+    const password = document.getElementById('modal-password').value;
+    const email    = document.getElementById('modal-email').value.trim();
+    const role     = getRadioRole();
+
+    // Validaciones
+    if (!nombre)   return showModalError('El nombre es requerido.');
+    if (!username) return showModalError('El nombre de usuario es requerido.');
+    if (/\s/.test(username)) return showModalError('El usuario no puede contener espacios.');
+    if (!isEdit && !password) return showModalError('La contraseña es requerida para nuevos usuarios.');
+    if (password && password.length < 6) return showModalError('La contraseña debe tener al menos 6 caracteres.');
+
+    const payload = { nombre, username, email, role };
+    if (password) payload.password = password;
+    if (isEdit)   payload.activo   = document.getElementById('modal-activo').checked ? 1 : 0;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i> Guardando...';
+    document.getElementById('modal-error').classList.add('hidden');
+
+    try {
+        const url    = isEdit ? `${API}/users/${uid}` : `${API}/users`;
+        const method = isEdit ? 'PUT' : 'POST';
+        const res    = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
+            body: JSON.stringify(payload)
         });
-        renderUsers(filtered);
-    }
-
-    // ── Stats ──────────────────────────────────────────────────
-    async function loadStats() {
-        try {
-            const res  = await fetch(`${API}/stats`, { credentials: 'include' });
-            const data = await res.json();
-            if (data.success) {
-                document.getElementById('stat-encuestas').textContent = data.data.total ?? 0;
-            }
-        } catch(e) {}
-    }
-
-    function updateStats() {
-        document.getElementById('stat-total').textContent    = allUsers.length;
-        document.getElementById('stat-egresados').textContent = allUsers.filter(u => u.role === 'egresado').length;
-        document.getElementById('stat-admins').textContent   = allUsers.filter(u => u.role === 'admin').length;
-    }
-
-    // ── Modal Crear ────────────────────────────────────────────
-    function openCreateModal() {
-        document.getElementById('modal-user-id').value      = '';
-        document.getElementById('modal-title').textContent  = 'Nuevo Usuario';
-        document.getElementById('modal-submit-text').textContent = 'Crear Usuario';
-        document.getElementById('modal-nombre').value       = '';
-        document.getElementById('modal-username').value     = '';
-        document.getElementById('modal-password').value     = '';
-        document.getElementById('modal-email').value        = '';
-        document.getElementById('modal-role').value         = 'egresado';
-        document.getElementById('modal-activo-group').classList.add('hidden');
-        document.getElementById('edit-password-hint').classList.add('hidden');
-        document.getElementById('password-required-label').classList.remove('hidden');
-        document.getElementById('modal-username').disabled  = false;
-        document.getElementById('modal-error').classList.add('hidden');
-        document.getElementById('user-modal').classList.remove('hidden');
-    }
-
-    function openEditModal(id) {
-        const u = allUsers.find(x => x.id === id);
-        if (!u) return;
-        document.getElementById('modal-user-id').value      = u.id;
-        document.getElementById('modal-title').textContent  = 'Editar Usuario';
-        document.getElementById('modal-submit-text').textContent = 'Guardar Cambios';
-        document.getElementById('modal-nombre').value       = u.nombre;
-        document.getElementById('modal-username').value     = u.username;
-        document.getElementById('modal-password').value     = '';
-        document.getElementById('modal-email').value        = u.email || '';
-        document.getElementById('modal-role').value         = u.role;
-        document.getElementById('modal-activo').checked     = !!u.activo;
-        document.getElementById('modal-activo-group').classList.remove('hidden');
-        document.getElementById('edit-password-hint').classList.remove('hidden');
-        document.getElementById('password-required-label').classList.add('hidden');
-        document.getElementById('modal-username').disabled  = u.username === 'admin';
-        document.getElementById('modal-error').classList.add('hidden');
-        document.getElementById('user-modal').classList.remove('hidden');
-    }
-
-    function closeUserModal() {
-        document.getElementById('user-modal').classList.add('hidden');
-    }
-
-    async function submitUserModal() {
-        const uid    = document.getElementById('modal-user-id').value;
-        const isEdit = !!uid;
-        const btn    = document.getElementById('modal-submit-btn');
-
-        const payload = {
-            nombre:   document.getElementById('modal-nombre').value.trim(),
-            username: document.getElementById('modal-username').value.trim(),
-            password: document.getElementById('modal-password').value,
-            email:    document.getElementById('modal-email').value.trim(),
-            role:     document.getElementById('modal-role').value,
-        };
-        if (isEdit) payload.activo = document.getElementById('modal-activo').checked ? 1 : 0;
-
-        if (!payload.nombre || (!isEdit && !payload.password) || !payload.username) {
-            showModalError('Nombre, usuario y contraseña son requeridos.');
-            return;
+        const data = await res.json();
+        if (data.success) {
+            closeUserModal();
+            await loadUsers();
+            showToast(isEdit ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente', 'success');
+        } else if (res.status === 401) {
+            // Sesión expirada — reconectar y reintentar
+            showModalError('Sesión expirada. Vuelve a iniciar sesión.');
+            setTimeout(() => { closeUserModal(); showLoginModal(); }, 1500);
+        } else {
+            showModalError(data.error || 'Error al guardar.');
         }
-
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
-        try {
-            const url    = isEdit ? `${API}/users/${uid}` : `${API}/users`;
-            const method = isEdit ? 'PUT' : 'POST';
-            const res    = await fetch(url, {
-                method,
-                headers:     { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body:        JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data.success) {
-                closeUserModal();
-                loadUsers();
-            } else {
-                showModalError(data.error || 'Error al guardar.');
-            }
-        } catch(e) {
-            showModalError('Error de conexión.');
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fas fa-check"></i> <span id="modal-submit-text">${isEdit ? 'Guardar Cambios' : 'Crear Usuario'}</span>`;
-        }
-    }
-
-    function showModalError(msg) {
-        document.getElementById('modal-error-msg').textContent = msg;
-        document.getElementById('modal-error').classList.remove('hidden');
-    }
-
-    // ── Modal Eliminar ─────────────────────────────────────────
-    function openDeleteModal(id, nombre) {
-        deleteUserId = id;
-        document.getElementById('delete-user-name').textContent = nombre;
-        document.getElementById('delete-modal').classList.remove('hidden');
-    }
-
-    function closeDeleteModal() {
-        deleteUserId = null;
-        document.getElementById('delete-modal').classList.add('hidden');
-    }
-
-    async function confirmDelete() {
-        if (!deleteUserId) return;
-        const btn = document.getElementById('delete-confirm-btn');
-        btn.disabled = true;
-        btn.textContent = 'Eliminando...';
-        try {
-            const res  = await fetch(`${API}/users/${deleteUserId}`, { method: 'DELETE', credentials: 'include' });
-            const data = await res.json();
-            if (data.success) {
-                closeDeleteModal();
-                loadUsers();
-            }
-        } catch(e) {}
+    } catch(e) {
+        showModalError('Error de conexión: ' + e.message);
+    } finally {
         btn.disabled = false;
-        btn.textContent = 'Eliminar';
+        const submitText = isEdit ? 'Guardar Cambios' : 'Crear Usuario';
+        const submitIcon = isEdit ? 'fa-floppy-disk' : 'fa-user-plus';
+        btn.innerHTML = `<i class="fas ${submitIcon} text-sm"></i> ${submitText}`;
     }
+}
 
-    // ── Helpers ────────────────────────────────────────────────
-    function toggleModalPassword() {
-        const inp  = document.getElementById('modal-password');
-        const icon = document.getElementById('modal-eye');
-        if (inp.type === 'password') { inp.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
-        else { inp.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
-    }
+function showModalError(msg) {
+    const el = document.getElementById('modal-error');
+    document.getElementById('modal-error-msg').textContent = msg;
+    el.classList.remove('hidden');
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 
-    function formatDate(ts) {
-        if (!ts) return '—';
-        return new Date(ts).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' });
-    }
+// ── Modal Eliminar ─────────────────────────────────────────────────
+function openDeleteModal(id, nombre) {
+    deleteUserId = id;
+    document.getElementById('delete-user-name').textContent = nombre;
+    document.getElementById('delete-modal').classList.remove('hidden');
+}
 
-    function escapeHtml(str) {
-        return (str || '').replace(/['"<>&]/g, c => ({'\'':'&#39;','"':'&quot;','<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+function closeDeleteModal() {
+    deleteUserId = null;
+    document.getElementById('delete-modal').classList.add('hidden');
+}
+
+async function confirmDelete() {
+    if (!deleteUserId) return;
+    const btn = document.getElementById('delete-confirm-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+    try {
+        const res  = await fetch(`${API}/users/${deleteUserId}`, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
+        const data = await res.json();
+        if (data.success) {
+            closeDeleteModal();
+            await loadUsers();
+            showToast('Usuario eliminado correctamente', 'success');
+        } else {
+            closeDeleteModal();
+            showToast(data.error || 'No se pudo eliminar el usuario', 'error');
+        }
+    } catch(e) {
+        showToast('Error de conexión', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-trash-alt"></i> Eliminar';
     }
-    </script>
+}
+
+// ── Helpers ────────────────────────────────────────────────────────
+function toggleModalPassword() {
+    const inp  = document.getElementById('modal-password');
+    const icon = document.getElementById('modal-eye');
+    if (inp.type === 'password') { inp.type = 'text'; icon.className = 'fas fa-eye-slash text-sm'; }
+    else { inp.type = 'password'; icon.className = 'fas fa-eye text-sm'; }
+}
+
+function formatDate(ts) {
+    if (!ts) return '—';
+    return new Date(ts).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, c =>
+        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
 </body>
 </html>

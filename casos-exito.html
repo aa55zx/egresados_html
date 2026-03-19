@@ -6,13 +6,13 @@
     <title>Casos de Éxito - TecNM Oaxaca</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="colores.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
         * { font-family: 'Montserrat', sans-serif; }
-        .gradient-blue-orange { background: linear-gradient(135deg, #1e3a8a 0%, #f97316 100%); }
         .card-hover { transition: all 0.3s ease; }
         .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-        .story-card { background: linear-gradient(135deg, rgba(30,58,138,0.05) 0%, rgba(249,115,22,0.05) 100%); }
+        .story-card { background-color: #f8fbff; border: 1px solid #e6edf4; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -26,20 +26,20 @@
                         <p class="text-sm text-gray-600">Casos de Éxito</p>
                     </div>
                 </div>
-                <a href="index.html" class="text-orange-500 hover:text-orange-600 font-semibold">
-                    <i class="fas fa-arrow-left mr-2"></i>Regresar
-                </a>
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="text-gray-500 hover:text-orange-500 font-semibold text-sm">
+                        <i class="fas fa-arrow-left mr-1"></i>Portal
+                    </a>
+                    <div id="nav-auth-area"></div>
+                </div>
             </div>
         </div>
     </nav>
 
-    <section class="gradient-blue-orange py-16">
+    <section class="bg-blue-900 py-16">
         <div class="container mx-auto px-4 text-center text-white">
-            <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6">
-                <i class="fas fa-trophy mr-2"></i>
-                <span class="font-semibold">#OrgulloTecNM</span>
-            </div>
-            <h1 class="text-5xl font-bold mb-4">Casos de Éxito</h1>
+            <p class="text-orange-400 font-semibold text-xs uppercase tracking-widest mb-3">#OrgulloTecNM</p>
+            <h1 class="text-4xl font-bold mb-3">Casos de Éxito</h1>
             <p class="text-xl max-w-3xl mx-auto">
                 Conoce las inspiradoras historias de nuestros egresados que están transformando el mundo
             </p>
@@ -276,5 +276,6 @@
             </div>
         </div>
     </footer>
+<script src="auth.js"></script>
 </body>
 </html>

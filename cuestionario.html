@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="colores.css">
     <style>
         * { font-family: 'Montserrat', sans-serif; }
 
@@ -27,10 +28,10 @@
             cursor: default;
             flex-shrink: 0;
         }
-        .step-dot.active  { background: #1e3a8a; border-color: #1e3a8a; color: white; box-shadow: 0 0 0 4px rgba(30,58,138,0.15); }
-        .step-dot.done    { background: #f97316; border-color: #f97316; color: white; }
+        .step-dot.active  { background: #1A3A5C; border-color: #1A3A5C; color: white; box-shadow: 0 0 0 4px rgba(26,58,92,0.15); }
+        .step-dot.done    { background: #E8A020; border-color: #E8A020; color: white; }
         .step-line        { flex: 1; height: 2px; background: #e5e7eb; transition: background 0.3s ease; }
-        .step-line.done   { background: #f97316; }
+        .step-line.done   { background: #E8A020; }
 
         /* ── Section slides ── */
         .section-panel { display: none; animation: fadeIn 0.35s ease; }
@@ -48,7 +49,7 @@
             transition: border-color 0.2s, box-shadow 0.2s;
             background: #fafafa;
         }
-        .form-input:focus { border-color: #1e3a8a; box-shadow: 0 0 0 3px rgba(30,58,138,0.1); background: white; }
+        .form-input:focus { border-color: #1A3A5C; box-shadow: 0 0 0 3px rgba(26,58,92,0.1); background: white; }
 
         /* ── Radio / Checkbox pill ── */
         .pill-label {
@@ -62,10 +63,10 @@
             background: white;
             user-select: none;
         }
-        .pill-label:hover { border-color: #1e3a8a; color: #1e3a8a; }
+        .pill-label:hover { border-color: #1A3A5C; color: #1A3A5C; }
         .pill-label input { display: none; }
-        .pill-label.selected { background: #1e3a8a; border-color: #1e3a8a; color: white; }
-        .pill-label.selected-orange { background: #f97316; border-color: #f97316; color: white; }
+        .pill-label.selected { background: #1A3A5C; border-color: #1A3A5C; color: white; }
+        .pill-label.selected-orange { background: #E8A020; border-color: #E8A020; color: white; }
 
         /* ── Scale buttons ── */
         .scale-btn {
@@ -77,8 +78,8 @@
             font-size: 13px; font-weight: 700;
             transition: all 0.2s;
         }
-        .scale-btn:hover { border-color: #f97316; color: #f97316; }
-        .scale-btn.active { background: #f97316; border-color: #f97316; color: white; }
+        .scale-btn:hover { border-color: #E8A020; color: #E8A020; }
+        .scale-btn.active { background: #E8A020; border-color: #E8A020; color: white; }
 
         /* ── Card ── */
         .question-card {
@@ -92,14 +93,14 @@
 
         /* ── Nav buttons ── */
         .btn-primary {
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            background: #1A3A5C;
             color: white; font-weight: 700;
             padding: 12px 28px; border-radius: 10px;
             border: none; cursor: pointer;
             transition: all 0.2s;
             display: inline-flex; align-items: center; gap: 8px;
         }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,58,138,0.3); }
+        .btn-primary:hover { background: #142d48; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,58,92,0.25); }
 
         .btn-secondary {
             background: white;
@@ -109,10 +110,10 @@
             transition: all 0.2s;
             display: inline-flex; align-items: center; gap: 8px;
         }
-        .btn-secondary:hover { border-color: #1e3a8a; color: #1e3a8a; }
+        .btn-secondary:hover { border-color: #1A3A5C; color: #1A3A5C; }
 
         .btn-submit {
-            background: linear-gradient(135deg, #f97316, #ea580c);
+            background: #E8A020;
             color: white; font-weight: 700;
             padding: 14px 36px; border-radius: 10px;
             border: none; cursor: pointer;
@@ -120,17 +121,17 @@
             display: inline-flex; align-items: center; gap: 8px;
             font-size: 16px;
         }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(249,115,22,0.35); }
+        .btn-submit:hover { background: #c07818; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(232,160,32,0.35); }
 
         /* ── Section header accent ── */
-        .section-header { border-left: 4px solid #f97316; padding-left: 14px; margin-bottom: 24px; }
+        .section-header { border-left: 4px solid #E8A020; padding-left: 14px; margin-bottom: 24px; }
 
         /* ── Textarea ── */
         textarea.form-input { resize: vertical; min-height: 80px; }
 
         /* ── Table inputs ── */
         .table-input { border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 10px; font-size: 12px; width: 100%; outline: none; background: #fafafa; }
-        .table-input:focus { border-color: #1e3a8a; background: white; }
+        .table-input:focus { border-color: #1A3A5C; background: white; }
 
         /* ── Success screen ── */
         #success-screen { display: none; }
@@ -1098,10 +1099,9 @@
 
             try {
                 const res  = await fetch('http://localhost:5000/api/egresados', {
-                    method:      'POST',
-                    headers:     { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body:        JSON.stringify(data)
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
+                    body:    JSON.stringify(data)
                 });
                 const json = await res.json();
                 if (!json.success) throw new Error(json.error || 'Error del servidor');
@@ -1128,6 +1128,7 @@
         updateUI();
     </script>
 
+    </div><!-- /.container -->
     </div><!-- /#protected-content -->
 
     <script src="auth.js"></script>
