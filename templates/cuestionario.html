@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="colores.css">
+    <link rel="stylesheet" href="../static/css/colores.css">
     <style>
         * { font-family: 'Montserrat', sans-serif; }
 
@@ -1131,24 +1131,29 @@
     </div><!-- /.container -->
     </div><!-- /#protected-content -->
 
-    <script src="auth.js"></script>
+    <script src="../static/js/auth.js"></script>
     <script>
     // ── Proteger página con autenticación ─────────────────────
     (async () => {
-        const user = await requireAuth(
-            (u) => {
-                // Mostrar nombre del usuario en el cuestionario
-                const greet = document.getElementById('cuestionario-greeting');
-                if (greet) {
-                    greet.textContent = `Bienvenido/a, ${u.nombre}`;
-                    greet.classList.remove('hidden');
+        const user = await checkSession();
+        if (!user) {
+            // No autenticado — mostrar modal de login
+            showLoginModal();
+            document.addEventListener('auth:login', (e) => {
+                if (e.detail.role === 'egresado' || e.detail.role === 'admin') {
+                    location.reload();
+                } else {
+                    window.location.href = 'cuestionario_organizacion.html';
                 }
-                // Hacer el contenido visible
-                const content = document.getElementById('protected-content');
-                if (content) content.classList.remove('hidden');
-            },
-            null  // showAuthWall por defecto si no está autenticado
-        );
+            }, { once: true });
+        } else if (user.role === 'organizacion') {
+            // Redirigir al cuestionario correcto
+            window.location.href = 'cuestionario_organizacion.html';
+        } else {
+            // Egresado o admin — mostrar contenido
+            const content = document.getElementById('protected-content');
+            if (content) content.classList.remove('hidden');
+        }
     })();
     </script>
 </body>

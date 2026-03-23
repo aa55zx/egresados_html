@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario Grupos de Interés — TecNM Oaxaca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/colores.css">
+    <style>
+        * { font-family: 'Montserrat', sans-serif; }
+        .section-panel { display:none; animation: fadeIn .35s ease; }
+        .section-panel.active { display:block; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .form-input { width:100%; border:2px solid #e5e7eb; border-radius:10px; padding:10px 14px; font-size:14px; outline:none; transition:border-color .2s,box-shadow .2s; background:#fafafa; }
+        .form-input:focus { border-color:#1A3A5C; box-shadow:0 0 0 3px rgba(26,58,92,.1); background:white; }
+        textarea.form-input { resize:vertical; min-height:80px; }
+        .pill-label { display:inline-flex; align-items:center; gap:7px; padding:7px 14px; border:2px solid #e5e7eb; border-radius:999px; cursor:pointer; font-size:13px; font-weight:500; transition:all .2s; background:white; user-select:none; }
+        .pill-label:hover { border-color:#16a34a; color:#16a34a; }
+        .pill-label input { display:none; }
+        .pill-label.selected { background:#1A3A5C; border-color:#1A3A5C; color:white; }
+        .pill-label.selected-green { background:#16a34a; border-color:#16a34a; color:white; }
+        .scale-btn { width:40px; height:40px; border-radius:8px; border:2px solid #e5e7eb; background:white; cursor:pointer; font-size:13px; font-weight:700; transition:all .2s; }
+        .scale-btn:hover { border-color:#16a34a; color:#16a34a; }
+        .scale-btn.active { background:#16a34a; border-color:#16a34a; color:white; }
+        .question-card { background:white; border-radius:14px; padding:20px; border:1px solid #f0f0f0; box-shadow:0 2px 8px rgba(0,0,0,.04); margin-bottom:16px; }
+        .section-header { border-left:4px solid #16a34a; padding-left:14px; margin-bottom:24px; }
+        .btn-primary { background:#1A3A5C; color:white; font-weight:700; padding:12px 28px; border-radius:10px; border:none; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:8px; }
+        .btn-primary:hover { background:#142d48; transform:translateY(-1px); }
+        .btn-secondary { background:white; color:#374151; font-weight:600; padding:12px 24px; border-radius:10px; border:2px solid #e5e7eb; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:8px; }
+        .btn-secondary:hover { border-color:#1A3A5C; color:#1A3A5C; }
+        .btn-submit { background:#16a34a; color:white; font-weight:700; padding:14px 36px; border-radius:10px; border:none; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:8px; font-size:16px; }
+        .btn-submit:hover { background:#15803d; transform:translateY(-2px); box-shadow:0 8px 25px rgba(22,163,74,.35); }
+        .step-dot { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; transition:all .3s; border:2px solid #d1d5db; background:white; color:#9ca3af; flex-shrink:0; }
+        .step-dot.active { background:#1A3A5C; border-color:#1A3A5C; color:white; box-shadow:0 0 0 4px rgba(26,58,92,.15); }
+        .step-dot.done { background:#16a34a; border-color:#16a34a; color:white; }
+        .step-line { flex:1; height:2px; background:#e5e7eb; transition:background .3s; }
+        .step-line.done { background:#16a34a; }
+        .progress-fill { transition:width .5s cubic-bezier(.4,0,.2,1); }
+        #success-screen { display:none; }
+        #success-screen.show { display:flex; animation:fadeIn .5s ease; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-3">
+            <div class="flex items-center space-x-3">
+                <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="TecNM" class="h-12">
+                <div>
+                    <p class="font-bold text-blue-900 text-sm leading-tight">TecNM Campus Oaxaca</p>
+                    <p class="text-xs text-gray-500">Cuestionario — Grupos de Interés 2025</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="text-gray-500 hover:text-orange-500 font-semibold text-sm">
+                    <i class="fas fa-arrow-left mr-1"></i>Portal
+                </a>
+                <div id="nav-auth-area"></div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="protected-content" class="hidden">
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+
+    <!-- Hero -->
+    <div class="bg-gradient-to-r from-green-800 to-green-600 rounded-2xl p-6 text-white mb-8 relative overflow-hidden">
+        <div class="absolute right-0 top-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-10 translate-x-10"></div>
+        <span class="inline-block bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
+            <i class="fas fa-building mr-1"></i>Grupos de Interés — Posgrado en Ciencias de la Ingeniería
+        </span>
+        <h1 class="text-2xl font-bold mb-1">Cuestionario para Organizaciones</h1>
+        <p class="text-green-100 text-sm max-w-lg">Su opinión como representante de organización empresarial o gubernamental es fundamental para orientar la formación de nuestros posgradistas. La información es confidencial y de uso exclusivo educativo.</p>
+        <div class="mt-4 flex items-center gap-4 text-xs text-green-200">
+            <span><i class="fas fa-clock mr-1"></i>~15 minutos</span>
+            <span><i class="fas fa-shield-alt mr-1"></i>Datos confidenciales</span>
+            <span><i class="fas fa-layer-group mr-1"></i>5 secciones</span>
+        </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100">
+        <div class="flex items-center mb-4" id="step-track"></div>
+        <div class="flex justify-between text-xs text-gray-400 font-medium px-1">
+            <span>Datos empresa</span>
+            <span>Habilidades</span>
+            <span>Vinculación</span>
+            <span>Áreas</span>
+            <span>Fortalezas</span>
+        </div>
+        <div class="mt-3 bg-gray-100 rounded-full h-2 overflow-hidden">
+            <div id="progress-bar" class="progress-fill h-full rounded-full" style="width:20%; background:linear-gradient(to right,#1A3A5C,#16a34a)"></div>
+        </div>
+        <p class="text-xs text-gray-400 mt-1 text-right" id="progress-label">Sección 1 de 5</p>
+    </div>
+
+    <!-- ═══ SECCIÓN 1: DATOS DE LA EMPRESA ═══ -->
+    <div class="section-panel active" id="section-1">
+        <div class="section-header">
+            <h2 class="text-xl font-bold text-blue-900">I. Datos de la Empresa o Institución</h2>
+            <p class="text-sm text-gray-500 mt-1">Información general de su organización</p>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha <span class="text-orange-500">*</span></label>
+            <input id="in-fecha" class="form-input" type="date">
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre de la Empresa / Institución <span class="text-orange-500">*</span></label>
+            <input id="in-nombre-empresa" class="form-input" type="text" placeholder="Razón social o nombre de la organización">
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">Domicilio</label>
+            <div class="space-y-3">
+                <input id="in-direccion" class="form-input" type="text" placeholder="Calle, número, colonia">
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="in-municipio" class="form-input" type="text" placeholder="Municipio y estado">
+                    <input id="in-cp" class="form-input" type="text" placeholder="Código Postal">
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">1.2 Cargo de la persona que contesta</label>
+            <input id="in-cargo" class="form-input" type="text" placeholder="Ej. Gerente de Recursos Humanos">
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Área de adscripción</label>
+            <input id="in-area" class="form-input" type="text" placeholder="Departamento o área">
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Correo electrónico <span class="text-orange-500">*</span></label>
+            <input id="in-correo" class="form-input" type="email" placeholder="contacto@empresa.com">
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono de contacto</label>
+            <input id="in-telefono" class="form-input" type="tel" placeholder="(951) 123 4567">
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">1.3 Tipo de empresa</label>
+            <div class="flex flex-wrap gap-2" id="grp-tipo">
+                <label class="pill-label" onclick="selectPill(this,'tipo')"><input type="radio" name="tipo"> Pública</label>
+                <label class="pill-label" onclick="selectPill(this,'tipo')"><input type="radio" name="tipo"> Privada</label>
+                <label class="pill-label" onclick="selectPill(this,'tipo')"><input type="radio" name="tipo"> ONG</label>
+                <label class="pill-label" onclick="selectPill(this,'tipo')"><input type="radio" name="tipo"> OSC</label>
+                <label class="pill-label" onclick="selectPill(this,'tipo'); toggleSection('tipo-otro',true)"><input type="radio" name="tipo"> Otra</label>
+            </div>
+            <input id="tipo-otro" class="form-input mt-3 hidden" type="text" placeholder="Especifique el tipo">
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">1.4 Tamaño de la empresa</label>
+            <div class="flex flex-wrap gap-2">
+                <label class="pill-label" onclick="selectPill(this,'tamano')"><input type="radio" name="tamano"> Microempresa (máx. 10)</label>
+                <label class="pill-label" onclick="selectPill(this,'tamano')"><input type="radio" name="tamano"> Pequeña (11–49)</label>
+                <label class="pill-label" onclick="selectPill(this,'tamano')"><input type="radio" name="tamano"> Mediana (50–249)</label>
+                <label class="pill-label" onclick="selectPill(this,'tamano')"><input type="radio" name="tamano"> Grande (250+)</label>
+                <label class="pill-label" onclick="selectPill(this,'tamano')"><input type="radio" name="tamano"> Startup</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">1.5 Sector al que pertenece</label>
+            <select id="in-sector" class="form-input">
+                <option value="">Selecciona…</option>
+                <option>Agricultura, cría y explotación de animales, aprovechamiento forestal, pesca y caza</option>
+                <option>Minería</option>
+                <option>Generación, transmisión y distribución de energía eléctrica, suministro de agua y de gas</option>
+                <option>Construcción</option>
+                <option>Industrias manufactureras</option>
+                <option>Comercio al por mayor o al por menor</option>
+                <option>Transportes, correos y almacenamiento</option>
+                <option>Información en medios masivos</option>
+                <option>Servicios financieros y de seguros</option>
+                <option>Servicios inmobiliarios y de alquiler</option>
+                <option>Servicios profesionales, científicos y técnicos</option>
+                <option>Corporativos</option>
+                <option>Servicios de apoyo a los negocios</option>
+                <option>Servicios educativos</option>
+                <option>Servicios de salud y de asistencia social</option>
+                <option>Servicios de esparcimiento, culturales y deportivos</option>
+                <option>Otros servicios excepto actividades gubernamentales</option>
+                <option>Actividades legislativas, gubernamentales y de impartición de justicia</option>
+                <option value="otra">Otra, especifique</option>
+            </select>
+            <input id="in-sector-otro" class="form-input mt-3 hidden" type="text" placeholder="Especifique el sector">
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">1.6 ¿Cuántos profesionistas con nivel de posgrado laboran en su empresa?</label>
+            <div class="grid grid-cols-3 gap-3">
+                <div>
+                    <p class="text-xs text-gray-400 mb-1">Maestría</p>
+                    <input id="in-posgrado-maestria" class="form-input" type="number" min="0" placeholder="0">
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 mb-1">Doctorado</p>
+                    <input id="in-posgrado-doctorado" class="form-input" type="number" min="0" placeholder="0">
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 mb-1">Posdoctorado</p>
+                    <input id="in-posgrado-posdoc" class="form-input" type="number" min="0" placeholder="0">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ SECCIÓN 2: HABILIDADES Y COMPETENCIAS ═══ -->
+    <div class="section-panel" id="section-2">
+        <div class="section-header">
+            <h2 class="text-xl font-bold text-blue-900">II. Habilidades y Competencias Requeridas</h2>
+            <p class="text-sm text-gray-500 mt-1">Perfiles y características que valora su organización</p>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-4">2.1 Importancia de características para la contratación
+                <span class="text-xs text-gray-400 font-normal">(1=Nada importante · 5=Muy importante)</span>
+            </label>
+            <div class="space-y-4" id="caract-scales">
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Actitud y motivación</p><div class="flex gap-1" id="s-actitud"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Experiencia Profesional</p><div class="flex gap-1" id="s-experiencia"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Adaptabilidad y aprendizaje continuo</p><div class="flex gap-1" id="s-adaptabilidad"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Habilidades de Investigación</p><div class="flex gap-1" id="s-investigacion"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Certificaciones</p><div class="flex gap-1" id="s-certificaciones"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Estudios de posgrado</p><div class="flex gap-1" id="s-posgrado-req"></div></div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">2.2 Perfiles profesionales requeridos <span class="text-xs text-gray-400">(selecciona los que apliquen)</span></label>
+            <div id="grp-perfiles" class="flex flex-wrap gap-2">
+                <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Ciencias agropecuarias</label>
+                <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Ciencias de la salud</label>
+                <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Ciencias naturales y exactas</label>
+                <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Ciencias sociales y administrativas</label>
+                <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Educación y humanidades</label>
+                <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Ingeniería y tecnología</label>
+            </div>
+            <div class="mt-3">
+                <p class="text-xs text-gray-500 mb-2 font-medium">Especifique área de ingeniería (si aplica):</p>
+                <div id="grp-ingenieria" class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Eléctrica y electrónica</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> TIC</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Semiconductores</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Electromovilidad</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Energías limpias</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Aeronáutica</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Ambiental</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Biomédica</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Química</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Mecánica</label>
+                </div>
+                <input id="in-perfiles-otro" class="form-input mt-2" type="text" placeholder="Otro perfil (especifique)">
+            </div>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-4">2.3 Importancia de aspectos para la selección de personal
+                <span class="text-xs text-gray-400 font-normal">(1–5)</span>
+            </label>
+            <div class="space-y-4">
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Prestigio de la institución de procedencia</p><div class="flex gap-1" id="s-prestigio"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Que cuente con título y cédula profesional</p><div class="flex gap-1" id="s-titulo"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Que haya realizado estudios de posgrado</p><div class="flex gap-1" id="s-estposgrado"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Que cuente con recomendaciones</p><div class="flex gap-1" id="s-recomendaciones"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Que cuente con experiencia laboral previa</p><div class="flex gap-1" id="s-explaboral"></div></div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-4">2.4 Nivel de importancia de habilidades por campo de aplicación
+                <span class="text-xs text-gray-400 font-normal">(1–5)</span>
+            </label>
+            <div class="space-y-4">
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Trabajo en equipo</p><div class="flex gap-1" id="h-equipo"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Investigación y desarrollo de tecnología</p><div class="flex gap-1" id="h-i-d"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Organización, gestión y control de grupos</p><div class="flex gap-1" id="h-gestion"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Diagnóstico y análisis de problemas</p><div class="flex gap-1" id="h-diagnostico"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Análisis de situaciones y toma de decisiones</p><div class="flex gap-1" id="h-decisiones"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Reconocer y utilizar información relevante</p><div class="flex gap-1" id="h-informacion"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Comunicación verbal</p><div class="flex gap-1" id="h-verbal"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Comunicación escrita</p><div class="flex gap-1" id="h-escrita"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Uso de herramientas, equipo o maquinaria</p><div class="flex gap-1" id="h-herramientas"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Manejo de segundo idioma</p><div class="flex gap-1" id="h-idioma"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Autoaprendizaje</p><div class="flex gap-1" id="h-autoaprendizaje"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Uso y aplicación de herramientas tecnológicas</p><div class="flex gap-1" id="h-tecnologicas"></div></div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-4">2.5 Nivel de importancia de competencias generales
+                <span class="text-xs text-gray-400 font-normal">(1–5)</span>
+            </label>
+            <div class="space-y-4">
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Valores y principios éticos</p><div class="flex gap-1" id="c-etica"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Responsabilidades con calidad y precisión</p><div class="flex gap-1" id="c-calidad"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Respeto por perspectivas distintas</p><div class="flex gap-1" id="c-respeto"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Generar nuevas ideas</p><div class="flex gap-1" id="c-ideas"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Liderazgo y adaptación al cambio</p><div class="flex gap-1" id="c-liderazgo"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Identificar problemas</p><div class="flex gap-1" id="c-problemas"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Planificar y administrar el tiempo</p><div class="flex gap-1" id="c-tiempo"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Solucionar problemas</p><div class="flex gap-1" id="c-solucionar"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Tomar decisiones</p><div class="flex gap-1" id="c-decisiones"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Responsabilidad social y compromiso con el entorno</p><div class="flex gap-1" id="c-social"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Aprendizaje continuo</p><div class="flex gap-1" id="c-continuo"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Realizar investigaciones en ingeniería</p><div class="flex gap-1" id="c-investigar"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Analizar e interpretar datos</p><div class="flex gap-1" id="c-datos"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ SECCIÓN 3: VINCULACIÓN ═══ -->
+    <div class="section-panel" id="section-3">
+        <div class="section-header">
+            <h2 class="text-xl font-bold text-blue-900">III. Vinculación Escuela – Institución/Empresa</h2>
+            <p class="text-sm text-gray-500 mt-1">Relación actual con instituciones educativas de posgrado</p>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">3.1 ¿La institución/empresa cuenta con actividades de vinculación con instituciones educativas a nivel posgrado?</label>
+            <div class="flex gap-2 mb-3">
+                <label class="pill-label" onclick="selectPill(this,'vinculacion'); toggleSection('vinculacion-tipos',true)"><input type="radio" name="vinculacion" value="Sí"> Sí</label>
+                <label class="pill-label" onclick="selectPill(this,'vinculacion'); toggleSection('vinculacion-tipos',false)"><input type="radio" name="vinculacion" value="No"> No</label>
+            </div>
+            <div id="vinculacion-tipos" class="hidden">
+                <p class="text-xs text-gray-500 mb-2 font-medium">Seleccione las actividades de vinculación:</p>
+                <div id="grp-vinc-tipos" class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Proyectos de investigación</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Actividades de formación académica (conferencias, talleres, cursos)</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Actividades de retribución social</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Firma de instrumentos jurídicos de colaboración</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Actividades de cuidado del medio ambiente</label>
+                </div>
+                <input id="in-vinc-otro" class="form-input mt-2" type="text" placeholder="Otro (especifique)">
+            </div>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">3.2 ¿La institución/empresa cuenta con estudiantes de posgrado que colaboren en algún proyecto?</label>
+            <div class="flex gap-2 mb-3">
+                <label class="pill-label" onclick="selectPill(this,'estudiantes'); toggleSection('estudiantes-si',true); toggleSection('estudiantes-no',false)"><input type="radio" name="estudiantes" value="Sí"> Sí</label>
+                <label class="pill-label" onclick="selectPill(this,'estudiantes'); toggleSection('estudiantes-si',false); toggleSection('estudiantes-no',true)"><input type="radio" name="estudiantes" value="No"> No</label>
+            </div>
+            <div id="estudiantes-si" class="hidden space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">Tipo de proyecto</p>
+                        <input id="in-est-tipo" class="form-input" type="text" placeholder="Tipo de proyecto">
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">Cantidad de estudiantes</p>
+                        <input id="in-est-cantidad" class="form-input" type="number" min="1" placeholder="Número">
+                    </div>
+                </div>
+            </div>
+            <div id="estudiantes-no" class="hidden">
+                <p class="text-xs text-gray-400 mb-2">¿Por qué no ha considerado integrar estudiantes de posgrado?</p>
+                <div id="grp-est-no" class="flex flex-wrap gap-2">
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> No es de interés</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> No es relevante</label>
+                    <label class="pill-label" onclick="toggleCheck(this)"><input type="checkbox"> Confidencialidad de la información</label>
+                </div>
+                <input id="in-est-no-otro" class="form-input mt-2" type="text" placeholder="Otro (especifique)">
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ SECCIÓN 4: ÁREAS DE OPORTUNIDAD ═══ -->
+    <div class="section-panel" id="section-4">
+        <div class="section-header">
+            <h2 class="text-xl font-bold text-blue-900">IV. Áreas de Oportunidad</h2>
+            <p class="text-sm text-gray-500 mt-1">Identificadas por su institución o empresa</p>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">4.1 Áreas de oportunidad en su empresa o institución</label>
+            <textarea id="in-areas-oportunidad" class="form-input" rows="4" placeholder="Describa las áreas de oportunidad que existen en su organización…"></textarea>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">4.2 ¿Será necesaria la incorporación de nuevos perfiles profesionales? ¿Cuáles?</label>
+            <textarea id="in-nuevos-perfiles" class="form-input" rows="3" placeholder="Describa los perfiles emergentes que considera necesarios…"></textarea>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">4.3 Problemática actual de los profesionistas con estudios de posgrado contratados</label>
+            <textarea id="in-problematica" class="form-input" rows="3" placeholder="Describa los principales problemas que identifica…"></textarea>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">4.4 Temáticas actuales como áreas de oportunidad para desarrollar o aprender</label>
+            <textarea id="in-tematicas" class="form-input" rows="3" placeholder="Temas, tecnologías o áreas del conocimiento relevantes…"></textarea>
+        </div>
+    </div>
+
+    <!-- ═══ SECCIÓN 5: FORTALEZAS Y ÁREAS DE ATENCIÓN ═══ -->
+    <div class="section-panel" id="section-5">
+        <div class="section-header">
+            <h2 class="text-xl font-bold text-blue-900">V. Fortalezas y Áreas de Atención</h2>
+            <p class="text-sm text-gray-500 mt-1">Diagnóstico interno de su organización</p>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Fortalezas de su institución o empresa</label>
+            <textarea id="in-fortalezas" class="form-input" rows="4" placeholder="Indique las principales fortalezas de su organización…"></textarea>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-4">5.1 Áreas que requieren mayor atención actualmente
+                <span class="text-xs text-gray-400 font-normal">(1=Nada importante · 5=Muy importante)</span>
+            </label>
+            <div class="space-y-4">
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Regulaciones y cumplimiento de normas</p><div class="flex gap-1" id="a-regulaciones"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Actualización en materia de tecnologías</p><div class="flex gap-1" id="a-tecnologias"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Servicio al cliente</p><div class="flex gap-1" id="a-cliente"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Gestión financiera</p><div class="flex gap-1" id="a-financiera"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Crear valor de la marca utilizando TIC's</p><div class="flex gap-1" id="a-marca"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Adaptabilidad al cambio</p><div class="flex gap-1" id="a-cambio"></div></div>
+                <div><p class="text-xs font-medium text-gray-600 mb-2">Mayor vinculación empresarial/institucional</p><div class="flex gap-1" id="a-vinculacion"></div></div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Comentarios generales</label>
+            <textarea id="in-comentarios" class="form-input" rows="4" placeholder="Cualquier comentario o sugerencia adicional que desee compartir…"></textarea>
+        </div>
+
+        <div class="bg-green-50 border border-green-100 rounded-xl p-5 mt-4">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-shield-alt text-green-700 text-xl mt-1"></i>
+                <div>
+                    <p class="font-semibold text-green-800 text-sm">Confidencialidad garantizada</p>
+                    <p class="text-xs text-gray-600 mt-1">La información proporcionada es estrictamente confidencial y se utiliza únicamente con fines educativos, conforme a la Ley Federal de Protección de Datos Personales.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de navegación -->
+    <div class="flex justify-between items-center mt-6 pt-6 border-t border-gray-100">
+        <button class="btn-secondary" id="btn-prev" onclick="changeSection(-1)" style="display:none">
+            <i class="fas fa-arrow-left text-sm"></i> Anterior
+        </button>
+        <div></div>
+        <button class="btn-primary" id="btn-next" onclick="changeSection(1)">
+            Siguiente <i class="fas fa-arrow-right text-sm"></i>
+        </button>
+        <button class="btn-submit" id="btn-submit" style="display:none" onclick="submitForm()">
+            <i class="fas fa-paper-plane"></i> Enviar cuestionario
+        </button>
+    </div>
+</div>
+
+<!-- Pantalla de éxito -->
+<div id="success-screen" class="fixed inset-0 bg-white flex-col items-center justify-center z-50 px-4">
+    <div class="text-center max-w-md">
+        <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl"
+             style="background:linear-gradient(135deg,#1A3A5C,#16a34a)">
+            <i class="fas fa-check text-white text-4xl"></i>
+        </div>
+        <h2 class="text-3xl font-bold text-blue-900 mb-3">¡Gracias por su respuesta!</h2>
+        <p class="text-gray-600 mb-2">El cuestionario ha sido enviado exitosamente.</p>
+        <p class="text-gray-500 text-sm mb-8">Su información contribuirá a mejorar la pertinencia de los programas de posgrado del ITO.</p>
+        <a href="index.html" class="btn-primary">
+            <i class="fas fa-home text-sm"></i> Volver al portal
+        </a>
+    </div>
+</div>
+
+</div><!-- /#protected-content -->
+
+<script src="../static/js/auth.js"></script>
+<script>
+const TOTAL = 5;
+let current = 1;
+
+// ── Escalas ───────────────────────────────────────────────────
+const ALL_SCALES = [
+    's-actitud','s-experiencia','s-adaptabilidad','s-investigacion','s-certificaciones','s-posgrado-req',
+    's-prestigio','s-titulo','s-estposgrado','s-recomendaciones','s-explaboral',
+    'h-equipo','h-i-d','h-gestion','h-diagnostico','h-decisiones','h-informacion',
+    'h-verbal','h-escrita','h-herramientas','h-idioma','h-autoaprendizaje','h-tecnologicas',
+    'c-etica','c-calidad','c-respeto','c-ideas','c-liderazgo','c-problemas','c-tiempo',
+    'c-solucionar','c-decisiones','c-social','c-continuo','c-investigar','c-datos',
+    'a-regulaciones','a-tecnologias','a-cliente','a-financiera','a-marca','a-cambio','a-vinculacion'
+];
+
+function buildScale(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'scale-btn';
+        btn.textContent = i;
+        btn.dataset.val = i;
+        btn.dataset.group = id;
+        btn.onclick = function() {
+            document.querySelectorAll(`[data-group="${id}"]`).forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        };
+        el.appendChild(btn);
+    }
+}
+
+function buildTrack() {
+    const track = document.getElementById('step-track');
+    track.innerHTML = '';
+    for (let i = 1; i <= TOTAL; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'step-dot' + (i < current ? ' done' : i === current ? ' active' : '');
+        dot.innerHTML = i < current ? '<i class="fas fa-check" style="font-size:11px"></i>' : i;
+        track.appendChild(dot);
+        if (i < TOTAL) {
+            const line = document.createElement('div');
+            line.className = 'step-line' + (i < current ? ' done' : '');
+            track.appendChild(line);
+        }
+    }
+}
+
+function init() {
+    ALL_SCALES.forEach(buildScale);
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('in-fecha').value = today;
+    buildTrack();
+    updateUI();
+    // Sector "otra" toggle
+    document.getElementById('in-sector').addEventListener('change', function() {
+        document.getElementById('in-sector-otro').classList.toggle('hidden', this.value !== 'otra');
+    });
+    // Tipo empresa otra toggle
+    document.querySelectorAll('input[name="tipo"]').forEach(r => {
+        r.closest('.pill-label').addEventListener('click', function() {
+            const val = r.closest('.pill-label').textContent.trim();
+            document.getElementById('tipo-otro').classList.toggle('hidden', val !== 'Otra');
+        });
+    });
+}
+
+// ── Navegación ────────────────────────────────────────────────
+function changeSection(dir) {
+    const next = current + dir;
+    if (next < 1 || next > TOTAL) return;
+    document.getElementById(`section-${current}`).classList.remove('active');
+    current = next;
+    document.getElementById(`section-${current}`).classList.add('active');
+    updateUI();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateUI() {
+    const pct = Math.round((current / TOTAL) * 100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = `Sección ${current} de ${TOTAL}`;
+    buildTrack();
+    document.getElementById('btn-prev').style.display   = current > 1 ? 'inline-flex' : 'none';
+    document.getElementById('btn-next').style.display   = current < TOTAL ? 'inline-flex' : 'none';
+    document.getElementById('btn-submit').style.display = current === TOTAL ? 'inline-flex' : 'none';
+}
+
+// ── Pill helpers ─────────────────────────────────────────────
+function selectPill(el, group) {
+    document.querySelectorAll(`input[name="${group}"]`).forEach(inp => {
+        inp.closest('.pill-label').classList.remove('selected');
+    });
+    el.classList.add('selected');
+}
+function toggleCheck(el) { el.classList.toggle('selected'); }
+function toggleSection(id, show) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('hidden', !show);
+}
+
+// ── Recolección ──────────────────────────────────────────────
+function getText(id) { const e = document.getElementById(id); return e ? (e.value.trim() || null) : null; }
+function getRadio(name) {
+    for (const inp of document.querySelectorAll(`input[name="${name}"]`)) {
+        const lbl = inp.closest('.pill-label');
+        if (lbl && lbl.classList.contains('selected')) {
+            return inp.value && inp.value !== 'on' ? inp.value : lbl.textContent.trim();
+        }
+    }
+    return null;
+}
+function getChecks(containerId) {
+    const el = document.getElementById(containerId);
+    if (!el) return [];
+    return Array.from(el.querySelectorAll('.pill-label.selected')).map(l => l.textContent.trim()).filter(Boolean);
+}
+function getScale(id) {
+    const btn = document.querySelector(`.scale-btn.active[data-group="${id}"]`);
+    return btn ? parseInt(btn.dataset.val) : null;
+}
+function buildScaleObj(ids) {
+    const obj = {};
+    ids.forEach(id => { const v = getScale(id); if (v) obj[id] = v; });
+    return Object.keys(obj).length ? JSON.stringify(obj) : null;
+}
+
+function collectData() {
+    return {
+        fecha:                getText('in-fecha'),
+        nombre_empresa:       getText('in-nombre-empresa'),
+        direccion:            getText('in-direccion'),
+        municipio_estado:     getText('in-municipio'),
+        codigo_postal:        getText('in-cp'),
+        cargo_persona:        getText('in-cargo'),
+        area_adscripcion:     getText('in-area'),
+        correo:               getText('in-correo'),
+        telefono:             getText('in-telefono'),
+        tipo_empresa:         getRadio('tipo'),
+        tipo_empresa_otro:    getText('tipo-otro'),
+        tamano_empresa:       getRadio('tamano'),
+        sector:               getText('in-sector') === 'otra' ? getText('in-sector-otro') : getText('in-sector'),
+        sector_otro:          getText('in-sector-otro'),
+        posgrado_maestria:    getText('in-posgrado-maestria'),
+        posgrado_doctorado:   getText('in-posgrado-doctorado'),
+        posgrado_posdoctorado:getText('in-posgrado-posdoc'),
+        caract_contratacion:  buildScaleObj(['s-actitud','s-experiencia','s-adaptabilidad','s-investigacion','s-certificaciones','s-posgrado-req']),
+        perfiles_requeridos:  JSON.stringify(getChecks('grp-perfiles')),
+        perfiles_ingenieria:  JSON.stringify(getChecks('grp-ingenieria')),
+        perfiles_otro:        getText('in-perfiles-otro'),
+        seleccion_personal:   buildScaleObj(['s-prestigio','s-titulo','s-estposgrado','s-recomendaciones','s-explaboral']),
+        habilidades_campo:    buildScaleObj(['h-equipo','h-i-d','h-gestion','h-diagnostico','h-decisiones','h-informacion','h-verbal','h-escrita','h-herramientas','h-idioma','h-autoaprendizaje','h-tecnologicas']),
+        competencias_generales:buildScaleObj(['c-etica','c-calidad','c-respeto','c-ideas','c-liderazgo','c-problemas','c-tiempo','c-solucionar','c-decisiones','c-social','c-continuo','c-investigar','c-datos']),
+        vinculacion_activa:   getRadio('vinculacion'),
+        vinculacion_tipos:    JSON.stringify(getChecks('grp-vinc-tipos')),
+        vinculacion_otro:     getText('in-vinc-otro'),
+        estudiantes_posgrado: getRadio('estudiantes'),
+        estudiantes_tipo:     getText('in-est-tipo'),
+        estudiantes_cantidad: getText('in-est-cantidad'),
+        estudiantes_no_razon: JSON.stringify(getChecks('grp-est-no')) + (getText('in-est-no-otro') ? ' | ' + getText('in-est-no-otro') : ''),
+        areas_oportunidad:    getText('in-areas-oportunidad'),
+        nuevos_perfiles:      getText('in-nuevos-perfiles'),
+        problematica:         getText('in-problematica'),
+        tematicas_oportunidad:getText('in-tematicas'),
+        fortalezas:           getText('in-fortalezas'),
+        areas_atencion:       buildScaleObj(['a-regulaciones','a-tecnologias','a-cliente','a-financiera','a-marca','a-cambio','a-vinculacion']),
+        comentarios_generales:getText('in-comentarios'),
+    };
+}
+
+// ── Submit ────────────────────────────────────────────────────
+async function submitForm() {
+    const btn  = document.getElementById('btn-submit');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando…';
+
+    const data = collectData();
+
+    if (!data.nombre_empresa) {
+        alert('Por favor ingresa el nombre de la empresa o institución.');
+        btn.disabled = false; btn.innerHTML = orig; return;
+    }
+
+    try {
+        const res = await fetch('http://localhost:5000/api/organizaciones', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
+            body:    JSON.stringify(data)
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || 'Error del servidor');
+    } catch (e) {
+        console.warn('Error al enviar:', e.message);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    document.getElementById('success-screen').classList.add('show');
+}
+
+// ── Auth: solo organizacion o admin ───────────────────────────
+(async () => {
+    const user = await checkSession();
+    if (!user) {
+        showLoginModal();
+        document.addEventListener('auth:login', (e) => {
+            if (e.detail.role === 'organizacion' || e.detail.role === 'admin') {
+                document.getElementById('protected-content').classList.remove('hidden');
+                init();
+            } else {
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif"><div style="text-align:center"><h2 style="color:#1A3A5C">Acceso restringido</h2><p style="color:#6b7280">Este formulario es exclusivo para usuarios de tipo Organización.</p><a href="index.html" style="color:#16a34a;font-weight:600">← Volver al portal</a></div></div>';
+            }
+        }, { once: true });
+    } else if (user.role !== 'organizacion' && user.role !== 'admin') {
+        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;padding:2rem"><div style="text-align:center;max-width:400px"><div style="font-size:3rem;margin-bottom:1rem">🏢</div><h2 style="color:#1A3A5C;margin-bottom:.5rem">Acceso restringido</h2><p style="color:#6b7280;margin-bottom:1.5rem">Este cuestionario es exclusivo para usuarios de tipo <strong>Organización</strong>. Tu cuenta es de tipo <strong>' + user.role + '</strong>.</p><a href="index.html" style="background:#1A3A5C;color:white;padding:.75rem 2rem;border-radius:.5rem;text-decoration:none;font-weight:600">← Volver al portal</a></div></div>';
+    } else {
+        document.getElementById('protected-content').classList.remove('hidden');
+        init();
+    }
+})();
+</script>
+</body>
+</html>

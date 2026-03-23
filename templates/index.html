@@ -6,7 +6,7 @@
     <title>Egresados - Tecnológico Nacional de México Campus Oaxaca</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="colores.css">
+    <link rel="stylesheet" href="../static/css/colores.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
         * { font-family: 'Montserrat', sans-serif; }
@@ -38,9 +38,7 @@
                     <a href="egresados_lista.html" class="nav-link text-gray-700 hover:text-orange-500 font-medium text-sm">Directorio</a>
                     <a href="bolsa-trabajo.html" class="nav-link text-gray-700 hover:text-orange-500 font-medium text-sm">Bolsa de Trabajo</a>
                     <a href="index.html#contacto" class="nav-link text-gray-700 hover:text-orange-500 font-medium text-sm">Contacto</a>
-                    <a id="nav-cuestionario-link" href="cuestionario.html" class="hidden bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold text-sm transition duration-200 flex items-center gap-2">
-                        <i class="fas fa-clipboard-list"></i>Encuesta Egresados
-                    </a>
+                    <!-- Botón cuestionario en navbar: eliminado, el quickLink en auth.js lo reemplaza -->
                     <div id="nav-auth-area">
                         <div class="w-32 h-9 bg-gray-100 rounded animate-pulse"></div>
                     </div>
@@ -97,21 +95,21 @@
         </div>
     </section>
 
-    <!-- Survey Banner -->
-    <section class="py-5 bg-blue-900">
+    <!-- Survey Banner: solo visible cuando hay sesión activa con rol egresado u organización -->
+    <section id="survey-banner" class="hidden py-5 bg-blue-900">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="bg-orange-500 w-10 h-10 rounded flex items-center justify-center flex-shrink-0">
+                    <div id="banner-icon" class="bg-orange-500 w-10 h-10 rounded flex items-center justify-center flex-shrink-0">
                         <i class="fas fa-clipboard-list text-white"></i>
                     </div>
                     <div class="text-white">
                         <p class="text-xs text-orange-300 font-semibold uppercase tracking-wide">Posgrado en Ciencias de la Ingeniería</p>
-                        <h3 class="font-bold">Cuestionario de Seguimiento de Egresados 2025</h3>
+                        <h3 id="banner-title" class="font-bold">Cuestionario de Seguimiento de Egresados 2025</h3>
                     </div>
                 </div>
-                <a href="cuestionario.html" class="flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2.5 rounded text-sm transition duration-200 flex items-center gap-2">
-                    <i class="fas fa-pen-to-square"></i> Responder cuestionario
+                <a id="banner-cuestionario-link" href="cuestionario.html" class="flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2.5 rounded text-sm transition duration-200 flex items-center gap-2">
+                    <i class="fas fa-pen-to-square"></i> <span id="banner-btn-label">Responder cuestionario</span>
                 </a>
             </div>
         </div>
@@ -180,7 +178,7 @@
                     <p class="mt-4 text-orange-500 text-sm font-semibold">Ver más →</p>
                 </a>
 
-                <a href="cuestionario.html" class="card border-2 border-blue-900 rounded-lg p-6 block hover:shadow-sm">
+                <a id="card-cuestionario-link" href="cuestionario.html" class="hidden card border-2 border-blue-900 rounded-lg p-6 block hover:shadow-sm">
                     <div class="flex items-center gap-2 mb-4">
                         <div class="bg-blue-900 w-12 h-12 rounded flex items-center justify-center">
                             <i class="fas fa-clipboard-list text-xl text-white"></i>
@@ -345,8 +343,8 @@
                 <a href="registro.html" class="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3 rounded font-semibold transition duration-200">
                     <i class="fas fa-user-plus mr-2"></i>Registrarme ahora
                 </a>
-                <a href="cuestionario.html" class="border border-white/50 hover:border-white text-white px-7 py-3 rounded font-semibold transition duration-200">
-                    <i class="fas fa-clipboard-list mr-2"></i>Encuesta de seguimiento
+                <a id="cta-cuestionario-link" href="cuestionario.html" class="hidden border border-white/50 hover:border-white text-white px-7 py-3 rounded font-semibold transition duration-200">
+                    <i class="fas fa-clipboard-list mr-2"></i><span id="cta-cuestionario-label">Encuesta de seguimiento</span>
                 </a>
                 <a href="#contacto" class="border border-white/30 hover:border-white/60 text-white/80 hover:text-white px-7 py-3 rounded font-semibold transition duration-200">
                     <i class="fas fa-envelope mr-2"></i>Contactar
@@ -488,14 +486,70 @@
             </div>
         </div>
     </footer>
-<script src="auth.js"></script>
+<script src="../static/js/auth.js"></script>
 <script>
-document.addEventListener('auth:login', (e) => {
-    document.getElementById('nav-cuestionario-link').classList.remove('hidden');
-});
+function updateCuestionarioLinks(user) {
+    const isOrg = user && user.role === 'organizacion';
+    const isEgr = user && user.role === 'egresado';
+    const show  = isOrg || isEgr;  // admin y sin sesión NO ven cuestionarios
+
+    const url        = isOrg ? 'cuestionario_organizacion.html' : 'cuestionario.html';
+    const navLabel   = isOrg ? 'Mi Cuestionario'               : 'Encuesta Egresados';
+    const bannerTitle= isOrg ? 'Cuestionario para Organizaciones 2025' : 'Cuestionario de Seguimiento de Egresados 2025';
+    const ctaLabel   = isOrg ? 'Mi cuestionario'               : 'Encuesta de seguimiento';
+
+    // Navbar: botón naranja (solo egresado; org ya tiene quickLink en auth.js)
+    const navLink = document.getElementById('nav-cuestionario-link');
+    if (navLink) {
+        if (isEgr) {
+            navLink.href = url;
+            document.getElementById('nav-cuestionario-label').textContent = navLabel;
+            navLink.classList.remove('hidden');
+        } else {
+            navLink.classList.add('hidden');
+        }
+    }
+
+    // Banner azul
+    const banner = document.getElementById('survey-banner');
+    if (banner) {
+        if (show) {
+            banner.classList.remove('hidden');
+            document.getElementById('banner-cuestionario-link').href = url;
+            document.getElementById('banner-title').textContent = bannerTitle;
+            document.getElementById('banner-btn-label').textContent = 'Responder cuestionario';
+            // icono verde para org
+            const icon = document.getElementById('banner-icon');
+            if (isOrg) icon.className = 'bg-green-600 w-10 h-10 rounded flex items-center justify-center flex-shrink-0';
+        } else {
+            banner.classList.add('hidden');
+        }
+    }
+
+    // Tarjeta de servicios
+    const cardLink = document.getElementById('card-cuestionario-link');
+    if (cardLink) {
+        if (show) { cardLink.href = url; cardLink.classList.remove('hidden'); }
+        else      { cardLink.classList.add('hidden'); }
+    }
+
+    // Botón CTA
+    const ctaLink = document.getElementById('cta-cuestionario-link');
+    if (ctaLink) {
+        if (show) {
+            ctaLink.href = url;
+            ctaLink.classList.remove('hidden');
+            document.getElementById('cta-cuestionario-label').textContent = ctaLabel;
+        } else {
+            ctaLink.classList.add('hidden');
+        }
+    }
+}
+
+document.addEventListener('auth:login', (e) => updateCuestionarioLinks(e.detail));
 document.addEventListener('DOMContentLoaded', async () => {
     const user = await checkSession();
-    if (user) document.getElementById('nav-cuestionario-link').classList.remove('hidden');
+    updateCuestionarioLinks(user);
 });
 </script>
 </body>

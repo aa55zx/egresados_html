@@ -65,10 +65,29 @@ function updateNavAuthArea() {
   if (!area) return;
 
   if (currentUser) {
-    const isAdmin = currentUser.role === 'admin';
+    const role    = currentUser.role;
+    const isAdmin = role === 'admin';
+    const isOrg   = role === 'organizacion';
+    const isEgr   = role === 'egresado';
+
+    const roleLabel = isAdmin ? 'Administrador' : isOrg ? 'Organización' : 'Egresado';
+    const roleIcon  = isAdmin ? 'fa-shield-halved' : isOrg ? 'fa-building' : 'fa-user-graduate';
+
+    // Quick link solo para admin (Panel Admin)
+    const quickLink = isAdmin
+      ? `<a href="admin.html" class="font-semibold text-sm flex items-center gap-1" style="color:#E8A020"><i class="fas fa-shield-halved"></i><span class="hidden lg:inline">Panel Admin</span></a>`
+      : '';
+
+    // Ítem de cuestionario en el dropdown — mismo estilo para egresado y organización
+    const cuestionarioItem = isEgr
+      ? `<a href="cuestionario.html" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50" style="color:#1A3A5C"><i class="fas fa-clipboard-list w-4"></i>Cuestionario Egresados</a>`
+      : isOrg
+      ? `<a href="cuestionario_organizacion.html" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50" style="color:#1A3A5C"><i class="fas fa-building w-4"></i>Mi Cuestionario</a>`
+      : '';
+
     area.innerHTML = `
       <div class="flex items-center gap-3">
-        ${isAdmin ? `<a href="admin.html" class="font-semibold text-sm flex items-center gap-1" style="color:#E8A020"><i class="fas fa-shield-halved"></i><span class="hidden lg:inline">Panel Admin</span></a>` : ''}
+        ${quickLink}
         <div class="relative group">
           <button class="flex items-center gap-2 border border-gray-200 rounded px-3 py-2 text-sm font-medium text-gray-700 transition">
             <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background:#1A3A5C">
@@ -77,13 +96,13 @@ function updateNavAuthArea() {
             <span class="hidden lg:inline max-w-28 truncate">${currentUser.nombre}</span>
             <i class="fas fa-chevron-down text-xs text-gray-400"></i>
           </button>
-          <div class="absolute right-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-50">
+          <div class="absolute right-0 mt-1 w-52 bg-white border border-gray-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-50">
             <div class="px-4 py-2 border-b border-gray-100">
               <p class="text-xs font-semibold text-gray-900 truncate">${currentUser.nombre}</p>
-              <p class="text-xs text-gray-400">${currentUser.role === 'admin' ? 'Administrador' : 'Egresado'}</p>
+              <p class="text-xs text-gray-400"><i class="fas ${roleIcon} mr-1"></i>${roleLabel}</p>
             </div>
             ${isAdmin ? `<a href="admin.html" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50" style="color:#1A3A5C"><i class="fas fa-users-gear w-4"></i>Gestionar usuarios</a>` : ''}
-            <a href="cuestionario.html" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" style="color:#E8A020"><i class="fas fa-clipboard-list w-4"></i>Cuestionario</a>
+            ${cuestionarioItem}
             <button onclick="doLogout()" class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 text-left">
               <i class="fas fa-sign-out-alt w-4"></i>Cerrar sesión
             </button>
