@@ -13,14 +13,11 @@ from datetime import datetime
 # Cargar variables del archivo .env
 load_dotenv()
 
-BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
-TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
-STATIC_DIR    = os.path.join(BASE_DIR, "static")
-
+BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 # Tokens activos: { token: {id, username, nombre, role} }
 TOKENS = {}
 
-app = Flask(__name__, static_folder=STATIC_DIR, template_folder=TEMPLATES_DIR)
+app = Flask(__name__, static_folder=BASE_DIR)
 CORS(app, supports_credentials=True)
 
 # ──────────────────────────────────────────────────────────────────
@@ -32,8 +29,9 @@ MYSQL_CONFIG = {
     "port":        int(os.getenv("DB_PORT", 3306)),
     "user":        os.getenv("DB_USER", "root"),
     "password":    os.getenv("DB_PASSWORD", ""),
-    "database":    os.getenv("DB_NAME", "egresados_tecnm"),
+    "database":    os.getenv("DB_NAME", "egresados"),
     "charset":     os.getenv("DB_CHARSET", "utf8mb4"),
+    
     "cursorclass": pymysql.cursors.DictCursor,
     "autocommit":  False,
 }
@@ -140,8 +138,8 @@ def init_db():
             conn.commit()
             c.execute("SELECT id FROM usuarios WHERE username='admin'")
             if not c.fetchone():
-                admin_user   = os.getenv("ADMIN_USERNAME", "admin")
-                admin_pass   = os.getenv("ADMIN_PASSWORD", "TecNM2025")
+                admin_user = os.getenv("ADMIN_USERNAME", "admin")
+                admin_pass = os.getenv("ADMIN_PASSWORD", "TecNM2025")
                 admin_nombre = os.getenv("ADMIN_NOMBRE", "Administrador TecNM")
                 c.execute("""
                     INSERT INTO usuarios (username, password_hash, nombre, role)
@@ -168,6 +166,13 @@ def require_login(f):
         return f(*args, **kwargs)
     return wrapper
 
+def optional_login(f):
+    """No requiere auth — pero si hay token, inyecta el usuario."""
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        return f(*args, **kwargs)
+    return wrapper
+
 def require_admin(f):
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
@@ -176,17 +181,6 @@ def require_admin(f):
             return jsonify({"success": False, "error": "No autenticado"}), 401
         if user["role"] != "admin":
             return jsonify({"success": False, "error": "Acceso denegado"}), 403
-        return f(*args, **kwargs)
-    return wrapper
-
-def require_organizacion(f):
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        user = get_current_user()
-        if not user:
-            return jsonify({"success": False, "error": "No autenticado"}), 401
-        if user["role"] not in ("organizacion", "admin"):
-            return jsonify({"success": False, "error": "Acceso solo para organizaciones"}), 403
         return f(*args, **kwargs)
     return wrapper
 
@@ -199,8 +193,10 @@ def login():
     d        = request.get_json(silent=True) or {}
     username = (d.get("username") or "").strip()
     password = d.get("password") or ""
+
     if not username or not password:
         return jsonify({"success": False, "error": "Usuario y contraseña requeridos"}), 400
+
     conn = get_db()
     try:
         with conn.cursor() as c:
@@ -208,18 +204,31 @@ def login():
             user = c.fetchone()
     finally:
         conn.close()
+
     if not user or not check_password_hash(user["password_hash"], password):
         return jsonify({"success": False, "error": "Credenciales incorrectas"}), 401
+
     token = secrets.token_hex(32)
-    TOKENS[token] = {"id": user["id"], "username": user["username"],
-                     "nombre": user["nombre"], "role": user["role"]}
-    return jsonify({"success": True, "token": token, "user": TOKENS[token]})
+    TOKENS[token] = {
+        "id":       user["id"],
+        "username": user["username"],
+        "nombre":   user["nombre"],
+        "role":     user["role"],
+    }
+
+    return jsonify({
+        "success": True,
+        "token": token,
+        "user": TOKENS[token]
+    })
+
 
 @app.route("/api/auth/logout", methods=["POST"])
 def logout():
     token = request.headers.get("X-Auth-Token", "")
     TOKENS.pop(token, None)
     return jsonify({"success": True, "message": "Sesión cerrada"})
+
 
 @app.route("/api/auth/me", methods=["GET"])
 def me():
@@ -244,6 +253,7 @@ def list_users():
         conn.close()
     return jsonify({"success": True, "data": users, "total": len(users)})
 
+
 @app.route("/api/users", methods=["POST"])
 @require_admin
 def create_user():
@@ -253,23 +263,28 @@ def create_user():
     nombre   = (d.get("nombre") or "").strip()
     email    = (d.get("email") or "").strip()
     role     = d.get("role", "egresado")
+
     if not username or not password or not nombre:
         return jsonify({"success": False, "error": "username, password y nombre son requeridos"}), 400
     if role not in ("admin", "egresado", "organizacion"):
         return jsonify({"success": False, "error": "role inválido"}), 400
+
     conn = get_db()
     try:
         with conn.cursor() as c:
             c.execute("SELECT id FROM usuarios WHERE username=%s", (username,))
             if c.fetchone():
                 return jsonify({"success": False, "error": "El usuario ya existe"}), 409
-            c.execute("INSERT INTO usuarios (username, password_hash, nombre, email, role) VALUES (%s, %s, %s, %s, %s)",
-                      (username, generate_password_hash(password), nombre, email, role))
+            c.execute("""
+                INSERT INTO usuarios (username, password_hash, nombre, email, role)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (username, generate_password_hash(password), nombre, email, role))
             conn.commit()
             new_id = c.lastrowid
     finally:
         conn.close()
     return jsonify({"success": True, "id": new_id, "message": "Usuario creado exitosamente"})
+
 
 @app.route("/api/users/<int:uid>", methods=["GET"])
 @require_admin
@@ -285,6 +300,7 @@ def get_user(uid):
         return jsonify({"success": False, "error": "No encontrado"}), 404
     return jsonify({"success": True, "data": row})
 
+
 @app.route("/api/users/<int:uid>", methods=["PUT"])
 @require_admin
 def update_user(uid):
@@ -296,21 +312,26 @@ def update_user(uid):
             user = c.fetchone()
             if not user:
                 return jsonify({"success": False, "error": "No encontrado"}), 404
-            nombre  = d.get("nombre", user["nombre"])
-            email   = d.get("email",  user["email"])
-            role    = d.get("role",   user["role"])
-            activo  = d.get("activo", user["activo"])
+
+            nombre = d.get("nombre", user["nombre"])
+            email  = d.get("email",  user["email"])
+            role   = d.get("role",   user["role"])
+            activo = d.get("activo", user["activo"])
+
             updates = ["nombre=%s", "email=%s", "role=%s", "activo=%s"]
             values  = [nombre, email, role, activo]
+
             if d.get("password"):
                 updates.append("password_hash=%s")
                 values.append(generate_password_hash(d["password"]))
+
             values.append(uid)
             c.execute(f"UPDATE usuarios SET {', '.join(updates)} WHERE id=%s", values)
             conn.commit()
     finally:
         conn.close()
     return jsonify({"success": True, "message": "Usuario actualizado"})
+
 
 @app.route("/api/users/<int:uid>", methods=["DELETE"])
 @require_admin
@@ -359,13 +380,18 @@ def list_egresados():
     sni_f  = request.args.get("sni","").strip()
     page   = max(1, int(request.args.get("page",1)))
     per    = min(50, int(request.args.get("per",12)))
+
     where, params = ["1=1"], []
     if search:
         where.append("(nombre LIKE %s OR email LIKE %s OR ciudad LIKE %s OR programa_posgrado LIKE %s)")
         params += [f"%{search}%"]*4
-    if prog:   where.append("programa_posgrado LIKE %s"); params.append(f"%{prog}%")
-    if sector: where.append("sector_economico LIKE %s");  params.append(f"%{sector}%")
-    if sni_f:  where.append("sni LIKE %s");               params.append(f"%{sni_f}%")
+    if prog:
+        where.append("programa_posgrado LIKE %s"); params.append(f"%{prog}%")
+    if sector:
+        where.append("sector_economico LIKE %s"); params.append(f"%{sector}%")
+    if sni_f:
+        where.append("sni LIKE %s"); params.append(f"%{sni_f}%")
+
     base_q = f"FROM egresados WHERE {' AND '.join(where)}"
     conn = get_db()
     try:
@@ -379,12 +405,14 @@ def list_egresados():
         conn.close()
     return jsonify({"success":True,"data":rows,"total":total,"page":page,"per":per,"pages":max(1,-(-total//per))})
 
+
 @app.route("/api/egresados", methods=["POST"])
 @require_login
 def create_egresado():
     d = request.get_json(silent=True) or {}
     if not d.get("nombre"):
         return jsonify({"success": False, "error": "El campo 'nombre' es requerido"}), 400
+
     COLS = [
         "nombre","sexo","estado_civil","municipio","ciudad","codigo_postal","pais",
         "telefono","email","dependientes_economicos","razon_eleccion_ito",
@@ -408,6 +436,7 @@ def create_egresado():
     values   = [user["id"] if user else None] + [serialize(d.get(col)) for col in COLS]
     cols_str = ",".join(f"`{c}`" for c in all_cols)
     placeholders = ",".join(["%s"]*len(all_cols))
+
     conn = get_db()
     try:
         with conn.cursor() as c:
@@ -417,6 +446,7 @@ def create_egresado():
     finally:
         conn.close()
     return jsonify({"success": True, "id": new_id, "message": "Cuestionario registrado exitosamente"})
+
 
 @app.route("/api/egresados/<int:eid>", methods=["GET"])
 def get_egresado(eid):
@@ -446,6 +476,7 @@ def get_stats():
                 return list(r.values())[0] if r else 0
             def rows(q, p=()):
                 c.execute(q, p); return c.fetchall()
+
             s["total"]             = scalar("SELECT COUNT(*) FROM egresados")
             s["empleados"]         = scalar("SELECT COUNT(*) FROM egresados WHERE labora_actualmente='Sí'")
             s["sni_activos"]       = scalar("SELECT COUNT(*) FROM egresados WHERE sni LIKE '%actualmente%'")
@@ -464,6 +495,18 @@ def get_stats():
 # ──────────────────────────────────────────────────────────────────
 # API — Organizaciones
 # ──────────────────────────────────────────────────────────────────
+
+def require_organizacion(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({"success": False, "error": "No autenticado"}), 401
+        if user["role"] not in ("organizacion", "admin"):
+            return jsonify({"success": False, "error": "Acceso solo para organizaciones"}), 403
+        return f(*args, **kwargs)
+    return wrapper
+
 
 def init_org_table():
     conn = get_db()
@@ -521,6 +564,7 @@ def init_org_table():
     finally:
         conn.close()
 
+
 @app.route("/api/organizaciones", methods=["POST"])
 @require_organizacion
 def create_organizacion():
@@ -529,7 +573,8 @@ def create_organizacion():
     COLS = [
         "fecha","nombre_empresa","direccion","municipio_estado","codigo_postal",
         "cargo_persona","area_adscripcion","correo","telefono",
-        "tipo_empresa","tipo_empresa_otro","tamano_empresa","sector","sector_otro",
+        "tipo_empresa","tipo_empresa_otro","tamano_empresa",
+        "sector","sector_otro",
         "posgrado_maestria","posgrado_doctorado","posgrado_posdoctorado",
         "caract_contratacion","perfiles_requeridos","perfiles_ingenieria","perfiles_otro",
         "seleccion_personal","habilidades_campo","competencias_generales",
@@ -555,6 +600,7 @@ def create_organizacion():
         conn.close()
     return jsonify({"success": True, "id": new_id, "message": "Cuestionario registrado exitosamente"})
 
+
 @app.route("/api/organizaciones", methods=["GET"])
 @require_admin
 def list_organizaciones():
@@ -568,28 +614,15 @@ def list_organizaciones():
     return jsonify({"success": True, "data": rows, "total": len(rows)})
 
 # ──────────────────────────────────────────────────────────────────
-# Archivos estáticos y rutas HTML
+# Archivos estáticos
 # ──────────────────────────────────────────────────────────────────
 
 @app.route("/")
 def serve_index():
-    return send_from_directory(TEMPLATES_DIR, "index.html")
-
-@app.route("/static/css/<path:fname>")
-def serve_css(fname):
-    return send_from_directory(os.path.join(STATIC_DIR, "css"), fname)
-
-@app.route("/static/js/<path:fname>")
-def serve_js(fname):
-    return send_from_directory(os.path.join(STATIC_DIR, "js"), fname)
+    return send_from_directory(BASE_DIR, "index.html")
 
 @app.route("/<path:fname>")
-def serve_template(fname):
-    # Servir HTMLs desde templates/
-    html_path = os.path.join(TEMPLATES_DIR, fname)
-    if os.path.exists(html_path):
-        return send_from_directory(TEMPLATES_DIR, fname)
-    # Fallback: buscar en raíz
+def serve_static(fname):
     return send_from_directory(BASE_DIR, fname)
 
 # ──────────────────────────────────────────────────────────────────
