@@ -3,25 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Egresados - Tecnológico Nacional de México Campus Oaxaca</title>
+    <title>Portal de Egresados — TecNM Campus Oaxaca</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../static/css/colores.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
         * { font-family: 'Montserrat', sans-serif; }
+
         .nav-link { position: relative; transition: color 0.2s; }
         .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: #E8A020; transition: width 0.2s; }
         .nav-link:hover::after { width: 100%; }
-        .card { transition: border-color 0.2s; }
-        .card:hover { border-color: #E8A020; }
+
+        .service-card { transition: border-color 0.2s, box-shadow 0.2s; }
+        .service-card:hover { border-color: #1A3A5C; }
+
         .job-card { transition: border-color 0.2s; }
         .job-card:hover { border-color: #1A3A5C; }
+
+        /* Stat counter animation */
+        .stat-num { font-variant-numeric: tabular-nums; }
     </style>
 </head>
 <body class="bg-white">
 
-    <!-- Navigation -->
+    <!-- Navbar -->
     <nav class="bg-white border-b border-gray-200 fixed w-full z-50">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
@@ -29,21 +35,20 @@
                     <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="TecNM Logo" class="h-12">
                     <div>
                         <h1 class="text-lg font-bold text-blue-900">TecNM Campus Oaxaca</h1>
-                        <p class="text-xs text-gray-500">Instituto Tecnológico de Oaxaca</p>
+                        <p class="text-xs text-gray-400">Instituto Tecnológico de Oaxaca</p>
                     </div>
                 </div>
                 <div class="hidden md:flex space-x-8 items-center">
-                    <a href="index.html#inicio" class="nav-link text-gray-700 hover:text-orange-500 font-medium text-sm">Inicio</a>
-                    <a href="index.html#servicios" class="nav-link text-gray-700 hover:text-orange-500 font-medium text-sm">Servicios</a>
-                    <a href="egresados_lista.html" class="nav-link text-gray-700 hover:text-orange-500 font-medium text-sm">Directorio</a>
-                    <a href="bolsa-trabajo.html" class="nav-link text-gray-700 hover:text-orange-500 font-medium text-sm">Bolsa de Trabajo</a>
-                    <a href="index.html#contacto" class="nav-link text-gray-700 hover:text-orange-500 font-medium text-sm">Contacto</a>
-                    <!-- Botón cuestionario en navbar: eliminado, el quickLink en auth.js lo reemplaza -->
+                    <a href="#inicio"    class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Inicio</a>
+                    <a href="#servicios" class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Servicios</a>
+                    <a href="egresados_lista.html" class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Directorio</a>
+                    <a href="bolsa-trabajo.html"   class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Bolsa de Trabajo</a>
+                    <a href="#contacto"  class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Contacto</a>
                     <div id="nav-auth-area">
                         <div class="w-32 h-9 bg-gray-100 rounded animate-pulse"></div>
                     </div>
                 </div>
-                <button class="md:hidden text-gray-700">
+                <button class="md:hidden text-gray-600">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
             </div>
@@ -51,285 +56,227 @@
     </nav>
 
     <!-- Hero -->
-    <section id="inicio" class="bg-blue-900 pt-28 pb-20">
+    <section id="inicio" class="bg-blue-900 pt-28 pb-24">
         <div class="container mx-auto px-4">
-            <div class="max-w-3xl mx-auto text-center text-white">
-                <p class="text-orange-400 font-semibold text-sm uppercase tracking-widest mb-4">Portal de Egresados</p>
-                <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">Conecta con tu comunidad</h1>
-                <p class="text-lg text-blue-200 mb-10 leading-relaxed">
-                    Servicios profesionales y oportunidades para los egresados del TecNM Campus Oaxaca.
+            <div class="max-w-2xl mx-auto text-center">
+                <p class="text-orange-400 font-semibold text-xs uppercase tracking-widest mb-5">Portal de Egresados · TecNM Campus Oaxaca</p>
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">Conecta con tu comunidad profesional</h1>
+                <p class="text-blue-200 text-base mb-10 leading-relaxed max-w-lg mx-auto">
+                    Servicios y oportunidades para los egresados del Tecnológico Nacional de México Campus Oaxaca.
                 </p>
                 <div class="flex flex-wrap justify-center gap-3">
-                    <a href="registro.html" class="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3 rounded font-semibold transition duration-200">
-                        <i class="fas fa-user-plus mr-2"></i>Registrarme
+                    <a href="registro.html" class="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3 rounded font-semibold text-sm transition duration-200">
+                        Registrarme
                     </a>
-                    <a href="index.html#servicios" class="border border-white/50 hover:border-white text-white px-7 py-3 rounded font-semibold transition duration-200">
-                        <i class="fas fa-info-circle mr-2"></i>Conocer más
+                    <a href="#servicios" class="border border-white/40 hover:border-white text-white px-7 py-3 rounded font-semibold text-sm transition duration-200">
+                        Ver servicios
                     </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Stats -->
-    <section class="py-12 border-b border-gray-100">
+    <!-- Stats — datos reales desde la API -->
+    <section class="py-10 border-b border-gray-100">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-gray-200">
-                <div class="text-center px-6">
-                    <h3 class="text-4xl font-bold text-blue-900 mb-1">5,000+</h3>
-                    <p class="text-gray-500 text-sm font-medium">Egresados Registrados</p>
+            <div id="stats-row" class="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-200">
+                <!-- Skeleton mientras carga -->
+                <div class="text-center px-6 py-2">
+                    <div class="h-9 bg-gray-100 rounded w-20 mx-auto mb-2 animate-pulse"></div>
+                    <div class="h-3 bg-gray-100 rounded w-28 mx-auto animate-pulse"></div>
                 </div>
-                <div class="text-center px-6">
-                    <h3 class="text-4xl font-bold text-orange-500 mb-1">300+</h3>
-                    <p class="text-gray-500 text-sm font-medium">Ofertas Laborales</p>
+                <div class="text-center px-6 py-2">
+                    <div class="h-9 bg-gray-100 rounded w-20 mx-auto mb-2 animate-pulse"></div>
+                    <div class="h-3 bg-gray-100 rounded w-28 mx-auto animate-pulse"></div>
                 </div>
-                <div class="text-center px-6">
-                    <h3 class="text-4xl font-bold text-blue-900 mb-1">150+</h3>
-                    <p class="text-gray-500 text-sm font-medium">Empresas Aliadas</p>
+                <div class="text-center px-6 py-2">
+                    <div class="h-9 bg-gray-100 rounded w-20 mx-auto mb-2 animate-pulse"></div>
+                    <div class="h-3 bg-gray-100 rounded w-28 mx-auto animate-pulse"></div>
                 </div>
-                <div class="text-center px-6">
-                    <h3 class="text-4xl font-bold text-orange-500 mb-1">92%</h3>
-                    <p class="text-gray-500 text-sm font-medium">Tasa de Empleabilidad</p>
+                <div class="text-center px-6 py-2">
+                    <div class="h-9 bg-gray-100 rounded w-20 mx-auto mb-2 animate-pulse"></div>
+                    <div class="h-3 bg-gray-100 rounded w-28 mx-auto animate-pulse"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Survey Banner: solo visible cuando hay sesión activa con rol egresado u organización -->
-    <section id="survey-banner" class="hidden py-5 bg-blue-900">
+    <!-- Banner cuestionario (solo para egresados y organizaciones con sesión activa) -->
+    <section id="survey-banner" class="hidden border-b border-blue-900/20 bg-blue-900 py-4">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div id="banner-icon" class="bg-orange-500 w-10 h-10 rounded flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-clipboard-list text-white"></i>
-                    </div>
-                    <div class="text-white">
-                        <p class="text-xs text-orange-300 font-semibold uppercase tracking-wide">Posgrado en Ciencias de la Ingeniería</p>
-                        <h3 id="banner-title" class="font-bold">Cuestionario de Seguimiento de Egresados 2025</h3>
-                    </div>
+                <div class="text-white">
+                    <p class="text-xs text-orange-300 font-semibold uppercase tracking-wide mb-0.5">Posgrado en Ciencias de la Ingeniería</p>
+                    <h3 id="banner-title" class="font-semibold text-sm">Cuestionario de Seguimiento de Egresados 2025</h3>
                 </div>
-                <a id="banner-cuestionario-link" href="cuestionario.html" class="flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2.5 rounded text-sm transition duration-200 flex items-center gap-2">
-                    <i class="fas fa-pen-to-square"></i> <span id="banner-btn-label">Responder cuestionario</span>
+                <a id="banner-cuestionario-link" href="cuestionario.html"
+                   class="flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-5 py-2 rounded text-sm transition duration-200">
+                    <span id="banner-btn-label">Responder cuestionario</span>
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Services -->
+    <!-- Servicios -->
     <section id="servicios" class="py-20">
         <div class="container mx-auto px-4">
-            <div class="mb-14">
-                <p class="text-orange-500 font-semibold text-sm uppercase tracking-widest mb-2">Lo que ofrecemos</p>
-                <h2 class="text-3xl font-bold text-blue-900">Servicios para Egresados</h2>
+            <div class="mb-12">
+                <p class="text-orange-500 font-semibold text-xs uppercase tracking-widest mb-2">Lo que ofrecemos</p>
+                <h2 class="text-2xl font-bold text-blue-900">Servicios para Egresados</h2>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-                <a href="credencial.html" class="card border border-gray-200 rounded-lg p-6 block hover:shadow-sm">
-                    <div class="bg-blue-900 w-12 h-12 rounded flex items-center justify-center mb-5">
-                        <i class="fas fa-id-card text-xl text-white"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Credencial de Egresado</h3>
+                <a href="credencial.html" class="service-card border border-gray-200 rounded-lg p-6 block">
+                    <h3 class="text-base font-bold text-gray-900 mb-2">Credencial de Egresado</h3>
                     <p class="text-gray-500 text-sm leading-relaxed">Identificación oficial como egresado del TecNM con acceso a beneficios exclusivos.</p>
-                    <p class="mt-4 text-orange-500 text-sm font-semibold">Ver más →</p>
+                    <p class="mt-4 text-blue-900 text-sm font-semibold">Ver más →</p>
                 </a>
 
-                <a href="titulacion.html" class="card border border-gray-200 rounded-lg p-6 block hover:shadow-sm">
-                    <div class="bg-orange-500 w-12 h-12 rounded flex items-center justify-center mb-5">
-                        <i class="fas fa-graduation-cap text-xl text-white"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Guía de Titulación</h3>
+                <a href="titulacion.html" class="service-card border border-gray-200 rounded-lg p-6 block">
+                    <h3 class="text-base font-bold text-gray-900 mb-2">Guía de Titulación</h3>
                     <p class="text-gray-500 text-sm leading-relaxed">Información completa sobre el proceso de titulación y modalidades disponibles.</p>
-                    <p class="mt-4 text-orange-500 text-sm font-semibold">Ver más →</p>
+                    <p class="mt-4 text-blue-900 text-sm font-semibold">Ver más →</p>
                 </a>
 
-                <a href="certificacion.html" class="card border border-gray-200 rounded-lg p-6 block hover:shadow-sm">
-                    <div class="bg-blue-900 w-12 h-12 rounded flex items-center justify-center mb-5">
-                        <i class="fas fa-certificate text-xl text-white"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Certificación</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">Apostille y certificación de documentos oficiales para trámites nacionales e internacionales.</p>
-                    <p class="mt-4 text-orange-500 text-sm font-semibold">Ver más →</p>
+                <a href="certificacion.html" class="service-card border border-gray-200 rounded-lg p-6 block">
+                    <h3 class="text-base font-bold text-gray-900 mb-2">Certificación y Apostille</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Certificación de documentos oficiales para trámites nacionales e internacionales.</p>
+                    <p class="mt-4 text-blue-900 text-sm font-semibold">Ver más →</p>
                 </a>
 
-                <a href="lenguas.html" class="card border border-gray-200 rounded-lg p-6 block hover:shadow-sm">
-                    <div class="bg-orange-500 w-12 h-12 rounded flex items-center justify-center mb-5">
-                        <i class="fas fa-language text-xl text-white"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Lenguas Extranjeras</h3>
+                <a href="lenguas.html" class="service-card border border-gray-200 rounded-lg p-6 block">
+                    <h3 class="text-base font-bold text-gray-900 mb-2">Lenguas Extranjeras</h3>
                     <p class="text-gray-500 text-sm leading-relaxed">Cursos y certificaciones en inglés y otros idiomas para fortalecer tu perfil profesional.</p>
-                    <p class="mt-4 text-orange-500 text-sm font-semibold">Ver más →</p>
+                    <p class="mt-4 text-blue-900 text-sm font-semibold">Ver más →</p>
                 </a>
 
-                <a href="bolsa-trabajo.html" class="card border border-gray-200 rounded-lg p-6 block hover:shadow-sm">
-                    <div class="bg-blue-900 w-12 h-12 rounded flex items-center justify-center mb-5">
-                        <i class="fas fa-briefcase text-xl text-white"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Bolsa de Trabajo</h3>
+                <a href="bolsa-trabajo.html" class="service-card border border-gray-200 rounded-lg p-6 block">
+                    <h3 class="text-base font-bold text-gray-900 mb-2">Bolsa de Trabajo</h3>
                     <p class="text-gray-500 text-sm leading-relaxed">Ofertas laborales exclusivas y conexión con empresas que buscan talento TecNM.</p>
-                    <p class="mt-4 text-orange-500 text-sm font-semibold">Ver más →</p>
+                    <p class="mt-4 text-blue-900 text-sm font-semibold">Ver más →</p>
                 </a>
 
-                <a href="egresados_lista.html" class="card border border-gray-200 rounded-lg p-6 block hover:shadow-sm">
-                    <div class="bg-orange-500 w-12 h-12 rounded flex items-center justify-center mb-5">
-                        <i class="fas fa-id-badge text-xl text-white"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Directorio de Egresados</h3>
+                <a href="egresados_lista.html" class="service-card border border-gray-200 rounded-lg p-6 block">
+                    <h3 class="text-base font-bold text-gray-900 mb-2">Directorio de Egresados</h3>
                     <p class="text-gray-500 text-sm leading-relaxed">Directorio actualizado de egresados del posgrado con información laboral y académica.</p>
-                    <p class="mt-4 text-orange-500 text-sm font-semibold">Ver más →</p>
+                    <p class="mt-4 text-blue-900 text-sm font-semibold">Ver más →</p>
                 </a>
 
-                <a id="card-cuestionario-link" href="cuestionario.html" class="hidden card border-2 border-blue-900 rounded-lg p-6 block hover:shadow-sm">
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="bg-blue-900 w-12 h-12 rounded flex items-center justify-center">
-                            <i class="fas fa-clipboard-list text-xl text-white"></i>
-                        </div>
-                        <span class="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">Nuevo 2025</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Cuestionario de Seguimiento</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">Comparte tu experiencia como egresado. Tu retroalimentación mejora los programas académicos.</p>
-                    <p class="mt-4 text-orange-500 text-sm font-semibold">Responder →</p>
+                <!-- Tarjeta cuestionario: visible solo con sesión -->
+                <a id="card-cuestionario-link" href="cuestionario.html" class="hidden service-card border-2 border-blue-900 rounded-lg p-6 block">
+                    <span class="inline-block bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded mb-3">2025</span>
+                    <h3 class="text-base font-bold text-gray-900 mb-2">Cuestionario de Seguimiento</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Comparte tu experiencia como egresado y ayuda a mejorar los programas académicos.</p>
+                    <p class="mt-4 text-blue-900 text-sm font-semibold">Responder →</p>
                 </a>
 
             </div>
         </div>
     </section>
 
-    <!-- Job Board -->
+    <!-- Ofertas laborales -->
     <section class="py-20 bg-gray-50 border-t border-gray-100">
         <div class="container mx-auto px-4">
-            <div class="mb-14">
-                <p class="text-orange-500 font-semibold text-sm uppercase tracking-widest mb-2">Oportunidades</p>
-                <h2 class="text-3xl font-bold text-blue-900">Ofertas Laborales Destacadas</h2>
+            <div class="mb-12">
+                <p class="text-orange-500 font-semibold text-xs uppercase tracking-widest mb-2">Oportunidades</p>
+                <h2 class="text-2xl font-bold text-blue-900">Ofertas Laborales Recientes</h2>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
-                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-orange-500 rounded-lg p-6">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center gap-4">
-                            <div class="bg-orange-50 w-12 h-12 rounded flex items-center justify-center">
-                                <i class="fas fa-code text-xl text-orange-500"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900">Desarrollador Full Stack</h3>
-                                <p class="text-gray-500 text-sm">TechSolutions SA de CV</p>
-                            </div>
-                        </div>
-                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Nuevo</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-4">Buscamos desarrollador con experiencia en React, Node.js y bases de datos SQL/NoSQL.</p>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">React</span>
-                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">Node.js</span>
-                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">MongoDB</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <div class="flex gap-4 text-gray-500">
-                            <span><i class="fas fa-map-marker-alt mr-1"></i>Oaxaca, Oax.</span>
-                            <span><i class="fas fa-dollar-sign mr-1"></i>$25,000 – $35,000</span>
-                        </div>
-                        <a href="bolsa-trabajo.html" class="text-orange-500 font-semibold">Ver detalles →</a>
-                    </div>
-                </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
 
                 <div class="job-card bg-white border border-gray-200 border-l-4 border-l-blue-900 rounded-lg p-6">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center gap-4">
-                            <div class="bg-blue-50 w-12 h-12 rounded flex items-center justify-center">
-                                <i class="fas fa-industry text-xl text-blue-900"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900">Ingeniero Industrial</h3>
-                                <p class="text-gray-500 text-sm">Manufactura del Sureste</p>
-                            </div>
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <h3 class="font-bold text-gray-900 text-sm">Desarrollador Full Stack</h3>
+                            <p class="text-gray-500 text-xs mt-0.5">TechSolutions SA de CV</p>
                         </div>
-                        <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-semibold">Urgente</span>
+                        <span class="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-semibold">Nuevo</span>
                     </div>
-                    <p class="text-gray-600 text-sm mb-4">Ingeniero para optimización de procesos y gestión de calidad en planta industrial.</p>
+                    <p class="text-gray-600 text-sm mb-3">Desarrollador con experiencia en React, Node.js y bases de datos SQL/NoSQL.</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">Six Sigma</span>
-                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">Lean</span>
-                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">ISO 9001</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">React</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Node.js</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">MongoDB</span>
                     </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <div class="flex gap-4 text-gray-500">
-                            <span><i class="fas fa-map-marker-alt mr-1"></i>Salina Cruz, Oax.</span>
-                            <span><i class="fas fa-dollar-sign mr-1"></i>$28,000 – $38,000</span>
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                        <div class="flex gap-4">
+                            <span>Oaxaca, Oax.</span>
+                            <span>$25,000 – $35,000</span>
                         </div>
                         <a href="bolsa-trabajo.html" class="text-blue-900 font-semibold">Ver detalles →</a>
                     </div>
                 </div>
+
+                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-orange-500 rounded-lg p-6">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <h3 class="font-bold text-gray-900 text-sm">Ingeniero Industrial</h3>
+                            <p class="text-gray-500 text-xs mt-0.5">Manufactura del Sureste</p>
+                        </div>
+                        <span class="bg-orange-50 text-orange-700 border border-orange-200 px-2 py-0.5 rounded text-xs font-semibold">Urgente</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">Optimización de procesos y gestión de calidad en planta industrial.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Six Sigma</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Lean</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">ISO 9001</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                        <div class="flex gap-4">
+                            <span>Salina Cruz, Oax.</span>
+                            <span>$28,000 – $38,000</span>
+                        </div>
+                        <a href="bolsa-trabajo.html" class="text-blue-900 font-semibold">Ver detalles →</a>
+                    </div>
+                </div>
+
             </div>
             <div class="text-center">
-                <a href="bolsa-trabajo.html" class="inline-block border border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white px-8 py-3 rounded font-semibold transition duration-200">
+                <a href="bolsa-trabajo.html" class="inline-block border border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white px-8 py-3 rounded font-semibold text-sm transition duration-200">
                     Ver todas las ofertas
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials -->
-    <section id="testimonios" class="py-20">
+    <!-- Testimonios -->
+    <section class="py-20 border-t border-gray-100">
         <div class="container mx-auto px-4">
-            <div class="mb-14">
-                <p class="text-orange-500 font-semibold text-sm uppercase tracking-widest mb-2">Historias reales</p>
-                <h2 class="text-3xl font-bold text-blue-900">Historias de Éxito</h2>
+            <div class="mb-12">
+                <p class="text-orange-500 font-semibold text-xs uppercase tracking-widest mb-2">Testimonios</p>
+                <h2 class="text-2xl font-bold text-blue-900">Lo que dicen nuestros egresados</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
                 <div class="border border-gray-200 rounded-lg p-6">
-                    <div class="flex items-center mb-5">
-                        <div class="w-14 h-14 rounded-full bg-blue-900 flex items-center justify-center mr-4 flex-shrink-0">
-                            <span class="text-white font-bold text-lg">JR</span>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-900">Juan Ramírez</h4>
-                            <p class="text-gray-500 text-xs">Ing. en Sistemas Computacionales</p>
-                            <p class="text-orange-500 text-xs font-semibold">Generación 2020</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 text-sm leading-relaxed italic mb-4">
+                    <p class="text-gray-600 text-sm leading-relaxed italic mb-5">
                         "Gracias al TecNM desarrollé las habilidades necesarias para trabajar en Google. El apoyo de la bolsa de trabajo fue fundamental."
                     </p>
-                    <div class="flex text-orange-500 text-xs gap-0.5">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <div class="border-t border-gray-100 pt-4">
+                        <p class="font-semibold text-gray-900 text-sm">Juan Ramírez</p>
+                        <p class="text-gray-400 text-xs mt-0.5">Ing. en Sistemas Computacionales · Generación 2020</p>
                     </div>
                 </div>
 
                 <div class="border border-gray-200 rounded-lg p-6">
-                    <div class="flex items-center mb-5">
-                        <div class="w-14 h-14 rounded-full bg-orange-500 flex items-center justify-center mr-4 flex-shrink-0">
-                            <span class="text-white font-bold text-lg">ML</span>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-900">María López</h4>
-                            <p class="text-gray-500 text-xs">Ing. Industrial</p>
-                            <p class="text-blue-900 text-xs font-semibold">Generación 2019</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 text-sm leading-relaxed italic mb-4">
+                    <p class="text-gray-600 text-sm leading-relaxed italic mb-5">
                         "El proceso de titulación fue muy claro. Ahora dirijo el área de producción en una empresa líder del sector automotriz."
                     </p>
-                    <div class="flex text-orange-500 text-xs gap-0.5">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <div class="border-t border-gray-100 pt-4">
+                        <p class="font-semibold text-gray-900 text-sm">María López</p>
+                        <p class="text-gray-400 text-xs mt-0.5">Ing. Industrial · Generación 2019</p>
                     </div>
                 </div>
 
                 <div class="border border-gray-200 rounded-lg p-6">
-                    <div class="flex items-center mb-5">
-                        <div class="w-14 h-14 rounded-full bg-blue-900 flex items-center justify-center mr-4 flex-shrink-0">
-                            <span class="text-white font-bold text-lg">CS</span>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-900">Carlos Sánchez</h4>
-                            <p class="text-gray-500 text-xs">Ing. Electrónica</p>
-                            <p class="text-orange-500 text-xs font-semibold">Generación 2021</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 text-sm leading-relaxed italic mb-4">
-                        "La credencial de egresado me ha abierto puertas. Las empresas valoran mucho la formación del TecNM."
+                    <p class="text-gray-600 text-sm leading-relaxed italic mb-5">
+                        "La credencial de egresado me ha abierto muchas puertas. Las empresas valoran mucho la formación del TecNM."
                     </p>
-                    <div class="flex text-orange-500 text-xs gap-0.5">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <div class="border-t border-gray-100 pt-4">
+                        <p class="font-semibold text-gray-900 text-sm">Carlos Sánchez</p>
+                        <p class="text-gray-400 text-xs mt-0.5">Ing. Electrónica · Generación 2021</p>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
@@ -337,93 +284,80 @@
     <!-- CTA -->
     <section class="py-16 bg-blue-900">
         <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold text-white mb-4">¿Listo para dar el siguiente paso?</h2>
-            <p class="text-blue-200 mb-8 max-w-xl mx-auto">Únete a nuestra comunidad de egresados y accede a beneficios exclusivos.</p>
+            <h2 class="text-2xl font-bold text-white mb-3">¿Listo para dar el siguiente paso?</h2>
+            <p class="text-blue-200 text-sm mb-8 max-w-md mx-auto">Únete a la comunidad de egresados y accede a todos los servicios del portal.</p>
             <div class="flex flex-wrap justify-center gap-3">
-                <a href="registro.html" class="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3 rounded font-semibold transition duration-200">
-                    <i class="fas fa-user-plus mr-2"></i>Registrarme ahora
+                <a href="registro.html" class="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3 rounded font-semibold text-sm transition duration-200">
+                    Registrarme ahora
                 </a>
-                <a id="cta-cuestionario-link" href="cuestionario.html" class="hidden border border-white/50 hover:border-white text-white px-7 py-3 rounded font-semibold transition duration-200">
-                    <i class="fas fa-clipboard-list mr-2"></i><span id="cta-cuestionario-label">Encuesta de seguimiento</span>
+                <a id="cta-cuestionario-link" href="cuestionario.html" class="hidden border border-white/40 hover:border-white text-white px-7 py-3 rounded font-semibold text-sm transition duration-200">
+                    <span id="cta-cuestionario-label">Encuesta de seguimiento</span>
                 </a>
-                <a href="#contacto" class="border border-white/30 hover:border-white/60 text-white/80 hover:text-white px-7 py-3 rounded font-semibold transition duration-200">
-                    <i class="fas fa-envelope mr-2"></i>Contactar
+                <a href="#contacto" class="border border-white/20 hover:border-white/50 text-white/70 hover:text-white px-7 py-3 rounded font-semibold text-sm transition duration-200">
+                    Contactar
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Contact -->
+    <!-- Contacto -->
     <section id="contacto" class="py-20 bg-gray-50 border-t border-gray-100">
         <div class="container mx-auto px-4">
-            <div class="mb-14">
-                <p class="text-orange-500 font-semibold text-sm uppercase tracking-widest mb-2">Estamos aquí</p>
-                <h2 class="text-3xl font-bold text-blue-900">Contáctanos</h2>
+            <div class="mb-12">
+                <p class="text-orange-500 font-semibold text-xs uppercase tracking-widest mb-2">Estamos aquí</p>
+                <h2 class="text-2xl font-bold text-blue-900">Contáctanos</h2>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+                <!-- Datos de contacto -->
                 <div class="space-y-6">
-                    <div class="flex items-start gap-4">
-                        <div class="bg-orange-500 w-10 h-10 rounded flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-map-marker-alt text-white"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900 mb-1">Dirección</h4>
-                            <p class="text-gray-500 text-sm">Av. Ing. Víctor Bravo Ahuja No. 125, Esquina Calzada Tecnológico<br>Oaxaca de Juárez, Oax. C.P. 68030</p>
-                        </div>
+                    <div class="border-l-2 border-orange-500 pl-4">
+                        <h4 class="font-semibold text-gray-900 text-sm mb-1">Dirección</h4>
+                        <p class="text-gray-500 text-sm">Av. Ing. Víctor Bravo Ahuja No. 125, Esquina Calzada Tecnológico<br>Oaxaca de Juárez, Oax. C.P. 68030</p>
                     </div>
-                    <div class="flex items-start gap-4">
-                        <div class="bg-blue-900 w-10 h-10 rounded flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-phone text-white"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900 mb-1">Teléfono</h4>
-                            <p class="text-gray-500 text-sm">(951) 501 5016<br>(951) 501 5000 Ext. 100</p>
-                        </div>
+                    <div class="border-l-2 border-blue-900 pl-4">
+                        <h4 class="font-semibold text-gray-900 text-sm mb-1">Teléfono</h4>
+                        <p class="text-gray-500 text-sm">(951) 501 5016 &nbsp;·&nbsp; (951) 501 5000 Ext. 100</p>
                     </div>
-                    <div class="flex items-start gap-4">
-                        <div class="bg-orange-500 w-10 h-10 rounded flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-envelope text-white"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900 mb-1">Email</h4>
-                            <p class="text-gray-500 text-sm">egresados@itoaxaca.edu.mx<br>vinculacion@itoaxaca.edu.mx</p>
-                        </div>
+                    <div class="border-l-2 border-orange-500 pl-4">
+                        <h4 class="font-semibold text-gray-900 text-sm mb-1">Correo</h4>
+                        <p class="text-gray-500 text-sm">egresados@itoaxaca.edu.mx<br>vinculacion@itoaxaca.edu.mx</p>
                     </div>
-                    <div class="flex items-start gap-4">
-                        <div class="bg-blue-900 w-10 h-10 rounded flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-clock text-white"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900 mb-1">Horario</h4>
-                            <p class="text-gray-500 text-sm">Lunes a Viernes · 9:00 AM – 5:00 PM</p>
-                        </div>
+                    <div class="border-l-2 border-blue-900 pl-4">
+                        <h4 class="font-semibold text-gray-900 text-sm mb-1">Horario de atención</h4>
+                        <p class="text-gray-500 text-sm">Lunes a Viernes · 9:00 AM – 5:00 PM</p>
                     </div>
                     <div class="flex gap-3 pt-2">
-                        <a href="#" class="bg-blue-900 w-10 h-10 rounded flex items-center justify-center hover:bg-blue-800 transition"><i class="fab fa-facebook-f text-white text-sm"></i></a>
-                        <a href="#" class="bg-orange-500 w-10 h-10 rounded flex items-center justify-center hover:bg-orange-600 transition"><i class="fab fa-instagram text-white text-sm"></i></a>
-                        <a href="#" class="bg-blue-900 w-10 h-10 rounded flex items-center justify-center hover:bg-blue-800 transition"><i class="fab fa-twitter text-white text-sm"></i></a>
-                        <a href="#" class="bg-orange-500 w-10 h-10 rounded flex items-center justify-center hover:bg-orange-600 transition"><i class="fab fa-linkedin-in text-white text-sm"></i></a>
+                        <a href="#" class="border border-gray-200 hover:border-blue-900 text-gray-400 hover:text-blue-900 w-9 h-9 rounded flex items-center justify-center transition text-sm">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="border border-gray-200 hover:border-orange-500 text-gray-400 hover:text-orange-500 w-9 h-9 rounded flex items-center justify-center transition text-sm">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="border border-gray-200 hover:border-blue-900 text-gray-400 hover:text-blue-900 w-9 h-9 rounded flex items-center justify-center transition text-sm">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="border border-gray-200 hover:border-blue-900 text-gray-400 hover:text-blue-900 w-9 h-9 rounded flex items-center justify-center transition text-sm">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
                     </div>
                 </div>
 
+                <!-- Formulario -->
                 <div class="bg-white border border-gray-200 rounded-lg p-8">
-                    <h3 class="text-xl font-bold text-blue-900 mb-6">Envíanos un Mensaje</h3>
+                    <h3 class="text-base font-bold text-blue-900 mb-6">Envíanos un mensaje</h3>
                     <form class="space-y-4">
                         <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Nombre Completo</label>
-                            <input type="text" class="w-full px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm" placeholder="Tu nombre">
+                            <label class="block text-gray-700 text-xs font-semibold mb-1 uppercase tracking-wide">Nombre</label>
+                            <input type="text" class="w-full px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm transition" placeholder="Tu nombre completo">
                         </div>
                         <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Correo Electrónico</label>
-                            <input type="email" class="w-full px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm" placeholder="tu@email.com">
+                            <label class="block text-gray-700 text-xs font-semibold mb-1 uppercase tracking-wide">Correo</label>
+                            <input type="email" class="w-full px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm transition" placeholder="tu@email.com">
                         </div>
                         <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Teléfono</label>
-                            <input type="tel" class="w-full px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm" placeholder="(951) 123-4567">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Asunto</label>
-                            <select class="w-full px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm">
+                            <label class="block text-gray-700 text-xs font-semibold mb-1 uppercase tracking-wide">Asunto</label>
+                            <select class="w-full px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm text-gray-700 transition">
                                 <option>Credencial de Egresado</option>
                                 <option>Titulación</option>
                                 <option>Certificación de Documentos</option>
@@ -433,14 +367,15 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Mensaje</label>
-                            <textarea rows="4" class="w-full px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm" placeholder="Escribe tu mensaje aquí..."></textarea>
+                            <label class="block text-gray-700 text-xs font-semibold mb-1 uppercase tracking-wide">Mensaje</label>
+                            <textarea rows="4" class="w-full px-3 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm transition" placeholder="Escribe tu mensaje..."></textarea>
                         </div>
-                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded font-semibold text-sm transition duration-200">
-                            <i class="fas fa-paper-plane mr-2"></i>Enviar Mensaje
+                        <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded font-semibold text-sm transition duration-200">
+                            Enviar mensaje
                         </button>
                     </form>
                 </div>
+
             </div>
         </div>
     </section>
@@ -450,107 +385,146 @@
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div>
-                    <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-14 mb-4 brightness-0 invert">
-                    <p class="text-gray-400 text-sm">Instituto Tecnológico de Oaxaca — Tecnológico Nacional de México</p>
+                    <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="Logo" class="h-12 mb-4 brightness-0 invert">
+                    <p class="text-gray-400 text-sm leading-relaxed">Instituto Tecnológico de Oaxaca — Tecnológico Nacional de México</p>
                 </div>
                 <div>
-                    <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Navegación</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="index.html#inicio" class="hover:text-orange-500 transition">Inicio</a></li>
-                        <li><a href="index.html#servicios" class="hover:text-orange-500 transition">Servicios</a></li>
-                        <li><a href="bolsa-trabajo.html" class="hover:text-orange-500 transition">Bolsa de Trabajo</a></li>
-                        <li><a href="casos-exito.html" class="hover:text-orange-500 transition">Casos de Éxito</a></li>
+                    <h4 class="font-semibold mb-4 text-xs uppercase tracking-wider text-gray-400">Navegación</h4>
+                    <ul class="space-y-2 text-gray-500 text-sm">
+                        <li><a href="#inicio"    class="hover:text-white transition">Inicio</a></li>
+                        <li><a href="#servicios" class="hover:text-white transition">Servicios</a></li>
+                        <li><a href="bolsa-trabajo.html"   class="hover:text-white transition">Bolsa de Trabajo</a></li>
+                        <li><a href="casos-exito.html"     class="hover:text-white transition">Casos de Éxito</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Servicios</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="credencial.html" class="hover:text-orange-500 transition">Credencial de Egresado</a></li>
-                        <li><a href="titulacion.html" class="hover:text-orange-500 transition">Titulación</a></li>
-                        <li><a href="certificacion.html" class="hover:text-orange-500 transition">Certificación</a></li>
-                        <li><a href="lenguas.html" class="hover:text-orange-500 transition">Lenguas Extranjeras</a></li>
-                        <li><a href="cuestionario.html" class="hover:text-orange-500 transition">Encuesta de Seguimiento</a></li>
+                    <h4 class="font-semibold mb-4 text-xs uppercase tracking-wider text-gray-400">Servicios</h4>
+                    <ul class="space-y-2 text-gray-500 text-sm">
+                        <li><a href="credencial.html"   class="hover:text-white transition">Credencial de Egresado</a></li>
+                        <li><a href="titulacion.html"   class="hover:text-white transition">Titulación</a></li>
+                        <li><a href="certificacion.html" class="hover:text-white transition">Certificación</a></li>
+                        <li><a href="lenguas.html"      class="hover:text-white transition">Lenguas Extranjeras</a></li>
+                        <li><a href="cuestionario.html" class="hover:text-white transition">Encuesta de Seguimiento</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Contacto</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><i class="fas fa-phone mr-2 text-orange-500"></i>(951) 501 5000</li>
-                        <li><i class="fas fa-envelope mr-2 text-orange-500"></i>egresados@itoaxaca.edu.mx</li>
-                        <li><i class="fas fa-map-marker-alt mr-2 text-orange-500"></i>Oaxaca, Oax.</li>
+                    <h4 class="font-semibold mb-4 text-xs uppercase tracking-wider text-gray-400">Contacto</h4>
+                    <ul class="space-y-2 text-gray-500 text-sm">
+                        <li>(951) 501 5000</li>
+                        <li>egresados@itoaxaca.edu.mx</li>
+                        <li>Oaxaca de Juárez, Oax.</li>
                     </ul>
                 </div>
             </div>
             <div class="border-t border-gray-800 pt-6 text-center">
-                <p class="text-gray-500 text-sm">&copy; 2025 TecNM Campus Oaxaca. Todos los derechos reservados.</p>
+                <p class="text-gray-600 text-xs">&copy; 2025 TecNM Campus Oaxaca. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
-<script src="../static/js/auth.js"></script>
-<script>
-function updateCuestionarioLinks(user) {
-    const isOrg = user && user.role === 'organizacion';
-    const isEgr = user && user.role === 'egresado';
-    const show  = isOrg || isEgr;  // admin y sin sesión NO ven cuestionarios
 
-    const url        = isOrg ? 'cuestionario_organizacion.html' : 'cuestionario.html';
-    const navLabel   = isOrg ? 'Mi Cuestionario'               : 'Encuesta Egresados';
-    const bannerTitle= isOrg ? 'Cuestionario para Organizaciones 2025' : 'Cuestionario de Seguimiento de Egresados 2025';
-    const ctaLabel   = isOrg ? 'Mi cuestionario'               : 'Encuesta de seguimiento';
+    <script src="../static/js/auth.js"></script>
+    <script>
+    // ── Stats desde la API ────────────────────────────────────────────
+    async function loadStats() {
+        try {
+            const res  = await fetch('http://localhost:5000/api/stats');
+            const json = await res.json();
+            if (!json.success) throw new Error();
+            const d = json.data;
 
-    // Navbar: botón naranja (solo egresado; org ya tiene quickLink en auth.js)
-    const navLink = document.getElementById('nav-cuestionario-link');
-    if (navLink) {
-        if (isEgr) {
-            navLink.href = url;
-            document.getElementById('nav-cuestionario-label').textContent = navLabel;
-            navLink.classList.remove('hidden');
-        } else {
-            navLink.classList.add('hidden');
+            const empleabilidad = d.total > 0
+                ? Math.round((d.empleados / d.total) * 100) + '%'
+                : '—';
+
+            document.getElementById('stats-row').innerHTML = `
+                <div class="text-center px-6 py-2">
+                    <p class="stat-num text-3xl font-bold text-blue-900 mb-1">${d.total}</p>
+                    <p class="text-gray-500 text-xs font-medium">Egresados registrados</p>
+                </div>
+                <div class="text-center px-6 py-2">
+                    <p class="stat-num text-3xl font-bold text-orange-500 mb-1">${d.empleados}</p>
+                    <p class="text-gray-500 text-xs font-medium">Empleados actualmente</p>
+                </div>
+                <div class="text-center px-6 py-2">
+                    <p class="stat-num text-3xl font-bold text-blue-900 mb-1">${d.sni_activos}</p>
+                    <p class="text-gray-500 text-xs font-medium">Miembros SNI activos</p>
+                </div>
+                <div class="text-center px-6 py-2">
+                    <p class="stat-num text-3xl font-bold text-orange-500 mb-1">${empleabilidad}</p>
+                    <p class="text-gray-500 text-xs font-medium">Tasa de empleabilidad</p>
+                </div>
+            `;
+        } catch {
+            // Si la API no responde, mostrar guiones
+            document.getElementById('stats-row').innerHTML = `
+                <div class="text-center px-6 py-2">
+                    <p class="text-3xl font-bold text-blue-900 mb-1">—</p>
+                    <p class="text-gray-500 text-xs font-medium">Egresados registrados</p>
+                </div>
+                <div class="text-center px-6 py-2">
+                    <p class="text-3xl font-bold text-orange-500 mb-1">—</p>
+                    <p class="text-gray-500 text-xs font-medium">Empleados actualmente</p>
+                </div>
+                <div class="text-center px-6 py-2">
+                    <p class="text-3xl font-bold text-blue-900 mb-1">—</p>
+                    <p class="text-gray-500 text-xs font-medium">Miembros SNI activos</p>
+                </div>
+                <div class="text-center px-6 py-2">
+                    <p class="text-3xl font-bold text-orange-500 mb-1">—</p>
+                    <p class="text-gray-500 text-xs font-medium">Tasa de empleabilidad</p>
+                </div>
+            `;
         }
     }
 
-    // Banner azul
-    const banner = document.getElementById('survey-banner');
-    if (banner) {
-        if (show) {
-            banner.classList.remove('hidden');
-            document.getElementById('banner-cuestionario-link').href = url;
-            document.getElementById('banner-title').textContent = bannerTitle;
-            document.getElementById('banner-btn-label').textContent = 'Responder cuestionario';
-            // icono verde para org
-            const icon = document.getElementById('banner-icon');
-            if (isOrg) icon.className = 'bg-green-600 w-10 h-10 rounded flex items-center justify-center flex-shrink-0';
-        } else {
-            banner.classList.add('hidden');
+    // ── Cuestionario links según rol ─────────────────────────────────
+    function updateCuestionarioLinks(user) {
+        const isOrg = user && user.role === 'organizacion';
+        const isEgr = user && user.role === 'egresado';
+        const show  = isOrg || isEgr;
+
+        const url         = isOrg ? 'cuestionario_organizacion.html' : 'cuestionario.html';
+        const bannerTitle = isOrg ? 'Cuestionario para Organizaciones 2025' : 'Cuestionario de Seguimiento de Egresados 2025';
+        const ctaLabel    = isOrg ? 'Mi cuestionario' : 'Encuesta de seguimiento';
+
+        // Banner
+        const banner = document.getElementById('survey-banner');
+        if (banner) {
+            if (show) {
+                banner.classList.remove('hidden');
+                document.getElementById('banner-cuestionario-link').href = url;
+                document.getElementById('banner-title').textContent = bannerTitle;
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        // Tarjeta de servicios
+        const cardLink = document.getElementById('card-cuestionario-link');
+        if (cardLink) {
+            if (show) { cardLink.href = url; cardLink.classList.remove('hidden'); }
+            else      { cardLink.classList.add('hidden'); }
+        }
+
+        // Botón CTA
+        const ctaLink = document.getElementById('cta-cuestionario-link');
+        if (ctaLink) {
+            if (show) {
+                ctaLink.href = url;
+                ctaLink.classList.remove('hidden');
+                document.getElementById('cta-cuestionario-label').textContent = ctaLabel;
+            } else {
+                ctaLink.classList.add('hidden');
+            }
         }
     }
 
-    // Tarjeta de servicios
-    const cardLink = document.getElementById('card-cuestionario-link');
-    if (cardLink) {
-        if (show) { cardLink.href = url; cardLink.classList.remove('hidden'); }
-        else      { cardLink.classList.add('hidden'); }
-    }
-
-    // Botón CTA
-    const ctaLink = document.getElementById('cta-cuestionario-link');
-    if (ctaLink) {
-        if (show) {
-            ctaLink.href = url;
-            ctaLink.classList.remove('hidden');
-            document.getElementById('cta-cuestionario-label').textContent = ctaLabel;
-        } else {
-            ctaLink.classList.add('hidden');
-        }
-    }
-}
-
-document.addEventListener('auth:login', (e) => updateCuestionarioLinks(e.detail));
-document.addEventListener('DOMContentLoaded', async () => {
-    const user = await checkSession();
-    updateCuestionarioLinks(user);
-});
-</script>
+    document.addEventListener('auth:login', (e) => updateCuestionarioLinks(e.detail));
+    document.addEventListener('DOMContentLoaded', async () => {
+        loadStats();
+        const user = await checkSession();
+        updateCuestionarioLinks(user);
+    });
+    </script>
 </body>
 </html>

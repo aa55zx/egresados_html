@@ -13,11 +13,14 @@ from datetime import datetime
 # Cargar variables del archivo .env
 load_dotenv()
 
-BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+STATIC_DIR    = os.path.join(BASE_DIR, "static")
+
 # Tokens activos: { token: {id, username, nombre, role} }
 TOKENS = {}
 
-app = Flask(__name__, static_folder=BASE_DIR)
+app = Flask(__name__, static_folder=STATIC_DIR, template_folder=TEMPLATES_DIR)
 CORS(app, supports_credentials=True)
 
 # ──────────────────────────────────────────────────────────────────
@@ -29,7 +32,7 @@ MYSQL_CONFIG = {
     "port":        int(os.getenv("DB_PORT", 3306)),
     "user":        os.getenv("DB_USER", "root"),
     "password":    os.getenv("DB_PASSWORD", ""),
-    "database":    os.getenv("DB_NAME", "egresados"),
+    "database":    os.getenv("DB_NAME", "egresados_tecnm"),
     "charset":     os.getenv("DB_CHARSET", "utf8mb4"),
     
     "cursorclass": pymysql.cursors.DictCursor,
@@ -619,10 +622,21 @@ def list_organizaciones():
 
 @app.route("/")
 def serve_index():
-    return send_from_directory(BASE_DIR, "index.html")
+    return send_from_directory(TEMPLATES_DIR, "index.html")
+
+@app.route("/static/css/<path:fname>")
+def serve_css(fname):
+    return send_from_directory(os.path.join(STATIC_DIR, "css"), fname)
+
+@app.route("/static/js/<path:fname>")
+def serve_js(fname):
+    return send_from_directory(os.path.join(STATIC_DIR, "js"), fname)
 
 @app.route("/<path:fname>")
-def serve_static(fname):
+def serve_template(fname):
+    html_path = os.path.join(TEMPLATES_DIR, fname)
+    if os.path.exists(html_path):
+        return send_from_directory(TEMPLATES_DIR, fname)
     return send_from_directory(BASE_DIR, fname)
 
 # ──────────────────────────────────────────────────────────────────
