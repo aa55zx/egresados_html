@@ -1,57 +1,59 @@
 /**
- * auth.js — Manejo de sesión con token en localStorage
+ * auth.js — Sesión con Supabase Auth
  * Portal de Egresados TecNM
  */
-
-const API = 'http://localhost:5000/api';
 
 let currentUser = null;
 
 // ─────────────────────────────────────────────────────────────
-// Token helpers
+// Token helpers (compatibilidad con código existente)
 // ─────────────────────────────────────────────────────────────
 function getToken() {
-  return localStorage.getItem('tecnm_token') || '';
-}
-
-function setToken(token) {
-  localStorage.setItem('tecnm_token', token);
+  const session = supabaseClient.auth.session?.() ?? null;
+  return session?.access_token || '';
 }
 
 function clearToken() {
-  localStorage.removeItem('tecnm_token');
   localStorage.removeItem('tecnm_user');
 }
 
 function authHeaders() {
   return {
     'Content-Type': 'application/json',
-    'X-Auth-Token': getToken()
+    'Authorization': `Bearer ${getToken()}`
   };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Perfil desde tabla usuarios
+// ─────────────────────────────────────────────────────────────
+async function fetchProfile(email) {
+  const { data } = await supabaseClient
+    .from('usuarios')
+    .select('id, nombre, email, role, activo, username')
+    .eq('email', email)
+    .single();
+  return data;
 }
 
 // ─────────────────────────────────────────────────────────────
 // Verificar sesión activa
 // ─────────────────────────────────────────────────────────────
 async function checkSession() {
-  const token = getToken();
-  if (!token) {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
     currentUser = null;
     updateNavAuthArea();
     return null;
   }
   try {
-    const res  = await fetch(`${API}/auth/me`, {
-      headers: { 'X-Auth-Token': token }
-    });
-    const data = await res.json();
-    if (data.authenticated) {
-      currentUser = data.user;
+    const profile = await fetchProfile(session.user.email);
+    if (profile && profile.activo !== false) {
+      currentUser = profile;
       updateNavAuthArea();
-      return data.user;
+      return profile;
     }
   } catch (e) {}
-  clearToken();
   currentUser = null;
   updateNavAuthArea();
   return null;
@@ -73,12 +75,10 @@ function updateNavAuthArea() {
     const roleLabel = isAdmin ? 'Administrador' : isOrg ? 'Organización' : 'Egresado';
     const roleIcon  = isAdmin ? 'fa-shield-halved' : isOrg ? 'fa-building' : 'fa-user-graduate';
 
-    // Quick link solo para admin (Panel Admin)
     const quickLink = isAdmin
       ? `<a href="admin.html" class="font-semibold text-sm flex items-center gap-1" style="color:#E8A020"><i class="fas fa-shield-halved"></i><span class="hidden lg:inline">Panel Admin</span></a>`
       : '';
 
-    // Ítem de cuestionario en el dropdown — mismo estilo para egresado y organización
     const cuestionarioItem = isEgr
       ? `<a href="cuestionario.html" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50" style="color:#1A3A5C"><i class="fas fa-clipboard-list w-4"></i>Cuestionario Egresados</a>`
       : isOrg
@@ -153,10 +153,10 @@ function showLoginModal() {
         </div>
         <div class="space-y-4">
           <div>
-            <label class="block text-gray-700 text-xs font-semibold mb-1 uppercase tracking-wide">Usuario</label>
+            <label class="block text-gray-700 text-xs font-semibold mb-1 uppercase tracking-wide">Correo Electrónico</label>
             <div class="relative">
-              <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input id="login-username" type="text" placeholder="Tu nombre de usuario"
+              <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input id="login-email" type="email" placeholder="tu@correo.com"
                 class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm"
                 onkeydown="if(event.key==='Enter') doLogin()">
             </div>
@@ -190,9 +190,9 @@ function showLoginModal() {
   const modal = document.getElementById('login-modal');
   modal.classList.remove('hidden');
   document.getElementById('login-error').classList.add('hidden');
-  document.getElementById('login-username').value = '';
+  document.getElementById('login-email').value = '';
   document.getElementById('login-password').value = '';
-  setTimeout(() => document.getElementById('login-username').focus(), 100);
+  setTimeout(() => document.getElementById('login-email').focus(), 100);
 }
 
 function hideLoginModal() {
@@ -213,13 +213,13 @@ function togglePasswordVisibility() {
 }
 
 async function doLogin() {
-  const username = document.getElementById('login-username').value.trim();
+  const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   const btn      = document.getElementById('login-btn');
   const errorDiv = document.getElementById('login-error');
 
-  if (!username || !password) {
-    showLoginError('Por favor ingresa usuario y contraseña.');
+  if (!email || !password) {
+    showLoginError('Por favor ingresa correo y contraseña.');
     return;
   }
 
@@ -228,24 +228,31 @@ async function doLogin() {
   errorDiv.classList.add('hidden');
 
   try {
-    const res  = await fetch(`${API}/auth/login`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ username, password })
-    });
-    const data = await res.json();
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-    if (data.success) {
-      setToken(data.token);
-      currentUser = data.user;
-      hideLoginModal();
-      updateNavAuthArea();
-      document.dispatchEvent(new CustomEvent('auth:login', { detail: data.user }));
-    } else {
-      showLoginError(data.error || 'Credenciales incorrectas.');
+    if (error) {
+      showLoginError('Credenciales incorrectas. Verifica tu correo y contraseña.');
+      return;
     }
+
+    const profile = await fetchProfile(email);
+    if (!profile) {
+      showLoginError('No se encontró perfil de usuario. Contacta al administrador.');
+      await supabaseClient.auth.signOut();
+      return;
+    }
+    if (profile.activo === false) {
+      showLoginError('Tu cuenta está desactivada. Contacta al administrador.');
+      await supabaseClient.auth.signOut();
+      return;
+    }
+
+    currentUser = profile;
+    hideLoginModal();
+    updateNavAuthArea();
+    document.dispatchEvent(new CustomEvent('auth:login', { detail: profile }));
   } catch (e) {
-    showLoginError('No se pudo conectar al servidor. ¿Está corriendo app.py?');
+    showLoginError('Error de conexión. Verifica tu internet.');
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
@@ -259,12 +266,7 @@ function showLoginError(msg) {
 }
 
 async function doLogout() {
-  try {
-    await fetch(`${API}/auth/logout`, {
-      method:  'POST',
-      headers: { 'X-Auth-Token': getToken() }
-    });
-  } catch(e) {}
+  await supabaseClient.auth.signOut();
   clearToken();
   currentUser = null;
   updateNavAuthArea();
@@ -275,7 +277,7 @@ async function doLogout() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Utilidades de protección de páginas
+// Protección de páginas
 // ─────────────────────────────────────────────────────────────
 async function requireAuth(onSuccess, onFail) {
   const user = await checkSession();
@@ -341,7 +343,7 @@ function showAuthWall(message) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Init automático
+// Init
 // ─────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   checkSession();
