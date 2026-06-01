@@ -26,14 +26,28 @@ function authHeaders() {
 
 // ─────────────────────────────────────────────────────────────
 // Perfil desde tabla usuarios
+// Busca primero por user_id (auth.uid), luego por email como fallback
 // ─────────────────────────────────────────────────────────────
-async function fetchProfile(email) {
-  const { data } = await supabaseClient
-    .from('usuarios')
-    .select('id, nombre, email, role, activo, username')
-    .eq('email', email)
-    .single();
-  return data;
+async function fetchProfile(email, authUserId) {
+  // Intento 1: buscar por user_id vinculado
+  if (authUserId) {
+    const { data } = await supabaseClient
+      .from('usuarios')
+      .select('id, nombre, email, role, activo, username, user_id')
+      .eq('user_id', authUserId)
+      .maybeSingle();
+    if (data) return data;
+  }
+  // Intento 2: fallback por email (usuarios migrados sin user_id aún)
+  if (email) {
+    const { data } = await supabaseClient
+      .from('usuarios')
+      .select('id, nombre, email, role, activo, username, user_id')
+      .eq('email', email)
+      .maybeSingle();
+    return data || null;
+  }
+  return null;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -47,8 +61,8 @@ async function checkSession() {
     return null;
   }
   try {
-    const profile = await fetchProfile(session.user.email);
-    if (profile && profile.activo !== false) {
+    const profile = await fetchProfile(session.user.email, session.user.id);
+    if (profile && profile.activo !== false && profile.activo !== 0) {
       currentUser = profile;
       updateNavAuthArea();
       return profile;
@@ -235,13 +249,13 @@ async function doLogin() {
       return;
     }
 
-    const profile = await fetchProfile(email);
+    const profile = await fetchProfile(email, data.user?.id);
     if (!profile) {
       showLoginError('No se encontró perfil de usuario. Contacta al administrador.');
       await supabaseClient.auth.signOut();
       return;
     }
-    if (profile.activo === false) {
+    if (profile.activo === false || profile.activo === 0) {
       showLoginError('Tu cuenta está desactivada. Contacta al administrador.');
       await supabaseClient.auth.signOut();
       return;
