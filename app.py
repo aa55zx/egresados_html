@@ -1,67 +1,79 @@
 """
 Portal de Egresados — TecNM Campus Oaxaca
-Backend Flask + MySQL  (autenticación por token simple en header)
+Backend Flask + PostgreSQL/Supabase
 """
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-import pymysql, pymysql.cursors, os, json, functools, secrets
-from datetime import datetime
+import psycopg2, psycopg2.extras, os, json, functools, secrets
+from urllib.parse import unquote
 
-# Cargar variables del archivo .env
 load_dotenv()
 
 BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR    = os.path.join(BASE_DIR, "static")
 
-# Tokens activos: { token: {id, username, nombre, role} }
-TOKENS = {}
+TOKENS = {}  # { token: {id, username, nombre, role} }
 
 app = Flask(__name__, static_folder=STATIC_DIR, template_folder=TEMPLATES_DIR)
 CORS(app, supports_credentials=True)
 
-# ──────────────────────────────────────────────────────────────────
-# Configuración MySQL (lee desde .env)
-# ──────────────────────────────────────────────────────────────────
-
-MYSQL_CONFIG = {
-    "host":        os.getenv("DB_HOST", "localhost"),
-    "port":        int(os.getenv("DB_PORT", 3306)),
-    "user":        os.getenv("DB_USER", "root"),
-    "password":    os.getenv("DB_PASSWORD", ""),
-    "database":    os.getenv("DB_NAME", "egresados_tecnm"),
-    "charset":     os.getenv("DB_CHARSET", "utf8mb4"),
-    
-    "cursorclass": pymysql.cursors.DictCursor,
-    "autocommit":  False,
-}
+# ─────────────────────────────────────────────────────────────────
+# Conexión PostgreSQL (Supabase)
+# ─────────────────────────────────────────────────────────────────
 
 def get_db():
-    return pymysql.connect(**MYSQL_CONFIG)
+    # Transaction pooler (puerto 6543)
+    # user = postgres.PROJECT_REF
+    # Session pooler (puerto 5432)
+    # user = postgres.PROJECT_REF  (mismo formato en Supabase nuevo)
+    for cfg in [
+        # Intento 1: Session pooler (aws-1)
+        dict(host="aws-1-us-east-1.pooler.supabase.com", port=6543,
+             user="postgres.lgmckhssohxdqmhszgtn"),
+        # Intento 2: Transaction pooler (aws-0)
+        dict(host="aws-0-us-east-1.pooler.supabase.com", port=6543,
+             user="postgres.lgmckhssohxdqmhszgtn"),
+    ]:
+        try:
+            conn = psycopg2.connect(
+                host=cfg["host"], port=cfg["port"],
+                dbname="postgres", user=cfg["user"],
+                password="3G456G65H6H", sslmode="require",
+                cursor_factory=psycopg2.extras.RealDictCursor,
+                connect_timeout=10
+            )
+            print(f"  ✅  Conectado via {cfg['host']}:{cfg['port']}")
+            return conn
+        except Exception as e:
+            print(f"  ⚠️   Fallo {cfg['host']}:{cfg['port']} → {e}")
+    raise Exception("No se pudo conectar a Supabase. Revisa credenciales y pooler en el dashboard.")
 
 def init_db():
     conn = get_db()
     try:
         with conn.cursor() as c:
+            # Tabla usuarios
             c.execute("""
                 CREATE TABLE IF NOT EXISTS usuarios (
-                    id             INT AUTO_INCREMENT PRIMARY KEY,
-                    username       VARCHAR(100) UNIQUE NOT NULL,
-                    password_hash  VARCHAR(255) NOT NULL,
-                    nombre         VARCHAR(255) NOT NULL,
-                    email          VARCHAR(255),
-                    role           VARCHAR(20) NOT NULL DEFAULT 'egresado',
-                    activo         TINYINT(1) NOT NULL DEFAULT 1,
-                    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+                    id            SERIAL PRIMARY KEY,
+                    username      VARCHAR(100) UNIQUE NOT NULL,
+                    password_hash VARCHAR(255) NOT NULL,
+                    nombre        VARCHAR(255) NOT NULL,
+                    email         VARCHAR(255),
+                    role          VARCHAR(20) NOT NULL DEFAULT 'egresado',
+                    activo        SMALLINT NOT NULL DEFAULT 1,
+                    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
             """)
+            # Tabla egresados
             c.execute("""
                 CREATE TABLE IF NOT EXISTS egresados (
-                    id                       INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id                  INT,
+                    id                       SERIAL PRIMARY KEY,
+                    user_id                  INT REFERENCES usuarios(id) ON DELETE SET NULL ON UPDATE CASCADE,
                     nombre                   VARCHAR(255),
                     sexo                     VARCHAR(50),
                     estado_civil             VARCHAR(50),
@@ -95,10 +107,10 @@ def init_db():
                     sector_economico         VARCHAR(150),
                     tipo_contrato_actual     VARCHAR(100),
                     actividades_empleo       TEXT,
-                    escala_coincidencia      TINYINT,
-                    escala_conocimientos     TINYINT,
-                    escala_impacto           TINYINT,
-                    escala_pertinencia       TINYINT,
+                    escala_coincidencia      SMALLINT,
+                    escala_conocimientos     SMALLINT,
+                    escala_impacto           SMALLINT,
+                    escala_pertinencia       SMALLINT,
                     publicaciones            VARCHAR(10),
                     tipo_publicaciones       TEXT,
                     sni                      VARCHAR(100),
@@ -107,16 +119,16 @@ def init_db():
                     descripcion_premios      TEXT,
                     academia                 VARCHAR(10),
                     postdoctoral             TEXT,
-                    escala_contenidos        TINYINT,
-                    escala_didacticas        TINYINT,
-                    escala_evaluacion_doc    TINYINT,
-                    escala_biblio            TINYINT,
-                    escala_asesoria          TINYINT,
-                    escala_satisfaccion      TINYINT,
-                    escala_laboratorios      TINYINT,
-                    escala_biblioteca        TINYINT,
-                    escala_internet          TINYINT,
-                    escala_instalaciones     TINYINT,
+                    escala_contenidos        SMALLINT,
+                    escala_didacticas        SMALLINT,
+                    escala_evaluacion_doc    SMALLINT,
+                    escala_biblio            SMALLINT,
+                    escala_asesoria          SMALLINT,
+                    escala_satisfaccion      SMALLINT,
+                    escala_laboratorios      SMALLINT,
+                    escala_biblioteca        SMALLINT,
+                    escala_internet          SMALLINT,
+                    escala_instalaciones     SMALLINT,
                     expectativas_cumplidas   VARCHAR(50),
                     calidad_programa         VARCHAR(100),
                     areas_mejora             TEXT,
@@ -132,393 +144,14 @@ def init_db():
                     comentarios              TEXT,
                     recomendaria             VARCHAR(50),
                     fecha_encuesta           VARCHAR(50),
-                    fecha_registro           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    CONSTRAINT fk_egresado_usuario
-                        FOREIGN KEY (user_id) REFERENCES usuarios(id)
-                        ON DELETE SET NULL ON UPDATE CASCADE
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+                    fecha_registro           TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
             """)
-            conn.commit()
-            c.execute("SELECT id FROM usuarios WHERE username='admin'")
-            if not c.fetchone():
-                admin_user = os.getenv("ADMIN_USERNAME", "admin")
-                admin_pass = os.getenv("ADMIN_PASSWORD", "TecNM2025")
-                admin_nombre = os.getenv("ADMIN_NOMBRE", "Administrador TecNM")
-                c.execute("""
-                    INSERT INTO usuarios (username, password_hash, nombre, role)
-                    VALUES (%s, %s, %s, %s)
-                """, (admin_user, generate_password_hash(admin_pass), admin_nombre, "admin"))
-                conn.commit()
-                print(f"  👤  Admin creado  →  user: {admin_user}  |  pass: {admin_pass}")
-    finally:
-        conn.close()
-
-# ──────────────────────────────────────────────────────────────────
-# Auth por token (header X-Auth-Token)
-# ──────────────────────────────────────────────────────────────────
-
-def get_current_user():
-    token = request.headers.get("X-Auth-Token", "")
-    return TOKENS.get(token)
-
-def require_login(f):
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        if not get_current_user():
-            return jsonify({"success": False, "error": "No autenticado"}), 401
-        return f(*args, **kwargs)
-    return wrapper
-
-def optional_login(f):
-    """No requiere auth — pero si hay token, inyecta el usuario."""
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        return f(*args, **kwargs)
-    return wrapper
-
-def require_admin(f):
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        user = get_current_user()
-        if not user:
-            return jsonify({"success": False, "error": "No autenticado"}), 401
-        if user["role"] != "admin":
-            return jsonify({"success": False, "error": "Acceso denegado"}), 403
-        return f(*args, **kwargs)
-    return wrapper
-
-# ──────────────────────────────────────────────────────────────────
-# API — Autenticación
-# ──────────────────────────────────────────────────────────────────
-
-@app.route("/api/auth/login", methods=["POST"])
-def login():
-    d        = request.get_json(silent=True) or {}
-    username = (d.get("username") or "").strip()
-    password = d.get("password") or ""
-
-    if not username or not password:
-        return jsonify({"success": False, "error": "Usuario y contraseña requeridos"}), 400
-
-    conn = get_db()
-    try:
-        with conn.cursor() as c:
-            c.execute("SELECT * FROM usuarios WHERE username=%s AND activo=1", (username,))
-            user = c.fetchone()
-    finally:
-        conn.close()
-
-    if not user or not check_password_hash(user["password_hash"], password):
-        return jsonify({"success": False, "error": "Credenciales incorrectas"}), 401
-
-    token = secrets.token_hex(32)
-    TOKENS[token] = {
-        "id":       user["id"],
-        "username": user["username"],
-        "nombre":   user["nombre"],
-        "role":     user["role"],
-    }
-
-    return jsonify({
-        "success": True,
-        "token": token,
-        "user": TOKENS[token]
-    })
-
-
-@app.route("/api/auth/logout", methods=["POST"])
-def logout():
-    token = request.headers.get("X-Auth-Token", "")
-    TOKENS.pop(token, None)
-    return jsonify({"success": True, "message": "Sesión cerrada"})
-
-
-@app.route("/api/auth/me", methods=["GET"])
-def me():
-    user = get_current_user()
-    if not user:
-        return jsonify({"success": False, "authenticated": False}), 401
-    return jsonify({"success": True, "authenticated": True, "user": user})
-
-# ──────────────────────────────────────────────────────────────────
-# API — Usuarios (solo admin)
-# ──────────────────────────────────────────────────────────────────
-
-@app.route("/api/users", methods=["GET"])
-@require_admin
-def list_users():
-    conn = get_db()
-    try:
-        with conn.cursor() as c:
-            c.execute("SELECT id, username, nombre, email, role, activo, created_at FROM usuarios ORDER BY created_at DESC")
-            users = c.fetchall()
-    finally:
-        conn.close()
-    return jsonify({"success": True, "data": users, "total": len(users)})
-
-
-@app.route("/api/users", methods=["POST"])
-@require_admin
-def create_user():
-    d        = request.get_json(silent=True) or {}
-    username = (d.get("username") or "").strip()
-    password = d.get("password") or ""
-    nombre   = (d.get("nombre") or "").strip()
-    email    = (d.get("email") or "").strip()
-    role     = d.get("role", "egresado")
-
-    if not username or not password or not nombre:
-        return jsonify({"success": False, "error": "username, password y nombre son requeridos"}), 400
-    if role not in ("admin", "egresado", "organizacion"):
-        return jsonify({"success": False, "error": "role inválido"}), 400
-
-    conn = get_db()
-    try:
-        with conn.cursor() as c:
-            c.execute("SELECT id FROM usuarios WHERE username=%s", (username,))
-            if c.fetchone():
-                return jsonify({"success": False, "error": "El usuario ya existe"}), 409
-            c.execute("""
-                INSERT INTO usuarios (username, password_hash, nombre, email, role)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (username, generate_password_hash(password), nombre, email, role))
-            conn.commit()
-            new_id = c.lastrowid
-    finally:
-        conn.close()
-    return jsonify({"success": True, "id": new_id, "message": "Usuario creado exitosamente"})
-
-
-@app.route("/api/users/<int:uid>", methods=["GET"])
-@require_admin
-def get_user(uid):
-    conn = get_db()
-    try:
-        with conn.cursor() as c:
-            c.execute("SELECT id, username, nombre, email, role, activo, created_at FROM usuarios WHERE id=%s", (uid,))
-            row = c.fetchone()
-    finally:
-        conn.close()
-    if not row:
-        return jsonify({"success": False, "error": "No encontrado"}), 404
-    return jsonify({"success": True, "data": row})
-
-
-@app.route("/api/users/<int:uid>", methods=["PUT"])
-@require_admin
-def update_user(uid):
-    d = request.get_json(silent=True) or {}
-    conn = get_db()
-    try:
-        with conn.cursor() as c:
-            c.execute("SELECT * FROM usuarios WHERE id=%s", (uid,))
-            user = c.fetchone()
-            if not user:
-                return jsonify({"success": False, "error": "No encontrado"}), 404
-
-            nombre = d.get("nombre", user["nombre"])
-            email  = d.get("email",  user["email"])
-            role   = d.get("role",   user["role"])
-            activo = d.get("activo", user["activo"])
-
-            updates = ["nombre=%s", "email=%s", "role=%s", "activo=%s"]
-            values  = [nombre, email, role, activo]
-
-            if d.get("password"):
-                updates.append("password_hash=%s")
-                values.append(generate_password_hash(d["password"]))
-
-            values.append(uid)
-            c.execute(f"UPDATE usuarios SET {', '.join(updates)} WHERE id=%s", values)
-            conn.commit()
-    finally:
-        conn.close()
-    return jsonify({"success": True, "message": "Usuario actualizado"})
-
-
-@app.route("/api/users/<int:uid>", methods=["DELETE"])
-@require_admin
-def delete_user(uid):
-    current = get_current_user()
-    if current and current["id"] == uid:
-        return jsonify({"success": False, "error": "No puedes eliminar tu propia cuenta"}), 400
-    conn = get_db()
-    try:
-        with conn.cursor() as c:
-            c.execute("SELECT id FROM usuarios WHERE id=%s", (uid,))
-            if not c.fetchone():
-                return jsonify({"success": False, "error": "No encontrado"}), 404
-            c.execute("DELETE FROM usuarios WHERE id=%s", (uid,))
-            conn.commit()
-    finally:
-        conn.close()
-    return jsonify({"success": True, "message": "Usuario eliminado"})
-
-# ──────────────────────────────────────────────────────────────────
-# Helpers egresados
-# ──────────────────────────────────────────────────────────────────
-
-JSON_FIELDS = {"razon_eleccion_ito","tipo_beca","certificacion_idioma","factores_empleo","tipo_publicaciones"}
-
-def row_to_dict(row):
-    d = dict(row)
-    for f in JSON_FIELDS:
-        if d.get(f):
-            try: d[f] = json.loads(d[f])
-            except: pass
-    return d
-
-def serialize(v):
-    return json.dumps(v, ensure_ascii=False) if isinstance(v, list) else v
-
-# ──────────────────────────────────────────────────────────────────
-# API — Egresados
-# ──────────────────────────────────────────────────────────────────
-
-@app.route("/api/egresados", methods=["GET"])
-def list_egresados():
-    search = request.args.get("search","").strip()
-    prog   = request.args.get("programa","").strip()
-    sector = request.args.get("sector","").strip()
-    sni_f  = request.args.get("sni","").strip()
-    page   = max(1, int(request.args.get("page",1)))
-    per    = min(50, int(request.args.get("per",12)))
-
-    where, params = ["1=1"], []
-    if search:
-        where.append("(nombre LIKE %s OR email LIKE %s OR ciudad LIKE %s OR programa_posgrado LIKE %s)")
-        params += [f"%{search}%"]*4
-    if prog:
-        where.append("programa_posgrado LIKE %s"); params.append(f"%{prog}%")
-    if sector:
-        where.append("sector_economico LIKE %s"); params.append(f"%{sector}%")
-    if sni_f:
-        where.append("sni LIKE %s"); params.append(f"%{sni_f}%")
-
-    base_q = f"FROM egresados WHERE {' AND '.join(where)}"
-    conn = get_db()
-    try:
-        with conn.cursor() as c:
-            c.execute(f"SELECT COUNT(*) AS n {base_q}", params)
-            total = c.fetchone()["n"]
-            c.execute(f"SELECT * {base_q} ORDER BY fecha_registro DESC LIMIT %s OFFSET %s",
-                      params + [per, (page-1)*per])
-            rows = [row_to_dict(r) for r in c.fetchall()]
-    finally:
-        conn.close()
-    return jsonify({"success":True,"data":rows,"total":total,"page":page,"per":per,"pages":max(1,-(-total//per))})
-
-
-@app.route("/api/egresados", methods=["POST"])
-@require_login
-def create_egresado():
-    d = request.get_json(silent=True) or {}
-    if not d.get("nombre"):
-        return jsonify({"success": False, "error": "El campo 'nombre' es requerido"}), 400
-
-    COLS = [
-        "nombre","sexo","estado_civil","municipio","ciudad","codigo_postal","pais",
-        "telefono","email","dependientes_economicos","razon_eleccion_ito",
-        "programa_posgrado","linea_investigacion","beca","institucion_beca","tipo_beca",
-        "tiempo_extra_grado","causa_tiempo_extra","importancia_titulacion","dominio_idioma",
-        "idiomas","certificacion_idioma","empleado_cursando","puesto_cursando",
-        "contrato_cursando","cambio_empleo","tiempo_conseguir_empleo","factores_empleo",
-        "labora_actualmente","tipo_institucion","sector_economico","tipo_contrato_actual",
-        "actividades_empleo","escala_coincidencia","escala_conocimientos","escala_impacto",
-        "escala_pertinencia","publicaciones","tipo_publicaciones","sni","red_tematica",
-        "premios","descripcion_premios","academia","postdoctoral","escala_contenidos",
-        "escala_didacticas","escala_evaluacion_doc","escala_biblio","escala_asesoria",
-        "escala_satisfaccion","escala_laboratorios","escala_biblioteca","escala_internet",
-        "escala_instalaciones","expectativas_cumplidas","calidad_programa","areas_mejora",
-        "mejora_plan_estudios","cursos_actualizacion","descripcion_cursos",
-        "actividades_deseadas","tiempo_disponible","empresa_propia","puesto_cinco_anos",
-        "cargo_eleccion","descripcion_cargo","comentarios","recomendaria","fecha_encuesta"
-    ]
-    user     = get_current_user()
-    all_cols = ["user_id"] + COLS
-    values   = [user["id"] if user else None] + [serialize(d.get(col)) for col in COLS]
-    cols_str = ",".join(f"`{c}`" for c in all_cols)
-    placeholders = ",".join(["%s"]*len(all_cols))
-
-    conn = get_db()
-    try:
-        with conn.cursor() as c:
-            c.execute(f"INSERT INTO egresados ({cols_str}) VALUES ({placeholders})", values)
-            conn.commit()
-            new_id = c.lastrowid
-    finally:
-        conn.close()
-    return jsonify({"success": True, "id": new_id, "message": "Cuestionario registrado exitosamente"})
-
-
-@app.route("/api/egresados/<int:eid>", methods=["GET"])
-def get_egresado(eid):
-    conn = get_db()
-    try:
-        with conn.cursor() as c:
-            c.execute("SELECT * FROM egresados WHERE id=%s", (eid,))
-            row = c.fetchone()
-    finally:
-        conn.close()
-    if not row:
-        return jsonify({"success": False, "error": "No encontrado"}), 404
-    return jsonify({"success": True, "data": row_to_dict(row)})
-
-# ──────────────────────────────────────────────────────────────────
-# API — Estadísticas
-# ──────────────────────────────────────────────────────────────────
-
-@app.route("/api/stats", methods=["GET"])
-def get_stats():
-    conn = get_db()
-    s = {}
-    try:
-        with conn.cursor() as c:
-            def scalar(q, p=()):
-                c.execute(q, p); r = c.fetchone()
-                return list(r.values())[0] if r else 0
-            def rows(q, p=()):
-                c.execute(q, p); return c.fetchall()
-
-            s["total"]             = scalar("SELECT COUNT(*) FROM egresados")
-            s["empleados"]         = scalar("SELECT COUNT(*) FROM egresados WHERE labora_actualmente='Sí'")
-            s["sni_activos"]       = scalar("SELECT COUNT(*) FROM egresados WHERE sni LIKE '%actualmente%'")
-            s["con_publicaciones"] = scalar("SELECT COUNT(*) FROM egresados WHERE publicaciones='Sí'")
-            s["emprendedores"]     = scalar("SELECT COUNT(*) FROM egresados WHERE empresa_propia='Sí'")
-            s["recomendarian"]     = scalar("SELECT COUNT(*) FROM egresados WHERE recomendaria LIKE 'Definitivamente sí%'")
-            s["total_usuarios"]    = scalar("SELECT COUNT(*) FROM usuarios WHERE activo=1")
-            s["por_programa"]      = rows("SELECT programa_posgrado AS label, COUNT(*) AS n FROM egresados WHERE programa_posgrado IS NOT NULL GROUP BY programa_posgrado ORDER BY n DESC")
-            s["por_sector"]        = rows("SELECT sector_economico AS label, COUNT(*) AS n FROM egresados WHERE sector_economico IS NOT NULL GROUP BY sector_economico ORDER BY n DESC")
-            s["por_calidad"]       = rows("SELECT calidad_programa AS label, COUNT(*) AS n FROM egresados WHERE calidad_programa IS NOT NULL GROUP BY calidad_programa ORDER BY n DESC")
-            s["satisfaccion_promedio"] = scalar("SELECT ROUND(AVG(escala_satisfaccion),1) FROM egresados WHERE escala_satisfaccion IS NOT NULL")
-    finally:
-        conn.close()
-    return jsonify({"success": True, "data": s})
-
-# ──────────────────────────────────────────────────────────────────
-# API — Organizaciones
-# ──────────────────────────────────────────────────────────────────
-
-def require_organizacion(f):
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        user = get_current_user()
-        if not user:
-            return jsonify({"success": False, "error": "No autenticado"}), 401
-        if user["role"] not in ("organizacion", "admin"):
-            return jsonify({"success": False, "error": "Acceso solo para organizaciones"}), 403
-        return f(*args, **kwargs)
-    return wrapper
-
-
-def init_org_table():
-    conn = get_db()
-    try:
-        with conn.cursor() as c:
+            # Tabla organizaciones
             c.execute("""
                 CREATE TABLE IF NOT EXISTS organizaciones (
-                    id                      INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id                 INT,
+                    id                      SERIAL PRIMARY KEY,
+                    user_id                 INT REFERENCES usuarios(id) ON DELETE SET NULL ON UPDATE CASCADE,
                     fecha                   VARCHAR(20),
                     nombre_empresa          VARCHAR(255),
                     direccion               TEXT,
@@ -557,16 +190,369 @@ def init_org_table():
                     fortalezas              TEXT,
                     areas_atencion          TEXT,
                     comentarios_generales   TEXT,
-                    fecha_registro          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    CONSTRAINT fk_org_usuario
-                        FOREIGN KEY (user_id) REFERENCES usuarios(id)
-                        ON DELETE SET NULL ON UPDATE CASCADE
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+                    fecha_registro          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
             """)
             conn.commit()
+
+            # Crear usuarios iniciales si no existen
+            def crear_usuario_si_no_existe(username, password, nombre, role):
+                c.execute(
+                    """
+                    INSERT INTO usuarios (username, password_hash, nombre, role)
+                    VALUES (%s, %s, %s, %s)
+                    ON CONFLICT (username) DO NOTHING
+                    """,
+                    (username, generate_password_hash(password), nombre, role)
+                )
+                conn.commit()
+                if c.rowcount:
+                    print(f"  👤  Creado: {role:12} → user: {username}  |  pass: {password}")
+                else:
+                    print(f"  ℹ️   Ya existe: {role:12} → user: {username}")
+
+            crear_usuario_si_no_existe(
+                os.getenv("ADMIN_USERNAME", "admin"),
+                os.getenv("ADMIN_PASSWORD", "TecNM2025"),
+                os.getenv("ADMIN_NOMBRE",   "Administrador TecNM"),
+                "admin"
+            )
+            crear_usuario_si_no_existe(
+                os.getenv("EGRESADO_USERNAME", "egresado1"),
+                os.getenv("EGRESADO_PASSWORD", "Egresado2025"),
+                os.getenv("EGRESADO_NOMBRE",   "Egresado de Prueba"),
+                "egresado"
+            )
+            crear_usuario_si_no_existe(
+                os.getenv("ORG_USERNAME", "empresa1"),
+                os.getenv("ORG_PASSWORD", "Empresa2025"),
+                os.getenv("ORG_NOMBRE",   "Empresa de Prueba"),
+                "organizacion"
+            )
     finally:
         conn.close()
 
+# ─────────────────────────────────────────────────────────────────
+# Auth
+# ─────────────────────────────────────────────────────────────────
+
+def get_current_user():
+    token = request.headers.get("X-Auth-Token", "")
+    return TOKENS.get(token)
+
+def require_login(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        if not get_current_user():
+            return jsonify({"success": False, "error": "No autenticado"}), 401
+        return f(*args, **kwargs)
+    return wrapper
+
+def require_admin(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({"success": False, "error": "No autenticado"}), 401
+        if user["role"] != "admin":
+            return jsonify({"success": False, "error": "Acceso denegado"}), 403
+        return f(*args, **kwargs)
+    return wrapper
+
+def require_organizacion(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({"success": False, "error": "No autenticado"}), 401
+        if user["role"] not in ("organizacion", "admin"):
+            return jsonify({"success": False, "error": "Acceso solo para organizaciones"}), 403
+        return f(*args, **kwargs)
+    return wrapper
+
+# ─────────────────────────────────────────────────────────────────
+# Endpoints de autenticación
+# ─────────────────────────────────────────────────────────────────
+
+@app.route("/api/auth/login", methods=["POST"])
+def login():
+    d        = request.get_json(silent=True) or {}
+    username = (d.get("username") or "").strip()
+    password = d.get("password") or ""
+    if not username or not password:
+        return jsonify({"success": False, "error": "Usuario y contraseña requeridos"}), 400
+    conn = get_db()
+    try:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM usuarios WHERE username=%s AND activo=1", (username,))
+            user = c.fetchone()
+    finally:
+        conn.close()
+    if not user or not check_password_hash(user["password_hash"], password):
+        return jsonify({"success": False, "error": "Credenciales incorrectas"}), 401
+    token = secrets.token_hex(32)
+    TOKENS[token] = {"id": user["id"], "username": user["username"],
+                     "nombre": user["nombre"], "role": user["role"]}
+    return jsonify({"success": True, "token": token, "user": TOKENS[token]})
+
+@app.route("/api/auth/logout", methods=["POST"])
+def logout():
+    TOKENS.pop(request.headers.get("X-Auth-Token", ""), None)
+    return jsonify({"success": True})
+
+@app.route("/api/auth/me", methods=["GET"])
+def me():
+    user = get_current_user()
+    if not user:
+        return jsonify({"success": False, "authenticated": False}), 401
+    return jsonify({"success": True, "authenticated": True, "user": user})
+
+# ─────────────────────────────────────────────────────────────────
+# Usuarios (solo admin)
+# ─────────────────────────────────────────────────────────────────
+
+@app.route("/api/users", methods=["GET"])
+@require_admin
+def list_users():
+    conn = get_db()
+    try:
+        with conn.cursor() as c:
+            c.execute("SELECT id,username,nombre,email,role,activo,created_at FROM usuarios ORDER BY created_at DESC")
+            users = [dict(r) for r in c.fetchall()]
+    finally:
+        conn.close()
+    # Serializar datetimes
+    for u in users:
+        if u.get("created_at"):
+            u["created_at"] = u["created_at"].isoformat()
+    return jsonify({"success": True, "data": users, "total": len(users)})
+
+@app.route("/api/users", methods=["POST"])
+@require_admin
+def create_user():
+    d        = request.get_json(silent=True) or {}
+    username = (d.get("username") or "").strip()
+    password = d.get("password") or ""
+    nombre   = (d.get("nombre") or "").strip()
+    email    = (d.get("email") or "").strip()
+    role     = d.get("role", "egresado")
+    if not username or not password or not nombre:
+        return jsonify({"success": False, "error": "username, password y nombre son requeridos"}), 400
+    if role not in ("admin", "egresado", "organizacion"):
+        return jsonify({"success": False, "error": "role inválido"}), 400
+    conn = get_db()
+    try:
+        with conn.cursor() as c:
+            c.execute("SELECT id FROM usuarios WHERE username=%s", (username,))
+            if c.fetchone():
+                return jsonify({"success": False, "error": "El usuario ya existe"}), 409
+            c.execute(
+                "INSERT INTO usuarios (username,password_hash,nombre,email,role) VALUES (%s,%s,%s,%s,%s) RETURNING id",
+                (username, generate_password_hash(password), nombre, email, role)
+            )
+            new_id = c.fetchone()["id"]
+            conn.commit()
+    finally:
+        conn.close()
+    return jsonify({"success": True, "id": new_id, "message": "Usuario creado"})
+
+@app.route("/api/users/<int:uid>", methods=["GET"])
+@require_admin
+def get_user(uid):
+    conn = get_db()
+    try:
+        with conn.cursor() as c:
+            c.execute("SELECT id,username,nombre,email,role,activo,created_at FROM usuarios WHERE id=%s", (uid,))
+            row = c.fetchone()
+    finally:
+        conn.close()
+    if not row:
+        return jsonify({"success": False, "error": "No encontrado"}), 404
+    row = dict(row)
+    if row.get("created_at"):
+        row["created_at"] = row["created_at"].isoformat()
+    return jsonify({"success": True, "data": row})
+
+@app.route("/api/users/<int:uid>", methods=["PUT"])
+@require_admin
+def update_user(uid):
+    d = request.get_json(silent=True) or {}
+    conn = get_db()
+    try:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM usuarios WHERE id=%s", (uid,))
+            user = c.fetchone()
+            if not user:
+                return jsonify({"success": False, "error": "No encontrado"}), 404
+            nombre = d.get("nombre", user["nombre"])
+            email  = d.get("email",  user["email"])
+            role   = d.get("role",   user["role"])
+            activo = d.get("activo", user["activo"])
+            updates = ["nombre=%s", "email=%s", "role=%s", "activo=%s"]
+            values  = [nombre, email, role, activo]
+            if d.get("password"):
+                updates.append("password_hash=%s")
+                values.append(generate_password_hash(d["password"]))
+            values.append(uid)
+            c.execute(f"UPDATE usuarios SET {', '.join(updates)} WHERE id=%s", values)
+            conn.commit()
+    finally:
+        conn.close()
+    return jsonify({"success": True, "message": "Usuario actualizado"})
+
+@app.route("/api/users/<int:uid>", methods=["DELETE"])
+@require_admin
+def delete_user(uid):
+    current = get_current_user()
+    if current and current["id"] == uid:
+        return jsonify({"success": False, "error": "No puedes eliminar tu propia cuenta"}), 400
+    conn = get_db()
+    try:
+        with conn.cursor() as c:
+            c.execute("SELECT id FROM usuarios WHERE id=%s", (uid,))
+            if not c.fetchone():
+                return jsonify({"success": False, "error": "No encontrado"}), 404
+            c.execute("DELETE FROM usuarios WHERE id=%s", (uid,))
+            conn.commit()
+    finally:
+        conn.close()
+    return jsonify({"success": True, "message": "Usuario eliminado"})
+
+# ─────────────────────────────────────────────────────────────────
+# Egresados
+# ─────────────────────────────────────────────────────────────────
+
+JSON_FIELDS = {"razon_eleccion_ito","tipo_beca","certificacion_idioma","factores_empleo","tipo_publicaciones"}
+
+def row_to_dict(row):
+    d = dict(row)
+    for f in JSON_FIELDS:
+        if d.get(f):
+            try: d[f] = json.loads(d[f])
+            except: pass
+    if d.get("fecha_registro"):
+        d["fecha_registro"] = d["fecha_registro"].isoformat()
+    return d
+
+def serialize(v):
+    return json.dumps(v, ensure_ascii=False) if isinstance(v, list) else v
+
+@app.route("/api/egresados", methods=["GET"])
+def list_egresados():
+    search = request.args.get("search","").strip()
+    prog   = request.args.get("programa","").strip()
+    sector = request.args.get("sector","").strip()
+    sni_f  = request.args.get("sni","").strip()
+    page   = max(1, int(request.args.get("page",1)))
+    per    = min(50, int(request.args.get("per",12)))
+    where, params = ["1=1"], []
+    if search:
+        where.append("(nombre ILIKE %s OR email ILIKE %s OR ciudad ILIKE %s OR programa_posgrado ILIKE %s)")
+        params += [f"%{search}%"]*4
+    if prog:
+        where.append("programa_posgrado ILIKE %s"); params.append(f"%{prog}%")
+    if sector:
+        where.append("sector_economico ILIKE %s"); params.append(f"%{sector}%")
+    if sni_f:
+        where.append("sni ILIKE %s"); params.append(f"%{sni_f}%")
+    base_q = f"FROM egresados WHERE {' AND '.join(where)}"
+    conn = get_db()
+    try:
+        with conn.cursor() as c:
+            c.execute(f"SELECT COUNT(*) AS n {base_q}", params)
+            total = c.fetchone()["n"]
+            c.execute(f"SELECT * {base_q} ORDER BY fecha_registro DESC LIMIT %s OFFSET %s",
+                      params + [per, (page-1)*per])
+            rows = [row_to_dict(r) for r in c.fetchall()]
+    finally:
+        conn.close()
+    return jsonify({"success":True,"data":rows,"total":total,"page":page,"per":per,"pages":max(1,-(-total//per))})
+
+@app.route("/api/egresados", methods=["POST"])
+@require_login
+def create_egresado():
+    d = request.get_json(silent=True) or {}
+    if not d.get("nombre"):
+        return jsonify({"success": False, "error": "El campo 'nombre' es requerido"}), 400
+    COLS = [
+        "nombre","sexo","estado_civil","municipio","ciudad","codigo_postal","pais",
+        "telefono","email","dependientes_economicos","razon_eleccion_ito",
+        "programa_posgrado","linea_investigacion","beca","institucion_beca","tipo_beca",
+        "tiempo_extra_grado","causa_tiempo_extra","importancia_titulacion","dominio_idioma",
+        "idiomas","certificacion_idioma","empleado_cursando","puesto_cursando",
+        "contrato_cursando","cambio_empleo","tiempo_conseguir_empleo","factores_empleo",
+        "labora_actualmente","tipo_institucion","sector_economico","tipo_contrato_actual",
+        "actividades_empleo","escala_coincidencia","escala_conocimientos","escala_impacto",
+        "escala_pertinencia","publicaciones","tipo_publicaciones","sni","red_tematica",
+        "premios","descripcion_premios","academia","postdoctoral","escala_contenidos",
+        "escala_didacticas","escala_evaluacion_doc","escala_biblio","escala_asesoria",
+        "escala_satisfaccion","escala_laboratorios","escala_biblioteca","escala_internet",
+        "escala_instalaciones","expectativas_cumplidas","calidad_programa","areas_mejora",
+        "mejora_plan_estudios","cursos_actualizacion","descripcion_cursos",
+        "actividades_deseadas","tiempo_disponible","empresa_propia","puesto_cinco_anos",
+        "cargo_eleccion","descripcion_cargo","comentarios","recomendaria","fecha_encuesta"
+    ]
+    user     = get_current_user()
+    all_cols = ["user_id"] + COLS
+    values   = [user["id"] if user else None] + [serialize(d.get(col)) for col in COLS]
+    cols_str     = ",".join(all_cols)
+    placeholders = ",".join(["%s"]*len(all_cols))
+    conn = get_db()
+    try:
+        with conn.cursor() as c:
+            c.execute(f"INSERT INTO egresados ({cols_str}) VALUES ({placeholders}) RETURNING id", values)
+            new_id = c.fetchone()["id"]
+            conn.commit()
+    finally:
+        conn.close()
+    return jsonify({"success": True, "id": new_id, "message": "Cuestionario registrado"})
+
+@app.route("/api/egresados/<int:eid>", methods=["GET"])
+def get_egresado(eid):
+    conn = get_db()
+    try:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM egresados WHERE id=%s", (eid,))
+            row = c.fetchone()
+    finally:
+        conn.close()
+    if not row:
+        return jsonify({"success": False, "error": "No encontrado"}), 404
+    return jsonify({"success": True, "data": row_to_dict(row)})
+
+# ─────────────────────────────────────────────────────────────────
+# Estadísticas
+# ─────────────────────────────────────────────────────────────────
+
+@app.route("/api/stats", methods=["GET"])
+def get_stats():
+    conn = get_db()
+    s = {}
+    try:
+        with conn.cursor() as c:
+            def scalar(q, p=()):
+                c.execute(q, p); r = c.fetchone()
+                return list(r.values())[0] if r else 0
+            def rows(q, p=()):
+                c.execute(q, p); return [dict(r) for r in c.fetchall()]
+            s["total"]             = scalar("SELECT COUNT(*) FROM egresados")
+            s["empleados"]         = scalar("SELECT COUNT(*) FROM egresados WHERE labora_actualmente='Sí'")
+            s["sni_activos"]       = scalar("SELECT COUNT(*) FROM egresados WHERE sni ILIKE '%actualmente%'")
+            s["con_publicaciones"] = scalar("SELECT COUNT(*) FROM egresados WHERE publicaciones='Sí'")
+            s["emprendedores"]     = scalar("SELECT COUNT(*) FROM egresados WHERE empresa_propia='Sí'")
+            s["recomendarian"]     = scalar("SELECT COUNT(*) FROM egresados WHERE recomendaria ILIKE 'Definitivamente sí%'")
+            s["total_usuarios"]    = scalar("SELECT COUNT(*) FROM usuarios WHERE activo=1")
+            s["por_programa"]      = rows("SELECT programa_posgrado AS label, COUNT(*) AS n FROM egresados WHERE programa_posgrado IS NOT NULL GROUP BY programa_posgrado ORDER BY n DESC")
+            s["por_sector"]        = rows("SELECT sector_economico AS label, COUNT(*) AS n FROM egresados WHERE sector_economico IS NOT NULL GROUP BY sector_economico ORDER BY n DESC")
+            s["por_calidad"]       = rows("SELECT calidad_programa AS label, COUNT(*) AS n FROM egresados WHERE calidad_programa IS NOT NULL GROUP BY calidad_programa ORDER BY n DESC")
+            s["satisfaccion_promedio"] = scalar("SELECT ROUND(AVG(escala_satisfaccion)::numeric,1) FROM egresados WHERE escala_satisfaccion IS NOT NULL")
+    finally:
+        conn.close()
+    return jsonify({"success": True, "data": s})
+
+# ─────────────────────────────────────────────────────────────────
+# Organizaciones
+# ─────────────────────────────────────────────────────────────────
 
 @app.route("/api/organizaciones", methods=["POST"])
 @require_organizacion
@@ -576,8 +562,7 @@ def create_organizacion():
     COLS = [
         "fecha","nombre_empresa","direccion","municipio_estado","codigo_postal",
         "cargo_persona","area_adscripcion","correo","telefono",
-        "tipo_empresa","tipo_empresa_otro","tamano_empresa",
-        "sector","sector_otro",
+        "tipo_empresa","tipo_empresa_otro","tamano_empresa","sector","sector_otro",
         "posgrado_maestria","posgrado_doctorado","posgrado_posdoctorado",
         "caract_contratacion","perfiles_requeridos","perfiles_ingenieria","perfiles_otro",
         "seleccion_personal","habilidades_campo","competencias_generales",
@@ -591,18 +576,17 @@ def create_organizacion():
         json.dumps(d.get(c), ensure_ascii=False) if isinstance(d.get(c), list) else d.get(c)
         for c in COLS
     ]
-    cols_str     = ",".join(f"`{c}`" for c in all_cols)
-    placeholders = ",".join(["%s"] * len(all_cols))
+    cols_str     = ",".join(all_cols)
+    placeholders = ",".join(["%s"]*len(all_cols))
     conn = get_db()
     try:
         with conn.cursor() as c:
-            c.execute(f"INSERT INTO organizaciones ({cols_str}) VALUES ({placeholders})", values)
+            c.execute(f"INSERT INTO organizaciones ({cols_str}) VALUES ({placeholders}) RETURNING id", values)
+            new_id = c.fetchone()["id"]
             conn.commit()
-            new_id = c.lastrowid
     finally:
         conn.close()
-    return jsonify({"success": True, "id": new_id, "message": "Cuestionario registrado exitosamente"})
-
+    return jsonify({"success": True, "id": new_id, "message": "Cuestionario registrado"})
 
 @app.route("/api/organizaciones", methods=["GET"])
 @require_admin
@@ -611,14 +595,14 @@ def list_organizaciones():
     try:
         with conn.cursor() as c:
             c.execute("SELECT * FROM organizaciones ORDER BY fecha_registro DESC")
-            rows = c.fetchall()
+            rows = [dict(r) for r in c.fetchall()]
     finally:
         conn.close()
     return jsonify({"success": True, "data": rows, "total": len(rows)})
 
-# ──────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────
 # Archivos estáticos
-# ──────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────
 
 @app.route("/")
 def serve_index():
@@ -639,18 +623,22 @@ def serve_template(fname):
         return send_from_directory(TEMPLATES_DIR, fname)
     return send_from_directory(BASE_DIR, fname)
 
-# ──────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────
 # Inicio
-# ──────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    init_db()
-    init_org_table()
-    print("\n" + "="*60)
-    print(f"  ✅  Base de datos MySQL lista  →  {os.getenv('DB_NAME', 'egresados_tecnm')}")
-    print(f"  🔐  Admin  →  user: {os.getenv('ADMIN_USERNAME','admin')} | pass: {os.getenv('ADMIN_PASSWORD','TecNM2025')}")
-    print("  🚀  Portal  →  http://localhost:5000")
-    print("="*60 + "\n")
+    # Solo inicializar DB en el proceso principal (no en el reloader de Flask)
+    if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
+        print("\n" + "="*60)
+        print("  🔌  Conectando a Supabase…")
+        init_db()
+        print("  ✅  Base de datos lista")
+        print(f"  🔐  admin      → user: {os.getenv('ADMIN_USERNAME','admin')} | pass: {os.getenv('ADMIN_PASSWORD','TecNM2025')}")
+        print(f"  🎓  egresado   → user: {os.getenv('EGRESADO_USERNAME','egresado1')} | pass: {os.getenv('EGRESADO_PASSWORD','Egresado2025')}")
+        print(f"  🏢  organiz.   → user: {os.getenv('ORG_USERNAME','empresa1')} | pass: {os.getenv('ORG_PASSWORD','Empresa2025')}")
+        print("  🚀  Portal     → http://localhost:5000")
+        print("="*60 + "\n")
     app.run(
         debug=os.getenv("FLASK_DEBUG", "True") == "True",
         port=int(os.getenv("FLASK_PORT", 5000)),
