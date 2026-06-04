@@ -9,7 +9,7 @@ const API = (window.location.origin && window.location.origin !== 'null' && wind
   ? window.location.origin + '/api'
   : 'http://localhost:5000/api';
 
-const isFlaskMode = (window.location.protocol !== 'file:' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
+const isFlaskMode = false; // Desactivado: comunicación directa con Supabase
 
 let currentUser = null;
 
@@ -198,10 +198,10 @@ function showLoginModal() {
         </div>
         <div class="space-y-4">
           <div>
-            <label class="block text-gray-700 text-xs font-semibold mb-1 uppercase tracking-wide">Usuario o Correo</label>
+            <label class="block text-gray-700 text-xs font-semibold mb-1 uppercase tracking-wide">Correo Electrónico</label>
             <div class="relative">
-              <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input id="login-email" type="text" placeholder="tu_usuario o tu@correo.com"
+              <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input id="login-email" type="email" placeholder="tu@correo.com"
                 class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm"
                 onkeydown="if(event.key==='Enter') doLogin()">
             </div>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -738,7 +738,7 @@ async function submitUserModal() {
             // Insertar perfil en tabla usuarios
             const { error: profileError } = await supabaseClient
                 .from('usuarios')
-                .insert([{ ...payload, user_id: authData.user?.id }]);
+                .insert([{ ...payload, user_id: authData.user?.id, auth_id: authData.user?.id }]);
             if (profileError) throw profileError;
         }
         closeUserModal();
