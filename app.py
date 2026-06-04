@@ -26,10 +26,24 @@ CORS(app, supports_credentials=True)
 # ─────────────────────────────────────────────────────────────────
 
 def get_db():
-    # Transaction pooler (puerto 6543)
-    # user = postgres.PROJECT_REF
-    # Session pooler (puerto 5432)
-    # user = postgres.PROJECT_REF  (mismo formato en Supabase nuevo)
+    db_url = os.getenv("DATABASE_URL")
+    if db_url:
+        try:
+            conn = psycopg2.connect(
+                db_url,
+                sslmode="require",
+                connect_timeout=10,
+                cursor_factory=psycopg2.extras.RealDictCursor
+            )
+            # Mask credentials for logging
+            masked_url = db_url.split('@')[-1] if '@' in db_url else db_url
+            print(f"  [OK] Conectado via DATABASE_URL ({masked_url})")
+            return conn
+        except Exception as e:
+            print(f"  [WARN] Fallo conexión con DATABASE_URL -> {e}")
+            print("  Intentando con configuraciones de respaldo...")
+            
+    # Respaldo (fallback)
     for cfg in [
         # Intento 1: Session pooler (aws-1)
         dict(host="aws-1-us-east-1.pooler.supabase.com", port=6543,
@@ -46,10 +60,10 @@ def get_db():
                 cursor_factory=psycopg2.extras.RealDictCursor,
                 connect_timeout=10
             )
-            print(f"  ✅  Conectado via {cfg['host']}:{cfg['port']}")
+            print(f"  [OK] Conectado via {cfg['host']}:{cfg['port']}")
             return conn
         except Exception as e:
-            print(f"  ⚠️   Fallo {cfg['host']}:{cfg['port']} → {e}")
+            print(f"  [WARN] Fallo {cfg['host']}:{cfg['port']} -> {e}")
     raise Exception("No se pudo conectar a Supabase. Revisa credenciales y pooler en el dashboard.")
 
 def init_db():
@@ -207,9 +221,9 @@ def init_db():
                 )
                 conn.commit()
                 if c.rowcount:
-                    print(f"  👤  Creado: {role:12} → user: {username}  |  pass: {password}")
+                    print(f"  [USER] Creado: {role:12} -> user: {username}  |  pass: {password}")
                 else:
-                    print(f"  ℹ️   Ya existe: {role:12} → user: {username}")
+                    print(f"  [INFO] Ya existe: {role:12} -> user: {username}")
 
             crear_usuario_si_no_existe(
                 os.getenv("ADMIN_USERNAME", "admin"),
@@ -631,13 +645,13 @@ if __name__ == "__main__":
     # Solo inicializar DB en el proceso principal (no en el reloader de Flask)
     if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
         print("\n" + "="*60)
-        print("  🔌  Conectando a Supabase…")
+        print("  [DB] Conectando a Supabase...")
         init_db()
-        print("  ✅  Base de datos lista")
-        print(f"  🔐  admin      → user: {os.getenv('ADMIN_USERNAME','admin')} | pass: {os.getenv('ADMIN_PASSWORD','TecNM2025')}")
-        print(f"  🎓  egresado   → user: {os.getenv('EGRESADO_USERNAME','egresado1')} | pass: {os.getenv('EGRESADO_PASSWORD','Egresado2025')}")
-        print(f"  🏢  organiz.   → user: {os.getenv('ORG_USERNAME','empresa1')} | pass: {os.getenv('ORG_PASSWORD','Empresa2025')}")
-        print("  🚀  Portal     → http://localhost:5000")
+        print("  [OK] Base de datos lista")
+        print(f"  [AUTH] admin      -> user: {os.getenv('ADMIN_USERNAME','admin')} | pass: {os.getenv('ADMIN_PASSWORD','TecNM2025')}")
+        print(f"  [AUTH] egresado   -> user: {os.getenv('EGRESADO_USERNAME','egresado1')} | pass: {os.getenv('EGRESADO_PASSWORD','Egresado2025')}")
+        print(f"  [AUTH] organiz.   -> user: {os.getenv('ORG_USERNAME','empresa1')} | pass: {os.getenv('ORG_PASSWORD','Empresa2025')}")
+        print("  [PORTAL] Portal     -> http://localhost:5000")
         print("="*60 + "\n")
     app.run(
         debug=os.getenv("FLASK_DEBUG", "True") == "True",

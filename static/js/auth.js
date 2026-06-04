@@ -1,15 +1,28 @@
 /**
- * auth.js — Sesión con Supabase Auth
+ * auth.js — Autenticación con Supabase Auth + tabla usuarios
  * Portal de Egresados TecNM
+ * Funciona en GitHub Pages (sin backend Flask)
  */
+
+// API global y detección de modo
+const API = (window.location.origin && window.location.origin !== 'null' && window.location.protocol !== 'file:')
+  ? window.location.origin + '/api'
+  : 'http://localhost:5000/api';
+
+const isFlaskMode = (window.location.protocol !== 'file:' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
 
 let currentUser = null;
 
 // ─────────────────────────────────────────────────────────────
-// Token helpers (compatibilidad con código existente)
+// Token helpers
 // ─────────────────────────────────────────────────────────────
 function getToken() {
-  return localStorage.getItem('tecnm_token') || '';
+  try {
+    const session = supabaseClient.auth.session?.();
+    return session?.access_token || localStorage.getItem('tecnm_token') || '';
+  } catch {
+    return localStorage.getItem('tecnm_token') || '';
+  }
 }
 
 function clearToken() {
@@ -20,57 +33,73 @@ function clearToken() {
 function authHeaders() {
   return {
     'Content-Type': 'application/json',
-    'X-Auth-Token': getToken()
+    'Authorization': `Bearer ${getToken()}`
   };
 }
 
 // ─────────────────────────────────────────────────────────────
-// Perfil desde tabla usuarios
-// Busca primero por user_id (auth.uid), luego por email como fallback
+// Perfil desde tabla usuarios (por auth_id de Supabase)
 // ─────────────────────────────────────────────────────────────
-async function fetchProfile(email, authUserId) {
-  // Intento 1: buscar por user_id vinculado
-  if (authUserId) {
-    const { data } = await supabaseClient
+async function fetchProfile(authUserId) {
+  if (!authUserId) return null;
+  try {
+    const { data, error } = await supabaseClient
       .from('usuarios')
-      .select('id, nombre, email, role, activo, username, user_id')
-      .eq('user_id', authUserId)
+      .select('id, nombre, email, role, activo, username, auth_id')
+      .eq('auth_id', authUserId)
       .maybeSingle();
-    if (data) return data;
+    if (error || !data) return null;
+    return data;
+  } catch (e) {
+    return null;
   }
-  // Intento 2: fallback por email (usuarios migrados sin user_id aún)
-  if (email) {
-    const { data } = await supabaseClient
-      .from('usuarios')
-      .select('id, nombre, email, role, activo, username, user_id')
-      .eq('email', email)
-      .maybeSingle();
-    return data || null;
-  }
-  return null;
 }
 
 // ─────────────────────────────────────────────────────────────
 // Verificar sesión activa
 // ─────────────────────────────────────────────────────────────
 async function checkSession() {
-  const token = getToken();
-  if (!token) {
+  if (isFlaskMode) {
+    try {
+      const token = getToken();
+      if (!token) {
+        currentUser = null;
+        updateNavAuthArea();
+        return null;
+      }
+      const res = await fetch(`${API}/auth/me`, {
+        headers: { 'X-Auth-Token': token }
+      });
+      const data = await res.json();
+      if (data.success && data.authenticated && data.user) {
+        currentUser = data.user;
+        updateNavAuthArea();
+        return data.user;
+      }
+    } catch (e) {}
     currentUser = null;
+    clearToken();
     updateNavAuthArea();
     return null;
   }
+
   try {
-    const res = await fetch('/api/auth/me', { headers: authHeaders() });
-    const data = await res.json();
-    if (data.success && data.authenticated) {
-      currentUser = data.user;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      currentUser = null;
       updateNavAuthArea();
-      return data.user;
+      return null;
+    }
+    const profile = await fetchProfile(session.user.id);
+    if (profile && profile.activo !== false && profile.activo !== 0) {
+      currentUser = profile;
+      localStorage.setItem('tecnm_token', session.access_token);
+      updateNavAuthArea();
+      return profile;
     }
   } catch (e) {}
-  clearToken();
   currentUser = null;
+  clearToken();
   updateNavAuthArea();
   return null;
 }
@@ -169,10 +198,10 @@ function showLoginModal() {
         </div>
         <div class="space-y-4">
           <div>
-            <label class="block text-gray-700 text-xs font-semibold mb-1 uppercase tracking-wide">Usuario</label>
+            <label class="block text-gray-700 text-xs font-semibold mb-1 uppercase tracking-wide">Usuario o Correo</label>
             <div class="relative">
               <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input id="login-email" type="text" placeholder="Tu nombre de usuario"
+              <input id="login-email" type="text" placeholder="tu_usuario o tu@correo.com"
                 class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-900 text-sm"
                 onkeydown="if(event.key==='Enter') doLogin()">
             </div>
@@ -229,13 +258,13 @@ function togglePasswordVisibility() {
 }
 
 async function doLogin() {
-  const username = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-  const btn      = document.getElementById('login-btn');
-  const errorDiv = document.getElementById('login-error');
+  const usernameOrEmail = document.getElementById('login-email').value.trim();
+  const password        = document.getElementById('login-password').value;
+  const btn             = document.getElementById('login-btn');
+  const errorDiv        = document.getElementById('login-error');
 
-  if (!username || !password) {
-    showLoginError('Por favor ingresa usuario y contraseña.');
+  if (!usernameOrEmail || !password) {
+    showLoginError('Por favor ingresa usuario/correo y contraseña.');
     return;
   }
 
@@ -243,29 +272,62 @@ async function doLogin() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
   errorDiv.classList.add('hidden');
 
-  try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-
-    if (!data.success) {
-      showLoginError(data.error || 'Credenciales incorrectas.');
-      return;
+  if (isFlaskMode) {
+    try {
+      const username = usernameOrEmail.startsWith('@') ? usernameOrEmail.slice(1) : usernameOrEmail;
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.success && data.token && data.user) {
+        localStorage.setItem('tecnm_token', data.token);
+        currentUser = data.user;
+        hideLoginModal();
+        updateNavAuthArea();
+        document.dispatchEvent(new CustomEvent('auth:login', { detail: data.user }));
+      } else {
+        showLoginError(data.error || 'Credenciales incorrectas.');
+      }
+    } catch (e) {
+      showLoginError('Error de conexión con el servidor Flask.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
     }
+  } else {
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email: usernameOrEmail, password });
 
-    localStorage.setItem('tecnm_token', data.token);
-    currentUser = data.user;
-    hideLoginModal();
-    updateNavAuthArea();
-    document.dispatchEvent(new CustomEvent('auth:login', { detail: data.user }));
-  } catch (e) {
-    showLoginError('Error de conexión. Verifica que el servidor esté activo.');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+      if (error) {
+        showLoginError('Credenciales incorrectas. Verifica tu correo y contraseña.');
+        return;
+      }
+
+      const profile = await fetchProfile(data.user.id);
+      if (!profile) {
+        showLoginError('No se encontró perfil de usuario. Contacta al administrador.');
+        await supabaseClient.auth.signOut();
+        return;
+      }
+      if (profile.activo === false || profile.activo === 0) {
+        showLoginError('Tu cuenta está desactivada. Contacta al administrador.');
+        await supabaseClient.auth.signOut();
+        return;
+      }
+
+      localStorage.setItem('tecnm_token', data.session.access_token);
+      currentUser = profile;
+      hideLoginModal();
+      updateNavAuthArea();
+      document.dispatchEvent(new CustomEvent('auth:login', { detail: profile }));
+    } catch (e) {
+      showLoginError('Error de conexión. Verifica tu internet.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+    }
   }
 }
 
@@ -276,10 +338,16 @@ function showLoginError(msg) {
 }
 
 async function doLogout() {
-  const token = getToken();
-  if (token) {
+  if (isFlaskMode) {
     try {
-      await fetch('/api/auth/logout', { method: 'POST', headers: authHeaders() });
+      await fetch(`${API}/auth/logout`, {
+        method: 'POST',
+        headers: { 'X-Auth-Token': getToken() }
+      });
+    } catch (e) {}
+  } else {
+    try {
+      await supabaseClient.auth.signOut();
     } catch (e) {}
   }
   clearToken();

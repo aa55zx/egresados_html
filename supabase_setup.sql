@@ -1,147 +1,124 @@
--- ================================================================
--- SETUP SUPABASE: Portal de Egresados TecNM
--- Ejecutar en: Supabase Dashboard → SQL Editor
--- ================================================================
+-- ============================================================
+--  supabase_setup.sql
+--  Ejecuta esto en: Supabase Dashboard → SQL Editor
+--  Proyecto: Portal de Egresados TecNM Campus Oaxaca
+-- ============================================================
 
--- 1. Agregar columna user_id a usuarios para vincular con Supabase Auth
+-- 1. Agregar columna auth_id a la tabla usuarios
+--    (vincula cada usuario con su cuenta en Supabase Auth)
 ALTER TABLE usuarios
-    ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+  ADD COLUMN IF NOT EXISTS auth_id UUID UNIQUE;
 
--- ----------------------------------------------------------------
--- 2. HABILITAR RLS en todas las tablas
--- ----------------------------------------------------------------
-ALTER TABLE usuarios      ENABLE ROW LEVEL SECURITY;
-ALTER TABLE egresados     ENABLE ROW LEVEL SECURITY;
+-- 2. Habilitar Row Level Security (RLS) en las tablas
+ALTER TABLE usuarios    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE egresados   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE organizaciones ENABLE ROW LEVEL SECURITY;
 
--- ----------------------------------------------------------------
--- 3. POLÍTICAS para tabla: usuarios
--- ----------------------------------------------------------------
+-- 3. Políticas para tabla usuarios
+--    Admin puede ver y modificar todo
+--    Usuarios autenticados pueden ver su propio perfil
+
+DROP POLICY IF EXISTS "usuarios_select_own"  ON usuarios;
+DROP POLICY IF EXISTS "usuarios_select_admin" ON usuarios;
+DROP POLICY IF EXISTS "usuarios_insert_admin" ON usuarios;
+DROP POLICY IF EXISTS "usuarios_update_admin" ON usuarios;
+DROP POLICY IF EXISTS "usuarios_delete_admin" ON usuarios;
 
 -- Cualquier usuario autenticado puede leer su propio perfil
-CREATE POLICY "usuarios: leer perfil propio"
-ON usuarios FOR SELECT
-USING (auth.uid() = user_id);
+CREATE POLICY "usuarios_select_own" ON usuarios
+  FOR SELECT USING (auth.uid() = auth_id);
 
--- Los admins pueden leer todos los perfiles
-CREATE POLICY "usuarios: admin lee todos"
-ON usuarios FOR SELECT
-USING (
+-- Admin puede leer todos los usuarios
+CREATE POLICY "usuarios_select_admin" ON usuarios
+  FOR SELECT USING (
     EXISTS (
-        SELECT 1 FROM usuarios u
-        WHERE u.user_id = auth.uid() AND u.role = 'admin'
+      SELECT 1 FROM usuarios u
+      WHERE u.auth_id = auth.uid() AND u.role = 'admin'
     )
-);
+  );
 
--- Los admins pueden actualizar cualquier perfil
-CREATE POLICY "usuarios: admin actualiza"
-ON usuarios FOR UPDATE
-USING (
+-- Admin puede crear usuarios
+CREATE POLICY "usuarios_insert_admin" ON usuarios
+  FOR INSERT WITH CHECK (
     EXISTS (
-        SELECT 1 FROM usuarios u
-        WHERE u.user_id = auth.uid() AND u.role = 'admin'
+      SELECT 1 FROM usuarios u
+      WHERE u.auth_id = auth.uid() AND u.role = 'admin'
     )
-);
+  );
 
--- Los admins pueden insertar usuarios
-CREATE POLICY "usuarios: admin inserta"
-ON usuarios FOR INSERT
-WITH CHECK (
+-- Admin puede actualizar usuarios
+CREATE POLICY "usuarios_update_admin" ON usuarios
+  FOR UPDATE USING (
     EXISTS (
-        SELECT 1 FROM usuarios u
-        WHERE u.user_id = auth.uid() AND u.role = 'admin'
+      SELECT 1 FROM usuarios u
+      WHERE u.auth_id = auth.uid() AND u.role = 'admin'
     )
-);
+  );
 
--- Los admins pueden eliminar usuarios (excepto a sí mismos)
-CREATE POLICY "usuarios: admin elimina"
-ON usuarios FOR DELETE
-USING (
+-- Admin puede eliminar usuarios
+CREATE POLICY "usuarios_delete_admin" ON usuarios
+  FOR DELETE USING (
     EXISTS (
-        SELECT 1 FROM usuarios u
-        WHERE u.user_id = auth.uid() AND u.role = 'admin'
+      SELECT 1 FROM usuarios u
+      WHERE u.auth_id = auth.uid() AND u.role = 'admin'
     )
-);
+  );
 
--- ----------------------------------------------------------------
--- 4. POLÍTICAS para tabla: egresados
--- ----------------------------------------------------------------
+-- 4. Políticas para tabla egresados
+DROP POLICY IF EXISTS "egresados_select_all"    ON egresados;
+DROP POLICY IF EXISTS "egresados_insert_auth"   ON egresados;
+DROP POLICY IF EXISTS "egresados_update_own"    ON egresados;
 
--- Lectura pública (directorio de egresados es visible para todos)
-CREATE POLICY "egresados: lectura publica"
-ON egresados FOR SELECT
-USING (true);
+-- Cualquiera puede leer egresados (directorio público)
+CREATE POLICY "egresados_select_all" ON egresados
+  FOR SELECT USING (true);
 
--- Solo el egresado dueño puede insertar su encuesta
-CREATE POLICY "egresados: insertar autenticado"
-ON egresados FOR INSERT
-WITH CHECK (
-    auth.uid() IS NOT NULL AND (
-        user_id IS NULL OR
-        user_id = (SELECT id FROM usuarios WHERE user_id = auth.uid() LIMIT 1)
-    )
-);
+-- Solo usuarios autenticados pueden insertar
+CREATE POLICY "egresados_insert_auth" ON egresados
+  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
--- El egresado puede actualizar su propio registro; admin puede actualizar cualquiera
-CREATE POLICY "egresados: actualizar propio o admin"
-ON egresados FOR UPDATE
-USING (
-    user_id = (SELECT id FROM usuarios WHERE user_id = auth.uid() LIMIT 1)
-    OR EXISTS (
-        SELECT 1 FROM usuarios u WHERE u.user_id = auth.uid() AND u.role = 'admin'
-    )
-);
-
--- ----------------------------------------------------------------
--- 5. POLÍTICAS para tabla: organizaciones
--- ----------------------------------------------------------------
-
--- Solo el usuario autenticado puede insertar su encuesta
-CREATE POLICY "organizaciones: insertar autenticado"
-ON organizaciones FOR INSERT
-WITH CHECK (auth.uid() IS NOT NULL);
-
--- Los admins pueden leer todas las organizaciones
-CREATE POLICY "organizaciones: admin lee todas"
-ON organizaciones FOR SELECT
-USING (
+-- Admin puede actualizar cualquier egresado
+CREATE POLICY "egresados_update_own" ON egresados
+  FOR UPDATE USING (
     EXISTS (
-        SELECT 1 FROM usuarios u WHERE u.user_id = auth.uid() AND u.role = 'admin'
+      SELECT 1 FROM usuarios u
+      WHERE u.auth_id = auth.uid() AND u.role = 'admin'
     )
-);
+  );
 
--- La organización dueña puede leer su propio registro
-CREATE POLICY "organizaciones: leer propio"
-ON organizaciones FOR SELECT
-USING (
-    user_id = (SELECT id FROM usuarios WHERE user_id = auth.uid() LIMIT 1)
-);
+-- 5. Políticas para tabla organizaciones
+DROP POLICY IF EXISTS "org_select_admin"  ON organizaciones;
+DROP POLICY IF EXISTS "org_insert_auth"   ON organizaciones;
 
--- ----------------------------------------------------------------
--- 6. FUNCIÓN + TRIGGER: crear perfil automáticamente al registrarse
--- ----------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Solo actualiza user_id si existe un registro con el mismo email
-    UPDATE public.usuarios
-    SET user_id = NEW.id
-    WHERE email = NEW.email AND user_id IS NULL;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+CREATE POLICY "org_select_admin" ON organizaciones
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM usuarios u
+      WHERE u.auth_id = auth.uid() AND u.role IN ('admin', 'organizacion')
+    )
+  );
 
--- Trigger que se ejecuta cuando se crea un nuevo usuario en Auth
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+CREATE POLICY "org_insert_auth" ON organizaciones
+  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
--- ----------------------------------------------------------------
--- 7. VINCULAR usuarios existentes (si ya tienen email en la tabla)
---    Ejecuta esto DESPUÉS de crear los usuarios en Supabase Auth
--- ----------------------------------------------------------------
--- UPDATE public.usuarios u
--- SET user_id = a.id
--- FROM auth.users a
--- WHERE a.email = u.email AND u.user_id IS NULL;
+-- ============================================================
+-- INSTRUCCIONES PARA CREAR EL USUARIO ADMIN:
+--
+-- 1. Ve a: Supabase Dashboard → Authentication → Users
+-- 2. Haz clic en "Add user" → "Create new user"
+-- 3. Email:    admin@tecnm-oaxaca.edu.mx
+-- 4. Password: TecNM2025!
+-- 5. Haz clic en "Create User"
+-- 6. Copia el UUID del usuario creado
+-- 7. Ejecuta el siguiente INSERT reemplazando el UUID:
+-- ============================================================
+
+-- PASO FINAL: vincular el admin de Auth con la tabla usuarios
+-- Reemplaza 'PEGA-AQUI-EL-UUID-DE-SUPABASE-AUTH' con el UUID real
+UPDATE usuarios
+SET auth_id = 'PEGA-AQUI-EL-UUID-DE-SUPABASE-AUTH',
+    email   = 'admin@tecnm-oaxaca.edu.mx'
+WHERE username = 'admin' AND role = 'admin';
+
+-- Verificar que quedó correcto:
+SELECT id, username, nombre, role, activo, auth_id FROM usuarios;
