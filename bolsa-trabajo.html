@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -14,30 +14,49 @@
         .job-card:hover { border-color: #1A3A5C; }
         .filter-btn { transition: all 0.2s; border: 1px solid #e5e7eb; }
         .filter-btn.active, .filter-btn:hover { background: #1A3A5C; color: white; border-color: #1A3A5C; }
+        .nav-link { position: relative; }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0; background-color: #E8A020; transition: width 0.2s; }
+        .nav-link:hover::after { width: 100%; }
     </style>
 </head>
 <body class="bg-gray-50">
-    <nav class="bg-white border-b border-gray-200">
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-gray-200 fixed w-full z-50">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-4">
+                <a href="index.html" class="flex items-center space-x-4">
                     <img src="https://www.huatabampo.tecnm.mx/wp-content/uploads/2019/09/TecNM-logo-216x300.png" alt="TecNM Logo" class="h-12">
                     <div>
                         <h1 class="text-lg font-bold text-blue-900">TecNM Campus Oaxaca</h1>
-                        <p class="text-xs text-gray-500">Bolsa de Trabajo OCC</p>
+                        <p class="text-xs text-gray-400">Instituto Tecnológico de Oaxaca</p>
+                    </div>
+                </a>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="index.html#inicio"    class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Inicio</a>
+                    <a href="index.html#servicios" class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Servicios</a>
+                    <a href="bolsa-trabajo.html"   class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Bolsa de Trabajo</a>
+                    <a href="eventos.html"         class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Eventos</a>
+                    <a href="index.html#contacto"  class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Contacto</a>
+                    <div id="nav-auth-area">
+                        <div class="w-32 h-9 bg-gray-100 rounded animate-pulse"></div>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <a href="index.html" class="text-gray-500 hover:text-orange-500 font-semibold text-sm">
-                        <i class="fas fa-arrow-left mr-1"></i>Portal
-                    </a>
-                    <div id="nav-auth-area"></div>
-                </div>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-gray-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4 space-y-3">
+                <a href="index.html#inicio"    class="block text-gray-600 hover:text-blue-900 font-medium text-sm">Inicio</a>
+                <a href="index.html#servicios" class="block text-gray-600 hover:text-blue-900 font-medium text-sm">Servicios</a>
+                <a href="bolsa-trabajo.html"   class="block text-gray-600 hover:text-blue-900 font-medium text-sm">Bolsa de Trabajo</a>
+                <a href="eventos.html"         class="block text-gray-600 hover:text-blue-900 font-medium text-sm">Eventos</a>
+                <a href="index.html#contacto"  class="block text-gray-600 hover:text-blue-900 font-medium text-sm">Contacto</a>
             </div>
         </div>
     </nav>
 
-    <section class="bg-blue-900 py-16">
+    <section class="bg-blue-900 pt-28 pb-16">
         <div class="container mx-auto px-4 text-center text-white">
             <p class="text-orange-400 font-semibold text-xs uppercase tracking-widest mb-3">Oportunidades Laborales</p>
             <h1 class="text-4xl font-bold mb-3">Bolsa de Trabajo</h1>
@@ -46,13 +65,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div class="relative">
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                        <input type="text" placeholder="Puesto, empresa o palabra clave" class="w-full pl-9 pr-4 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm text-gray-800">
+                        <input id="search-title" type="text" placeholder="Puesto, empresa o palabra clave" class="w-full pl-9 pr-4 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm text-gray-800" oninput="filterJobs()">
                     </div>
                     <div class="relative">
                         <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                        <input type="text" placeholder="Ubicación" class="w-full pl-9 pr-4 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm text-gray-800">
+                        <input id="search-location" type="text" placeholder="Ubicación" class="w-full pl-9 pr-4 py-2.5 rounded border border-gray-200 focus:outline-none focus:border-blue-900 text-sm text-gray-800" oninput="filterJobs()">
                     </div>
-                    <button class="bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded font-semibold text-sm transition">
+                    <button onclick="filterJobs()" class="bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded font-semibold text-sm transition">
                         <i class="fas fa-search mr-2"></i>Buscar
                     </button>
                 </div>
@@ -84,31 +103,18 @@
         </div>
     </section>
 
-    <!-- CTA registro -->
-    <section class="py-8 bg-gray-50 border-b border-gray-100">
-        <div class="container mx-auto px-4">
-            <div class="bg-white border border-gray-200 rounded-lg p-6 max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-                <div>
-                    <h3 class="text-lg font-bold text-blue-900 mb-1">¿Buscas empleo?</h3>
-                    <p class="text-gray-500 text-sm">Regístrate y accede a ofertas exclusivas para egresados del TecNM</p>
-                </div>
-                <a href="registro.html" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded font-semibold text-sm transition whitespace-nowrap">
-                    <i class="fas fa-user-plus mr-2"></i>Registrarme Gratis
-                </a>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Filtros de categoría -->
     <section class="py-6 bg-white border-b border-gray-100">
         <div class="container mx-auto px-4">
-            <div class="flex flex-wrap gap-2">
-                <button class="filter-btn active px-4 py-1.5 rounded text-sm font-medium">Todos</button>
-                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600">Tecnología</button>
-                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600">Industrial</button>
-                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600">Electrónica</button>
-                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600">Gestión</button>
-                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600">Mecatrónica</button>
+            <div class="flex flex-wrap gap-2" id="category-filters">
+                <button class="filter-btn active px-4 py-1.5 rounded text-sm font-medium" onclick="selectCategory('Todos', this)">Todos</button>
+                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600" onclick="selectCategory('Tecnología', this)">Tecnología</button>
+                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600" onclick="selectCategory('Industrial', this)">Industrial</button>
+                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600" onclick="selectCategory('Electrónica', this)">Electrónica</button>
+                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600" onclick="selectCategory('Gestión', this)">Gestión</button>
+                <button class="filter-btn px-4 py-1.5 rounded text-sm font-medium text-gray-600" onclick="selectCategory('Mecatrónica', this)">Mecatrónica</button>
             </div>
         </div>
     </section>
@@ -116,88 +122,19 @@
     <!-- Ofertas -->
     <section class="py-12">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div id="jobs-container" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <!-- Skeletons cargando -->
+                <div class="bg-white border border-gray-100 p-5 rounded-lg animate-pulse h-36"></div>
+                <div class="bg-white border border-gray-100 p-5 rounded-lg animate-pulse h-36"></div>
+            </div>
 
-                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-orange-500 rounded-lg p-5">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-orange-50 w-11 h-11 rounded flex items-center justify-center"><i class="fas fa-code text-orange-500"></i></div>
-                            <div><h3 class="font-bold text-gray-900">Desarrollador Full Stack</h3><p class="text-gray-500 text-xs">TechSolutions SA de CV</p></div>
-                        </div>
-                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Nuevo</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-3">Desarrollador con experiencia en React, Node.js y bases de datos SQL/NoSQL.</p>
-                    <div class="flex flex-wrap gap-1.5 mb-3">
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">React</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Node.js</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">MongoDB</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs text-gray-500">
-                        <div class="flex gap-3"><span><i class="fas fa-map-marker-alt mr-1"></i>Oaxaca</span><span><i class="fas fa-dollar-sign mr-1"></i>$25k–$35k</span></div>
-                        <button class="text-orange-500 font-semibold">Ver detalles →</button>
-                    </div>
+            <!-- Estado Vacío -->
+            <div id="jobs-empty" class="hidden text-center py-16 bg-white border border-gray-200 rounded-xl max-w-md mx-auto px-6">
+                <div class="w-12 h-12 bg-blue-50 text-blue-900 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-briefcase text-xl"></i>
                 </div>
-
-                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-blue-900 rounded-lg p-5">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-blue-50 w-11 h-11 rounded flex items-center justify-center"><i class="fas fa-industry text-blue-900"></i></div>
-                            <div><h3 class="font-bold text-gray-900">Ingeniero Industrial</h3><p class="text-gray-500 text-xs">Manufactura del Sureste</p></div>
-                        </div>
-                        <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-semibold">Urgente</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-3">Optimización de procesos y gestión de calidad en planta industrial.</p>
-                    <div class="flex flex-wrap gap-1.5 mb-3">
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Six Sigma</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Lean</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">ISO 9001</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs text-gray-500">
-                        <div class="flex gap-3"><span><i class="fas fa-map-marker-alt mr-1"></i>Salina Cruz</span><span><i class="fas fa-dollar-sign mr-1"></i>$28k–$38k</span></div>
-                        <button class="text-blue-900 font-semibold">Ver detalles →</button>
-                    </div>
-                </div>
-
-                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-orange-500 rounded-lg p-5">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-orange-50 w-11 h-11 rounded flex items-center justify-center"><i class="fas fa-shield-alt text-orange-500"></i></div>
-                            <div><h3 class="font-bold text-gray-900">Analista de Ciberseguridad</h3><p class="text-gray-500 text-xs">SecureNet MX</p></div>
-                        </div>
-                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">Remoto</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-3">Monitoreo y respuesta a incidentes de seguridad en infraestructura crítica.</p>
-                    <div class="flex flex-wrap gap-1.5 mb-3">
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">SIEM</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Pentesting</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Python</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs text-gray-500">
-                        <div class="flex gap-3"><span><i class="fas fa-map-marker-alt mr-1"></i>Remoto</span><span><i class="fas fa-dollar-sign mr-1"></i>$30k–$45k</span></div>
-                        <button class="text-orange-500 font-semibold">Ver detalles →</button>
-                    </div>
-                </div>
-
-                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-blue-900 rounded-lg p-5">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-blue-50 w-11 h-11 rounded flex items-center justify-center"><i class="fas fa-robot text-blue-900"></i></div>
-                            <div><h3 class="font-bold text-gray-900">Ingeniero Mecatrónico</h3><p class="text-gray-500 text-xs">AutoTech Oaxaca</p></div>
-                        </div>
-                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Nuevo</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-3">Diseño y mantenimiento de sistemas automatizados en líneas de producción.</p>
-                    <div class="flex flex-wrap gap-1.5 mb-3">
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">PLC</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Robótica</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">AutoCAD</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs text-gray-500">
-                        <div class="flex gap-3"><span><i class="fas fa-map-marker-alt mr-1"></i>Oaxaca</span><span><i class="fas fa-dollar-sign mr-1"></i>$22k–$32k</span></div>
-                        <button class="text-blue-900 font-semibold">Ver detalles →</button>
-                    </div>
-                </div>
-
+                <h3 class="font-bold text-gray-800 text-base mb-1">No hay vacantes disponibles</h3>
+                <p class="text-gray-500 text-xs">No se encontraron ofertas laborales con los filtros seleccionados o términos de búsqueda.</p>
             </div>
         </div>
     </section>
@@ -208,15 +145,157 @@
             <h2 class="text-2xl font-bold text-blue-900 mb-3">¿Eres una Empresa?</h2>
             <p class="text-gray-500 text-sm mb-6 max-w-md mx-auto">Publica tus vacantes y encuentra el talento que necesitas entre nuestros egresados.</p>
             <div class="flex flex-wrap justify-center gap-3">
-                <a href="#" class="bg-blue-900 hover:bg-blue-800 text-white px-7 py-3 rounded font-semibold text-sm transition inline-flex items-center">
-                    <i class="fas fa-building mr-2"></i>Publicar Vacante
-                </a>
-                <a href="#" class="border border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white px-7 py-3 rounded font-semibold text-sm transition inline-flex items-center">
-                    <i class="fas fa-info-circle mr-2"></i>Más Información
+                <button id="btn-publish-footer" onclick="openPublishModal()" class="bg-blue-900 hover:bg-blue-800 text-white px-7 py-3 rounded font-semibold text-sm transition inline-flex items-center gap-2">
+                    <i class="fas fa-building"></i>Publicar Vacante
+                </button>
+                <a href="#contacto" class="border border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white px-7 py-3 rounded font-semibold text-sm transition inline-flex items-center gap-2">
+                    <i class="fas fa-info-circle"></i>Más Información
                 </a>
             </div>
         </div>
     </section>
+
+    <!-- MODAL: Crear Vacante -->
+    <div id="publish-vacancy-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-[2px]" onclick="closePublishModal()"></div>
+        <div class="modal-enter relative bg-white rounded-2xl shadow-2xl w-full max-w-lg z-10 overflow-hidden">
+            <!-- Header modal -->
+            <div class="bg-blue-900 px-6 py-4.5 flex items-center gap-3">
+                <div class="bg-white/20 w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-briefcase text-white text-base"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-base font-bold text-white leading-tight">Publicar Oferta de Trabajo</h3>
+                    <p class="text-xs text-blue-200">Encuentra talento calificado del ITO</p>
+                </div>
+                <button onclick="closePublishModal()" class="text-white/70 hover:text-white transition">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Formulario -->
+            <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+                <div id="modal-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-sm text-red-700">
+                    <i class="fas fa-circle-exclamation text-red-500"></i>
+                    <span id="modal-error-msg"></span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">Título del Puesto <span class="text-red-500">*</span></label>
+                        <input id="in-vac-titulo" type="text" placeholder="Ej. Desarrollador Web"
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">Nombre de la Empresa <span class="text-red-500">*</span></label>
+                        <input id="in-vac-empresa" type="text" placeholder="Ej. TechSolutions"
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">Categoría <span class="text-red-500">*</span></label>
+                        <select id="in-vac-categoria"
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition bg-white text-gray-700">
+                            <option value="Tecnología">Tecnología</option>
+                            <option value="Industrial">Industrial</option>
+                            <option value="Electrónica">Electrónica</option>
+                            <option value="Gestión">Gestión</option>
+                            <option value="Mecatrónica">Mecatrónica</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">Tipo de Vacante</label>
+                        <select id="in-vac-tipo"
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition bg-white text-gray-700">
+                            <option value="Normal">Normal</option>
+                            <option value="Nuevo">Nuevo</option>
+                            <option value="Urgente">Urgente</option>
+                            <option value="Remoto">Remoto</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">Ubicación <span class="text-red-500">*</span></label>
+                        <input id="in-vac-ubicacion" type="text" placeholder="Ej. Oaxaca, Oax. / Remoto"
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">Salario Mensual (Opcional)</label>
+                        <input id="in-vac-salario" type="text" placeholder="Ej. $25,000 - $30,000"
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">Requisitos / Palabras clave <span class="text-gray-400">(separadas por comas)</span></label>
+                    <input id="in-vac-requisitos" type="text" placeholder="Ej. React, Node.js, SQL, Inglés intermedio"
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">Descripción de la Vacante <span class="text-red-500">*</span></label>
+                    <textarea id="in-vac-descripcion" placeholder="Describe el puesto, las responsabilidades y beneficios..." rows="5"
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- Footer modal -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3.5">
+                <button onclick="closePublishModal()" class="px-5 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-100 text-gray-600 font-semibold text-xs transition">
+                    Cancelar
+                </button>
+                <button id="modal-submit-btn" onclick="submitVacancy()" class="bg-blue-900 hover:bg-blue-800 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2">
+                    <i class="fas fa-paper-plane"></i>Enviar Vacante
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Detalles de Vacante -->
+    <div id="details-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-[2px]" onclick="closeDetailsModal()"></div>
+        <div class="modal-enter relative bg-white rounded-2xl shadow-2xl w-full max-w-md z-10 overflow-hidden">
+            <div class="bg-blue-900 px-6 py-5 text-white">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span id="det-tipo" class="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider mb-2 inline-block"></span>
+                        <h3 id="det-titulo" class="text-xl font-bold leading-tight"></h3>
+                        <p id="det-empresa" class="text-blue-200 text-sm mt-0.5"></p>
+                    </div>
+                    <button onclick="closeDetailsModal()" class="text-white/70 hover:text-white transition">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 space-y-4 max-h-[50vh] overflow-y-auto">
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Ubicación y Salario</h4>
+                    <p class="text-sm text-gray-800 flex items-center gap-4">
+                        <span><i class="fas fa-map-marker-alt text-orange-500 mr-1.5"></i><span id="det-ubicacion"></span></span>
+                        <span><i class="fas fa-dollar-sign text-green-600 mr-1.5"></i><span id="det-salario"></span></span>
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Requisitos</h4>
+                    <div id="det-requisitos-tags" class="flex flex-wrap gap-1.5 mt-1"></div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Descripción de la Vacante</h4>
+                    <p id="det-descripcion" class="text-sm text-gray-600 leading-relaxed whitespace-pre-line"></p>
+                </div>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+                <button onclick="closeDetailsModal()" class="bg-blue-900 hover:bg-blue-800 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <footer class="bg-gray-900 text-white py-10">
         <div class="container mx-auto px-4 text-center">
@@ -227,8 +306,290 @@
             </div>
         </div>
     </footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="static/js/supabase-config.js"></script>
     <script src="static/js/auth.js"></script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        let allJobs = [];
+        let selectedCategory = 'Todos';
+        let currentUserId = null;
+        let currentUserRole = null;
+        let currentCompany = '';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = await checkSession();
+            if (user) {
+                currentUserId = user.id;
+                currentUserRole = user.role;
+                currentCompany = user.nombre;
+                
+                // Si es organización o admin, cambiar el botón del pie para que abra directamente el modal
+                const publishBtn = document.getElementById('btn-publish-footer');
+                if (publishBtn) {
+                    publishBtn.onclick = (e) => { e.preventDefault(); openPublishModal(); };
+                }
+            }
+            loadJobs();
+        });
+
+        async function loadJobs() {
+            const container = document.getElementById('jobs-container');
+            const empty = document.getElementById('jobs-empty');
+            
+            try {
+                // RLS filtrará:
+                // - Aprobados para todos.
+                // - Propios sin aprobar para el autor.
+                // - Todos para el administrador.
+                const { data, error } = await supabaseClient
+                    .from('ofertas')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                allJobs = data || [];
+                filterJobs();
+            } catch (e) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-10 text-gray-500 bg-white border border-gray-200 rounded-lg p-6">
+                        <i class="fas fa-wifi text-2xl mb-2 text-red-400"></i>
+                        <p class="text-sm font-semibold">Error al cargar ofertas: ${e.message}</p>
+                        <button onclick="loadJobs()" class="text-orange-500 hover:text-orange-600 font-bold text-xs mt-1 underline">Reintentar</button>
+                    </div>
+                `;
+            }
+        }
+
+        function selectCategory(cat, btn) {
+            selectedCategory = cat;
+            document.querySelectorAll('#category-filters button').forEach(b => {
+                b.classList.remove('active', 'bg-blue-900', 'text-white');
+                b.classList.add('text-gray-600');
+            });
+            btn.classList.add('active', 'bg-blue-900', 'text-white');
+            btn.classList.remove('text-gray-600');
+            filterJobs();
+        }
+
+        function filterJobs() {
+            const titleQ = (document.getElementById('search-title').value || '').toLowerCase();
+            const locQ = (document.getElementById('search-location').value || '').toLowerCase();
+            
+            const filtered = allJobs.filter(job => {
+                const matchCategory = selectedCategory === 'Todos' || job.categoria === selectedCategory;
+                const matchTitle = !titleQ || job.titulo.toLowerCase().includes(titleQ) || job.descripcion.toLowerCase().includes(titleQ) || job.empresa.toLowerCase().includes(titleQ);
+                const matchLocation = !locQ || job.ubicacion.toLowerCase().includes(locQ);
+                return matchCategory && matchTitle && matchLocation;
+            });
+            
+            renderJobs(filtered);
+        }
+
+        function renderJobs(jobs) {
+            const container = document.getElementById('jobs-container');
+            const empty = document.getElementById('jobs-empty');
+            
+            if (!jobs.length) {
+                container.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            
+            empty.classList.add('hidden');
+            container.innerHTML = jobs.map(job => {
+                const badgeColor = job.tipo_vacante === 'Urgente' 
+                    ? 'bg-red-100 text-red-700' 
+                    : job.tipo_vacante === 'Remoto' 
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-green-100 text-green-700';
+                
+                const badgeText = job.tipo_vacante || 'Nuevo';
+                
+                const pendingLabel = !job.aprobado
+                    ? `<span class="bg-orange-100 text-orange-800 border border-orange-200 text-[10px] font-bold px-2 py-0.5 rounded-full"><i class="fas fa-clock mr-1"></i>Pendiente</span>`
+                    : '';
+
+                const leftBorder = job.tipo_vacante === 'Urgente'
+                    ? 'border-l-red-500'
+                    : 'border-l-blue-900';
+                
+                const requirementsArr = job.requisitos ? job.requisitos.split(',').map(r => r.trim()).filter(Boolean) : [];
+                const reqBadges = requirementsArr.map(req => `
+                    <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">${escapeHtml(req)}</span>
+                `).join('');
+                
+                return `
+                    <div class="job-card bg-white border border-gray-200 border-l-4 ${leftBorder} rounded-lg p-5">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-blue-50 w-11 h-11 rounded flex items-center justify-center">
+                                    <i class="fas ${getCategoryIcon(job.categoria)} text-blue-900 text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-base leading-tight">${escapeHtml(job.titulo)}</h3>
+                                    <p class="text-gray-500 text-xs mt-0.5">${escapeHtml(job.empresa)}</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-1.5">
+                                <span class="${badgeColor} px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">${badgeText}</span>
+                                ${pendingLabel}
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3 line-clamp-2">${escapeHtml(job.descripcion)}</p>
+                        <div class="flex flex-wrap gap-1.5 mb-4">
+                            ${reqBadges}
+                        </div>
+                        <div class="flex justify-between items-center text-xs text-gray-500 border-t border-gray-50 pt-3">
+                            <div class="flex gap-3">
+                                <span><i class="fas fa-map-marker-alt text-gray-400 mr-1"></i>${escapeHtml(job.ubicacion)}</span>
+                                <span><i class="fas fa-dollar-sign text-gray-400 mr-1"></i>${escapeHtml(job.salario || 'No especificado')}</span>
+                            </div>
+                            <button onclick="openDetailsModal(${job.id})" class="text-blue-900 hover:text-orange-500 font-bold flex items-center gap-1 transition">
+                                Ver detalles <i class="fas fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getCategoryIcon(cat) {
+            switch(cat) {
+                case 'Tecnología': return 'fa-code';
+                case 'Industrial': return 'fa-industry';
+                case 'Electrónica': return 'fa-bolt';
+                case 'Gestión': return 'fa-chart-pie';
+                case 'Mecatrónica': return 'fa-robot';
+                default: return 'fa-briefcase';
+            }
+        }
+
+        function openPublishModal() {
+            if (!currentUserId) {
+                showLoginModal();
+                return;
+            }
+            if (currentUserRole !== 'organizacion' && currentUserRole !== 'admin') {
+                alert('Solo los perfiles de tipo Organización y Administradores pueden publicar vacantes.');
+                return;
+            }
+            document.getElementById('in-vac-titulo').value = '';
+            document.getElementById('in-vac-empresa').value = currentCompany;
+            document.getElementById('in-vac-categoria').value = 'Tecnología';
+            document.getElementById('in-vac-tipo').value = 'Normal';
+            document.getElementById('in-vac-ubicacion').value = '';
+            document.getElementById('in-vac-salario').value = '';
+            document.getElementById('in-vac-requisitos').value = '';
+            document.getElementById('in-vac-descripcion').value = '';
+            document.getElementById('modal-error').classList.add('hidden');
+            document.getElementById('publish-vacancy-modal').classList.remove('hidden');
+        }
+
+        function closePublishModal() {
+            document.getElementById('publish-vacancy-modal').classList.add('hidden');
+        }
+
+        async function submitVacancy() {
+            const btn = document.getElementById('modal-submit-btn');
+            const titulo = document.getElementById('in-vac-titulo').value.trim();
+            const empresa = document.getElementById('in-vac-empresa').value.trim();
+            const categoria = document.getElementById('in-vac-categoria').value;
+            const tipo_vacante = document.getElementById('in-vac-tipo').value;
+            const ubicacion = document.getElementById('in-vac-ubicacion').value.trim();
+            const salario = document.getElementById('in-vac-salario').value.trim();
+            const requisitos = document.getElementById('in-vac-requisitos').value.trim();
+            const descripcion = document.getElementById('in-vac-descripcion').value.trim();
+
+            if (!titulo) return showModalError('El título del puesto es obligatorio.');
+            if (!empresa) return showModalError('El nombre de la empresa es obligatorio.');
+            if (!ubicacion) return showModalError('La ubicación es obligatoria.');
+            if (!descripcion) return showModalError('La descripción es obligatoria.');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> Enviando...';
+            document.getElementById('modal-error').classList.add('hidden');
+
+            try {
+                const payload = {
+                    titulo,
+                    empresa,
+                    categoria,
+                    tipo_vacante,
+                    ubicacion,
+                    salario: salario || null,
+                    requisitos: requisitos || null,
+                    descripcion,
+                    user_id: currentUserId,
+                    aprobado: (currentUserRole === 'admin') // Aprobado automáticamente si es admin
+                };
+
+                const { error } = await supabaseClient
+                    .from('ofertas')
+                    .insert([payload]);
+
+                if (error) throw error;
+
+                closePublishModal();
+                await loadJobs();
+                alert(currentUserRole === 'admin' 
+                    ? 'Vacante publicada correctamente.' 
+                    : 'Tu oferta laboral ha sido enviada. Será visible en el portal una vez que un administrador la apruebe.'
+                );
+
+            } catch (e) {
+                showModalError(e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i>Enviar Vacante';
+            }
+        }
+
+        function showModalError(msg) {
+            const el = document.getElementById('modal-error');
+            document.getElementById('modal-error-msg').textContent = msg;
+            el.classList.remove('hidden');
+        }
+
+        function openDetailsModal(id) {
+            const job = allJobs.find(j => j.id === id);
+            if (!job) return;
+            
+            document.getElementById('det-tipo').textContent = job.tipo_vacante || 'Nuevo';
+            document.getElementById('det-tipo').className = `bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider mb-2 inline-block ${
+                job.tipo_vacante === 'Urgente' ? 'bg-red-500' : job.tipo_vacante === 'Remoto' ? 'bg-blue-600' : 'bg-green-600'
+            }`;
+            document.getElementById('det-titulo').textContent = job.titulo;
+            document.getElementById('det-empresa').textContent = job.empresa;
+            document.getElementById('det-ubicacion').textContent = job.ubicacion;
+            document.getElementById('det-salario').textContent = job.salario || 'No especificado';
+            document.getElementById('det-descripcion').textContent = job.descripcion;
+            
+            const reqTags = document.getElementById('det-requisitos-tags');
+            const requirementsArr = job.requisitos ? job.requisitos.split(',').map(r => r.trim()).filter(Boolean) : [];
+            if (requirementsArr.length > 0) {
+                reqTags.innerHTML = requirementsArr.map(req => `
+                    <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-xs font-medium">${escapeHtml(req)}</span>
+                `).join('');
+            } else {
+                reqTags.innerHTML = '<span class="text-xs text-gray-400 font-normal">Ninguno especificado</span>';
+            }
+            
+            document.getElementById('details-modal').classList.remove('hidden');
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('details-modal').classList.add('hidden');
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/[&<>"']/g, c =>
+                ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+    </script>
 </body>
 </html>

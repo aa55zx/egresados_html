@@ -354,7 +354,7 @@ async function doLogout() {
   currentUser = null;
   updateNavAuthArea();
   document.dispatchEvent(new CustomEvent('auth:logout'));
-  const protectedPages = ['cuestionario.html', 'admin.html', 'egresados_lista.html'];
+  const protectedPages = ['cuestionario.html', 'admin.html'];
   const page = window.location.pathname.split('/').pop();
   if (protectedPages.includes(page)) window.location.href = 'index.html';
 }

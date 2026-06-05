@@ -79,7 +79,28 @@
         </div>
     </div>
 
-    <!-- Stats -->
+    <!-- Tabs de navegación -->
+    <div class="bg-white border-b border-gray-200 shadow-sm mb-6">
+        <div class="container mx-auto px-4">
+            <div class="flex gap-6">
+                <button id="tab-users-btn" onclick="switchTab('users')" 
+                    class="border-b-2 border-blue-900 text-blue-900 py-3.5 px-1 text-sm font-bold transition flex items-center gap-2">
+                    <i class="fas fa-users-gear"></i>Gestión de Usuarios
+                </button>
+                <button id="tab-events-btn" onclick="switchTab('events')" 
+                    class="border-b-2 border-transparent text-gray-500 hover:text-blue-900 py-3.5 px-1 text-sm font-semibold transition flex items-center gap-2">
+                    <i class="fas fa-bullhorn text-sm"></i>Validar Eventos
+                </button>
+                <button id="tab-vacancies-btn" onclick="switchTab('vacancies')" 
+                    class="border-b-2 border-transparent text-gray-500 hover:text-blue-900 py-3.5 px-1 text-sm font-semibold transition flex items-center gap-2">
+                    <i class="fas fa-briefcase text-sm"></i>Validar Vacantes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-users-content">
+        <!-- Stats -->
     <div class="bg-white border-b border-gray-100 shadow-sm">
         <div class="container mx-auto px-4 py-5">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-gray-100">
@@ -162,8 +183,161 @@
                 <p class="text-xs text-gray-300">Portal Egresados TecNM</p>
             </div>
         </div>
+
+        <!-- Sección de Descarga de Reportes -->
+        <div class="mt-8 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm p-6">
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-4 mb-5">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white bg-blue-900 flex-shrink-0">
+                    <i class="fas fa-file-excel text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-blue-900">Reportes y Descargas</h2>
+                    <p class="text-xs text-gray-400">Descarga la información recopilada de los cuestionarios en formato CSV compatible con Excel</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <button onclick="downloadReport('egresados')"
+                    class="flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-orange-500 hover:bg-orange-50/10 text-gray-700 hover:text-orange-950 font-semibold text-sm transition text-left group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                            <i class="fas fa-user-graduate text-base"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 text-sm">Cuestionarios Egresados</p>
+                            <p class="text-xs text-gray-400 font-normal">Respuestas de egresados</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-download text-sm text-gray-400 group-hover:text-orange-500 transition-colors"></i>
+                </button>
+                
+                <button onclick="downloadReport('organizaciones')"
+                    class="flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-green-600 hover:bg-green-50/10 text-gray-700 hover:text-green-950 font-semibold text-sm transition text-left group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-green-100 text-green-700 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                            <i class="fas fa-building text-base"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 text-sm">Cuestionarios Organizaciones</p>
+                            <p class="text-xs text-gray-400 font-normal">Respuestas de empresas</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-download text-sm text-gray-400 group-hover:text-green-600 transition-colors"></i>
+                </button>
+                
+                <button onclick="downloadReport('usuarios')"
+                    class="flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-blue-900 hover:bg-blue-50/20 text-gray-700 hover:text-blue-950 font-semibold text-sm transition text-left group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-900 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                            <i class="fas fa-users text-base"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 text-sm">Listado de Usuarios</p>
+                            <p class="text-xs text-gray-400 font-normal">Cuentas y roles registrados</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-download text-sm text-gray-400 group-hover:text-blue-900 transition-colors"></i>
+                </button>
+            </div>
+        </div>
     </div>
 </div>
+
+    <div id="tab-events-content" class="hidden">
+        <!-- Contenido de Validación de Publicaciones -->
+        <div class="container mx-auto px-4 py-8">
+            <!-- Barra de filtros de eventos -->
+            <div class="flex flex-col sm:flex-row gap-3 mb-5">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input id="search-events" type="text" placeholder="Buscar por título o autor..."
+                        class="w-full pl-8 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition"
+                        oninput="filterEvents()">
+                </div>
+                <select id="filter-event-status" onchange="filterEvents()"
+                    class="px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition bg-white">
+                    <option value="">Todos los estados</option>
+                    <option value="true">Aprobados</option>
+                    <option value="false" selected>Pendientes</option>
+                </select>
+                <button onclick="loadAdminEvents()"
+                    class="border border-gray-200 hover:border-blue-900 text-gray-500 hover:text-blue-900 px-4 py-2.5 rounded-lg text-sm font-medium transition flex items-center gap-2 bg-white">
+                    <i class="fas fa-rotate-right text-xs"></i>Actualizar
+                </button>
+            </div>
+
+            <!-- Tabla de Eventos -->
+            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider w-12">#</th>
+                                <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Autor</th>
+                                <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Título / Descripción</th>
+                                <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="text-right px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="events-tbody">
+                            <tr><td colspan="6" class="text-center py-14 text-gray-400">
+                                <i class="fas fa-spinner fa-spin mr-2 text-blue-900"></i>Cargando publicaciones...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-vacancies-content" class="hidden">
+        <!-- Contenido de Validación de Vacantes -->
+        <div class="container mx-auto px-4 py-8">
+            <!-- Barra de filtros de vacantes -->
+            <div class="flex flex-col sm:flex-row gap-3 mb-5">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input id="search-vacancies" type="text" placeholder="Buscar por puesto o empresa..."
+                        class="w-full pl-8 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition"
+                        oninput="filterVacancies()">
+                </div>
+                <select id="filter-vacancy-status" onchange="filterVacancies()"
+                    class="px-3 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 text-sm transition bg-white">
+                    <option value="">Todos los estados</option>
+                    <option value="true">Aprobados</option>
+                    <option value="false" selected>Pendientes</option>
+                </select>
+                <button onclick="loadAdminVacancies()"
+                    class="border border-gray-200 hover:border-blue-900 text-gray-500 hover:text-blue-900 px-4 py-2.5 rounded-lg text-sm font-medium transition flex items-center gap-2 bg-white">
+                    <i class="fas fa-rotate-right text-xs"></i>Actualizar
+                </button>
+            </div>
+
+            <!-- Tabla de Vacantes -->
+            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider w-12">#</th>
+                                <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Empresa</th>
+                                <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Título / Categoría</th>
+                                <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Ubicación / Salario</th>
+                                <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="text-right px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vacancies-tbody">
+                            <tr><td colspan="6" class="text-center py-14 text-gray-400">
+                                <i class="fas fa-spinner fa-spin mr-2 text-blue-900"></i>Cargando vacantes...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <!-- ══════════════════════════════════════════════════════════════════
      MODAL: Crear / Editar Usuario
@@ -624,6 +798,8 @@ function openCreateModal() {
     document.getElementById('modal-nombre').value    = '';
     document.getElementById('modal-username').value  = '';
     document.getElementById('modal-password').value  = '';
+    document.getElementById('modal-password').disabled = false;
+    document.getElementById('modal-password').placeholder = 'Mínimo 6 caracteres';
     document.getElementById('modal-email').value     = '';
     document.getElementById('modal-username').disabled = false;
     setRadioRole('egresado');
@@ -647,12 +823,14 @@ function openEditModal(id) {
     document.getElementById('modal-nombre').value    = u.nombre;
     document.getElementById('modal-username').value  = u.username;
     document.getElementById('modal-password').value  = '';
+    document.getElementById('modal-password').disabled = true;
+    document.getElementById('modal-password').placeholder = 'Contraseña gestionada por Supabase';
     document.getElementById('modal-email').value     = u.email || '';
     document.getElementById('modal-username').disabled = (u.username === 'admin');
     setRadioRole(u.role);
     document.getElementById('modal-activo').checked  = !!u.activo;
     document.getElementById('modal-activo-group').classList.remove('hidden');
-    document.getElementById('edit-password-hint').classList.remove('hidden');
+    document.getElementById('edit-password-hint').classList.add('hidden');
     document.getElementById('password-required-label').classList.add('hidden');
     document.getElementById('modal-error').classList.add('hidden');
     updateActivoUI();
@@ -709,12 +887,9 @@ async function submitUserModal() {
     if (!nombre)   return showModalError('El nombre es requerido.');
     if (!username) return showModalError('El nombre de usuario es requerido.');
     if (/\s/.test(username)) return showModalError('El usuario no puede contener espacios.');
+    if (!isEdit && !email) return showModalError('El correo electrónico es requerido para nuevos usuarios.');
     if (!isEdit && !password) return showModalError('La contraseña es requerida para nuevos usuarios.');
     if (password && password.length < 6) return showModalError('La contraseña debe tener al menos 6 caracteres.');
-
-    const payload = { nombre, username, email, role };
-    if (password) payload.password = password;
-    if (isEdit)   payload.activo   = document.getElementById('modal-activo').checked ? 1 : 0;
 
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i> Guardando...';
@@ -722,28 +897,55 @@ async function submitUserModal() {
 
     try {
         if (isEdit) {
+            const dbPayload = {
+                nombre,
+                username,
+                email,
+                role,
+                activo: document.getElementById('modal-activo').checked ? 1 : 0
+            };
             const { error } = await supabaseClient
                 .from('usuarios')
-                .update(payload)
+                .update(dbPayload)
                 .eq('id', uid);
             if (error) throw error;
         } else {
-            // Crear usuario en Supabase Auth
-            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                email: payload.email,
-                password: payload.password,
-                options: { data: { nombre: payload.nombre, role: payload.role } }
+            // Crear un cliente temporal de Supabase sin persistencia de sesión
+            // para evitar desloguear al administrador actual del portal
+            const tempSupabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                auth: {
+                    persistSession: false,
+                    autoRefreshToken: false,
+                    detectSessionInUrl: false
+                }
+            });
+
+            // Registrar usuario en Supabase Auth usando el cliente temporal
+            const { data: authData, error: authError } = await tempSupabase.auth.signUp({
+                email: email,
+                password: password,
+                options: { data: { nombre: nombre, role: role } }
             });
             if (authError) throw authError;
-            // Insertar perfil en tabla usuarios
+
+            // Insertar perfil en la tabla usuarios de la base de datos
+            const dbPayload = {
+                nombre,
+                username,
+                email,
+                role,
+                activo: 1,
+                auth_id: authData.user?.id,
+                user_id: authData.user?.id
+            };
             const { error: profileError } = await supabaseClient
                 .from('usuarios')
-                .insert([{ ...payload, user_id: authData.user?.id, auth_id: authData.user?.id }]);
+                .insert([dbPayload]);
             if (profileError) throw profileError;
         }
         closeUserModal();
         await loadUsers();
-        showToast(isEdit ? 'Usuario actualizado correctamente' : 'Usuario creado. Revisar confirmación por email.', 'success');
+        showToast(isEdit ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente.', 'success');
     } catch(e) {
         showModalError('Error: ' + e.message);
     } finally {
@@ -812,6 +1014,323 @@ function formatDate(ts) {
 function escapeHtml(str) {
     return String(str || '').replace(/[&<>"']/g, c =>
         ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function downloadReport(tableName) {
+    showToast(`Generando reporte de ${tableName}...`, 'info');
+    try {
+        const { data, error } = await supabaseClient
+            .from(tableName)
+            .select('*');
+        if (error) throw error;
+        
+        if (!data || data.length === 0) {
+            showToast('No hay datos disponibles para este reporte.', 'error');
+            return;
+        }
+
+        // Obtener cabeceras
+        const headers = Object.keys(data[0]);
+        
+        // Mapear filas a CSV
+        const csvRows = [];
+        // Añadir cabecera
+        csvRows.push(headers.join(','));
+
+        for (const row of data) {
+            const values = headers.map(header => {
+                const val = row[header];
+                let formatted = val === null || val === undefined ? '' : String(val);
+                // Escapar comillas dobles y englobar en comillas si contiene comas, comillas o saltos de línea
+                if (formatted.includes(',') || formatted.includes('"') || formatted.includes('\n') || formatted.includes('\r')) {
+                    formatted = `"${formatted.replace(/"/g, '""')}"`;
+                }
+                return formatted;
+            });
+            csvRows.push(values.join(','));
+        }
+
+        // Crear el archivo con UTF-8 BOM para soporte correcto de acentos y eñes en Excel
+        const csvContent = "\uFEFF" + csvRows.join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `reporte_${tableName}_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showToast('Reporte descargado correctamente.', 'success');
+    } catch (e) {
+        showToast(`Error al descargar reporte: ${e.message}`, 'error');
+    }
+}
+
+function switchTab(tab) {
+    const uBtn = document.getElementById('tab-users-btn');
+    const eBtn = document.getElementById('tab-events-btn');
+    const vBtn = document.getElementById('tab-vacancies-btn');
+    const uContent = document.getElementById('tab-users-content');
+    const eContent = document.getElementById('tab-events-content');
+    const vContent = document.getElementById('tab-vacancies-content');
+    
+    // Reset buttons
+    uBtn.className = "border-b-2 border-transparent text-gray-500 hover:text-blue-900 py-3.5 px-1 text-sm font-semibold transition flex items-center gap-2";
+    eBtn.className = "border-b-2 border-transparent text-gray-500 hover:text-blue-900 py-3.5 px-1 text-sm font-semibold transition flex items-center gap-2";
+    vBtn.className = "border-b-2 border-transparent text-gray-500 hover:text-blue-900 py-3.5 px-1 text-sm font-semibold transition flex items-center gap-2";
+    
+    // Hide content
+    uContent.classList.add('hidden');
+    eContent.classList.add('hidden');
+    vContent.classList.add('hidden');
+    
+    if (tab === 'users') {
+        uBtn.className = "border-b-2 border-blue-900 text-blue-900 py-3.5 px-1 text-sm font-bold transition flex items-center gap-2";
+        uContent.classList.remove('hidden');
+    } else if (tab === 'events') {
+        eBtn.className = "border-b-2 border-blue-900 text-blue-900 py-3.5 px-1 text-sm font-bold transition flex items-center gap-2";
+        eContent.classList.remove('hidden');
+        loadAdminEvents();
+    } else if (tab === 'vacancies') {
+        vBtn.className = "border-b-2 border-blue-900 text-blue-900 py-3.5 px-1 text-sm font-bold transition flex items-center gap-2";
+        vContent.classList.remove('hidden');
+        loadAdminVacancies();
+    }
+}
+
+let allAdminEvents = [];
+async function loadAdminEvents() {
+    const tbody = document.getElementById('events-tbody');
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-14 text-gray-400"><i class="fas fa-spinner fa-spin mr-2 text-blue-900"></i>Cargando...</td></tr>`;
+    try {
+        const { data, error } = await supabaseClient
+            .from('eventos')
+            .select('*, usuarios(nombre, role)')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        allAdminEvents = data;
+        filterEvents();
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-14 text-red-400 text-sm">
+            <i class="fas fa-wifi-slash mr-2"></i>Error al cargar publicaciones: ${e.message}
+        </td></tr>`;
+    }
+}
+
+function filterEvents() {
+    const q = (document.getElementById('search-events').value || '').toLowerCase();
+    const status = document.getElementById('filter-event-status').value;
+    
+    const filtered = allAdminEvents.filter(ev => {
+        const autorNombre = ev.usuarios ? ev.usuarios.nombre.toLowerCase() : '';
+        const matchQ = !q || ev.titulo.toLowerCase().includes(q) || autorNombre.includes(q);
+        const matchSt = status === '' || String(ev.aprobado) === status;
+        return matchQ && matchSt;
+    });
+    renderAdminEvents(filtered);
+}
+
+function renderAdminEvents(events) {
+    const tbody = document.getElementById('events-tbody');
+    if (!events.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-14 text-gray-400 text-sm">
+            <i class="fas fa-bullhorn mr-2 text-gray-300 text-2xl block mb-2"></i>
+            No se encontraron publicaciones.
+        </td></tr>`;
+        return;
+    }
+    tbody.innerHTML = events.map((ev, i) => {
+        const autorNombre = ev.usuarios ? ev.usuarios.nombre : 'Usuario';
+        const autorRol = ev.usuarios ? (ev.usuarios.role === 'admin' ? 'Admin' : ev.usuarios.role === 'organizacion' ? 'Organización' : 'Egresado') : 'Usuario';
+        
+        const stateBadge = ev.aprobado
+            ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700">
+                 <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Aprobado</span>`
+            : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-100 text-orange-700">
+                 <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Pendiente</span>`;
+
+        const dateStr = new Date(ev.fecha_evento).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric', timeZone: 'UTC' });
+        
+        const approveBtn = !ev.aprobado
+            ? `<button onclick="approveEvent(${ev.id})"
+                  class="px-3 py-1.5 rounded-lg border border-green-600 hover:bg-green-50 text-green-600 font-semibold text-xs transition"
+                  title="Aprobar publicación">
+                  <i class="fas fa-check mr-1"></i>Aprobar
+               </button>`
+            : '';
+
+        return `
+            <tr class="border-b border-gray-100 hover:bg-blue-50/30">
+                <td class="px-5 py-3.5 text-xs text-gray-400 font-mono">${i + 1}</td>
+                <td class="px-5 py-3.5">
+                    <p class="font-bold text-gray-900 text-sm">${escapeHtml(autorNombre)}</p>
+                    <p class="text-[10px] text-gray-400 mt-0.5">${autorRol}</p>
+                </td>
+                <td class="px-5 py-3.5">
+                    <p class="font-semibold text-gray-800 text-sm truncate max-w-xs" title="${escapeHtml(ev.titulo)}">${escapeHtml(ev.titulo)}</p>
+                    <p class="text-xs text-gray-400 truncate max-w-xs">${escapeHtml(ev.descripcion)}</p>
+                </td>
+                <td class="px-5 py-3.5 text-xs text-gray-500">${dateStr}</td>
+                <td class="px-5 py-3.5">${stateBadge}</td>
+                <td class="px-5 py-3.5 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                        ${approveBtn}
+                        <button onclick="deleteEvent(${ev.id})"
+                            class="w-8 h-8 rounded-lg border border-gray-200 hover:border-red-400 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition"
+                            title="Eliminar publicación">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+async function approveEvent(id) {
+    if (!confirm('¿Estás seguro de que deseas aprobar esta publicación para que sea visible públicamente?')) return;
+    try {
+        const { error } = await supabaseClient
+            .from('eventos')
+            .update({ aprobado: true })
+            .eq('id', id);
+        if (error) throw error;
+        showToast('Publicación aprobada con éxito.', 'success');
+        await loadAdminEvents();
+    } catch(e) {
+        showToast(`Error al aprobar: ${e.message}`, 'error');
+    }
+}
+
+async function deleteEvent(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar permanentemente esta publicación?')) return;
+    try {
+        const { error } = await supabaseClient
+            .from('eventos')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        showToast('Publicación eliminada con éxito.', 'success');
+        await loadAdminEvents();
+    } catch(e) {
+        showToast(`Error al eliminar: ${e.message}`, 'error');
+    }
+}
+
+let allAdminVacancies = [];
+async function loadAdminVacancies() {
+    const tbody = document.getElementById('vacancies-tbody');
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-14 text-gray-400"><i class="fas fa-spinner fa-spin mr-2 text-blue-900"></i>Cargando...</td></tr>`;
+    try {
+        const { data, error } = await supabaseClient
+            .from('ofertas')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        allAdminVacancies = data || [];
+        filterVacancies();
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-14 text-red-400 text-sm">
+            <i class="fas fa-wifi-slash mr-2"></i>Error al cargar vacantes: ${e.message}
+        </td></tr>`;
+    }
+}
+
+function filterVacancies() {
+    const q = (document.getElementById('search-vacancies').value || '').toLowerCase();
+    const status = document.getElementById('filter-vacancy-status').value;
+    
+    const filtered = allAdminVacancies.filter(vac => {
+        const matchQ = !q || vac.titulo.toLowerCase().includes(q) || vac.empresa.toLowerCase().includes(q) || vac.descripcion.toLowerCase().includes(q);
+        const matchSt = status === '' || String(vac.aprobado) === status;
+        return matchQ && matchSt;
+    });
+    renderAdminVacancies(filtered);
+}
+
+function renderAdminVacancies(vacancies) {
+    const tbody = document.getElementById('vacancies-tbody');
+    if (!vacancies.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-14 text-gray-400 text-sm">
+            <i class="fas fa-briefcase mr-2 text-gray-300 text-2xl block mb-2"></i>
+            No se encontraron vacantes.
+        </td></tr>`;
+        return;
+    }
+    
+    tbody.innerHTML = vacancies.map((vac, i) => {
+        const stateBadge = vac.aprobado
+            ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700">
+                 <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Aprobado</span>`
+            : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-100 text-orange-700">
+                 <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Pendiente</span>`;
+
+        const approveBtn = !vac.aprobado
+            ? `<button onclick="approveVacancy(${vac.id})"
+                  class="px-3 py-1.5 rounded-lg border border-green-600 hover:bg-green-50 text-green-600 font-semibold text-xs transition"
+                  title="Aprobar vacante">
+                  <i class="fas fa-check mr-1"></i>Aprobar
+               </button>`
+            : '';
+
+        return `
+            <tr class="border-b border-gray-100 hover:bg-blue-50/30">
+                <td class="px-5 py-3.5 text-xs text-gray-400 font-mono">${i + 1}</td>
+                <td class="px-5 py-3.5 font-bold text-gray-900 text-sm">${escapeHtml(vac.empresa)}</td>
+                <td class="px-5 py-3.5">
+                    <p class="font-semibold text-gray-800 text-sm">${escapeHtml(vac.titulo)}</p>
+                    <p class="text-[10px] text-gray-400 mt-0.5">${escapeHtml(vac.categoria)}</p>
+                </td>
+                <td class="px-5 py-3.5">
+                    <p class="text-xs text-gray-800">${escapeHtml(vac.ubicacion)}</p>
+                    <p class="text-[10px] text-gray-400 mt-0.5">${escapeHtml(vac.salario || 'No especificado')}</p>
+                </td>
+                <td class="px-5 py-3.5">${stateBadge}</td>
+                <td class="px-5 py-3.5 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                        ${approveBtn}
+                        <button onclick="deleteVacancy(${vac.id})"
+                            class="w-8 h-8 rounded-lg border border-gray-200 hover:border-red-400 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition"
+                            title="Eliminar vacante">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+async function approveVacancy(id) {
+    if (!confirm('¿Estás seguro de que deseas aprobar esta oferta laboral para que sea visible públicamente en el portal?')) return;
+    try {
+        const { error } = await supabaseClient
+            .from('ofertas')
+            .update({ aprobado: true })
+            .eq('id', id);
+        if (error) throw error;
+        showToast('Oferta laboral aprobada con éxito.', 'success');
+        await loadAdminVacancies();
+    } catch(e) {
+        showToast(`Error al aprobar: ${e.message}`, 'error');
+    }
+}
+
+async function deleteVacancy(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar permanentemente esta oferta laboral?')) return;
+    try {
+        const { error } = await supabaseClient
+            .from('ofertas')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        showToast('Oferta laboral eliminada con éxito.', 'success');
+        await loadAdminVacancies();
+    } catch(e) {
+        showToast(`Error al eliminar: ${e.message}`, 'error');
+    }
 }
 </script>
 </body>

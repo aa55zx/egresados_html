@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -41,8 +41,8 @@
                 <div class="hidden md:flex space-x-8 items-center">
                     <a href="#inicio"    class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Inicio</a>
                     <a href="#servicios" class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Servicios</a>
-                    <a href="egresados_lista.html" class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Directorio</a>
                     <a href="bolsa-trabajo.html"   class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Bolsa de Trabajo</a>
+                    <a href="eventos.html"         class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Eventos</a>
                     <a href="#contacto"  class="nav-link text-gray-600 hover:text-blue-900 font-medium text-sm">Contacto</a>
                     <div id="nav-auth-area">
                         <div class="w-32 h-9 bg-gray-100 rounded animate-pulse"></div>
@@ -65,9 +65,6 @@
                     Servicios y oportunidades para los egresados del Tecnológico Nacional de México Campus Oaxaca.
                 </p>
                 <div class="flex flex-wrap justify-center gap-3">
-                    <a href="registro.html" class="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3 rounded font-semibold text-sm transition duration-200">
-                        Registrarme
-                    </a>
                     <a href="#servicios" class="border border-white/40 hover:border-white text-white px-7 py-3 rounded font-semibold text-sm transition duration-200">
                         Ver servicios
                     </a>
@@ -156,11 +153,6 @@
                     <p class="mt-4 text-blue-900 text-sm font-semibold">Ver más →</p>
                 </a>
 
-                <a href="egresados_lista.html" class="service-card border border-gray-200 rounded-lg p-6 block">
-                    <h3 class="text-base font-bold text-gray-900 mb-2">Directorio de Egresados</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">Directorio actualizado de egresados del posgrado con información laboral y académica.</p>
-                    <p class="mt-4 text-blue-900 text-sm font-semibold">Ver más →</p>
-                </a>
 
                 <!-- Tarjeta cuestionario: visible solo con sesión -->
                 <a id="card-cuestionario-link" href="cuestionario.html" class="hidden service-card border-2 border-blue-900 rounded-lg p-6 block">
@@ -181,54 +173,10 @@
                 <p class="text-orange-500 font-semibold text-xs uppercase tracking-widest mb-2">Oportunidades</p>
                 <h2 class="text-2xl font-bold text-blue-900">Ofertas Laborales Recientes</h2>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
-
-                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-blue-900 rounded-lg p-6">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-sm">Desarrollador Full Stack</h3>
-                            <p class="text-gray-500 text-xs mt-0.5">TechSolutions SA de CV</p>
-                        </div>
-                        <span class="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-semibold">Nuevo</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-3">Desarrollador con experiencia en React, Node.js y bases de datos SQL/NoSQL.</p>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">React</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Node.js</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">MongoDB</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs text-gray-500">
-                        <div class="flex gap-4">
-                            <span>Oaxaca, Oax.</span>
-                            <span>$25,000 – $35,000</span>
-                        </div>
-                        <a href="bolsa-trabajo.html" class="text-blue-900 font-semibold">Ver detalles →</a>
-                    </div>
-                </div>
-
-                <div class="job-card bg-white border border-gray-200 border-l-4 border-l-orange-500 rounded-lg p-6">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-sm">Ingeniero Industrial</h3>
-                            <p class="text-gray-500 text-xs mt-0.5">Manufactura del Sureste</p>
-                        </div>
-                        <span class="bg-orange-50 text-orange-700 border border-orange-200 px-2 py-0.5 rounded text-xs font-semibold">Urgente</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-3">Optimización de procesos y gestión de calidad en planta industrial.</p>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Six Sigma</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">Lean</span>
-                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">ISO 9001</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs text-gray-500">
-                        <div class="flex gap-4">
-                            <span>Salina Cruz, Oax.</span>
-                            <span>$28,000 – $38,000</span>
-                        </div>
-                        <a href="bolsa-trabajo.html" class="text-blue-900 font-semibold">Ver detalles →</a>
-                    </div>
-                </div>
-
+            <div id="recent-jobs-container" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+                <!-- Skeletons cargando -->
+                <div class="bg-white border border-gray-100 p-6 rounded-lg animate-pulse h-36"></div>
+                <div class="bg-white border border-gray-100 p-6 rounded-lg animate-pulse h-36"></div>
             </div>
             <div class="text-center">
                 <a href="bolsa-trabajo.html" class="inline-block border border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white px-8 py-3 rounded font-semibold text-sm transition duration-200">
@@ -287,9 +235,6 @@
             <h2 class="text-2xl font-bold text-white mb-3">¿Listo para dar el siguiente paso?</h2>
             <p class="text-blue-200 text-sm mb-8 max-w-md mx-auto">Únete a la comunidad de egresados y accede a todos los servicios del portal.</p>
             <div class="flex flex-wrap justify-center gap-3">
-                <a href="registro.html" class="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3 rounded font-semibold text-sm transition duration-200">
-                    Registrarme ahora
-                </a>
                 <a id="cta-cuestionario-link" href="cuestionario.html" class="hidden border border-white/40 hover:border-white text-white px-7 py-3 rounded font-semibold text-sm transition duration-200">
                     <span id="cta-cuestionario-label">Encuesta de seguimiento</span>
                 </a>
@@ -394,6 +339,7 @@
                         <li><a href="#inicio"    class="hover:text-white transition">Inicio</a></li>
                         <li><a href="#servicios" class="hover:text-white transition">Servicios</a></li>
                         <li><a href="bolsa-trabajo.html"   class="hover:text-white transition">Bolsa de Trabajo</a></li>
+                        <li><a href="eventos.html"         class="hover:text-white transition">Eventos</a></li>
                         <li><a href="casos-exito.html"     class="hover:text-white transition">Casos de Éxito</a></li>
                     </ul>
                 </div>
@@ -487,6 +433,83 @@
         }
     }
 
+    async function loadRecentJobs() {
+        const container = document.getElementById('recent-jobs-container');
+        if (!container) return;
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('ofertas')
+                .select('*')
+                .eq('aprobado', true)
+                .order('created_at', { ascending: false })
+                .limit(2);
+                
+            if (error) throw error;
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8 bg-white border border-gray-100 rounded-lg">
+                        <p class="text-gray-400 text-sm"><i class="fas fa-briefcase mr-1.5"></i>No hay ofertas laborales recientes publicadas.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = data.map(job => {
+                const badgeColor = job.tipo_vacante === 'Urgente' 
+                    ? 'bg-red-50 text-red-700 border border-red-200' 
+                    : job.tipo_vacante === 'Remoto' 
+                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                    : 'bg-green-50 text-green-700 border border-green-200';
+                
+                const badgeText = job.tipo_vacante || 'Nuevo';
+                const leftBorder = job.tipo_vacante === 'Urgente'
+                    ? 'border-l-red-500'
+                    : 'border-l-blue-900';
+                    
+                const requirementsArr = job.requisitos ? job.requisitos.split(',').map(r => r.trim()).filter(Boolean) : [];
+                const reqBadges = requirementsArr.map(req => `
+                    <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">${escapeHtml(req)}</span>
+                `).join('');
+                
+                return `
+                    <div class="job-card bg-white border border-gray-200 border-l-4 ${leftBorder} rounded-lg p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-sm">${escapeHtml(job.titulo)}</h3>
+                                <p class="text-gray-500 text-xs mt-0.5">${escapeHtml(job.empresa)}</p>
+                            </div>
+                            <span class="${badgeColor} px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider">${badgeText}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3 line-clamp-2">${escapeHtml(job.descripcion)}</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${reqBadges}
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <div class="flex gap-4">
+                                <span><i class="fas fa-map-marker-alt text-gray-400 mr-1"></i>${escapeHtml(job.ubicacion)}</span>
+                                <span><i class="fas fa-dollar-sign text-gray-400 mr-1"></i>${escapeHtml(job.salario || 'No especificado')}</span>
+                            </div>
+                            <a href="bolsa-trabajo.html" class="text-blue-900 font-semibold hover:text-orange-500 transition">Ver detalles →</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) {
+            container.innerHTML = `
+                <div class="col-span-full text-center py-8 bg-white border border-gray-100 rounded-lg">
+                    <p class="text-red-400 text-xs"><i class="fas fa-exclamation-triangle mr-1.5"></i>Error al cargar vacantes recientes.</p>
+                </div>
+            `;
+        }
+    }
+
+    function escapeHtml(str) {
+        return String(str || '').replace(/[&<>"']/g, c =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
     // ── Cuestionario links según rol ─────────────────────────────────
     function updateCuestionarioLinks(user) {
         const isOrg = user && user.role === 'organizacion';
@@ -532,6 +555,7 @@
     document.addEventListener('auth:login', (e) => updateCuestionarioLinks(e.detail));
     document.addEventListener('DOMContentLoaded', async () => {
         loadStats();
+        loadRecentJobs();
         const user = await checkSession();
         updateCuestionarioLinks(user);
     });

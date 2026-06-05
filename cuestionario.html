@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -65,8 +65,9 @@
         }
         .pill-label:hover { border-color: #1A3A5C; color: #1A3A5C; }
         .pill-label input { display: none; }
-        .pill-label.selected { background: #1A3A5C; border-color: #1A3A5C; color: white; }
-        .pill-label.selected-orange { background: #E8A020; border-color: #E8A020; color: white; }
+        .pill-label.selected,
+        .pill-label:has(input:checked) { background: #1A3A5C !important; border-color: #1A3A5C !important; color: white !important; }
+        .pill-label.selected-orange { background: #E8A020 !important; border-color: #E8A020 !important; color: white !important; }
 
         /* ── Scale buttons ── */
         .scale-btn {
@@ -161,12 +162,29 @@
         </div>
     </nav>
 
+    <!-- ── ALREADY SUBMITTED SCREEN ── -->
+    <div id="already-submitted-screen" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-50 px-4 hidden">
+        <div class="text-center max-w-md">
+            <div class="w-24 h-24 bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl text-white text-4xl">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-blue-900 mb-3">Cuestionario Completado</h2>
+            <p class="text-gray-600 mb-2">Ya has respondido este cuestionario anteriormente.</p>
+            <p class="text-gray-500 text-sm mb-8">Muchas gracias por tu valiosa participación en el seguimiento de egresados.</p>
+            <div class="flex justify-center">
+                <a href="index.html" class="btn-primary">
+                    <i class="fas fa-arrow-left text-sm"></i> Volver al portal
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- Contenido protegido (oculto hasta verificar sesión) -->
     <div id="protected-content" class="hidden">
     <div class="container mx-auto px-4 py-8 max-w-3xl">
 
         <!-- Hero intro -->
-        <div class="bg-gradient-to-r from-blue-900 to-blue-700 rounded-2xl p-6 text-white mb-8 relative overflow-hidden">
+        <div class="bg-blue-900 rounded-2xl p-6 text-white mb-8 relative overflow-hidden shadow-md">
             <div class="absolute right-0 top-0 w-40 h-40 bg-orange-500 opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
             <span class="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Posgrado en Ciencias de la Ingeniería</span>
             <h1 class="text-2xl font-bold mb-1">Cuestionario de Seguimiento de Egresados</h1>
@@ -196,7 +214,7 @@
             </div>
             <!-- Progress fill -->
             <div class="mt-3 bg-gray-100 rounded-full h-2 overflow-hidden">
-                <div id="progress-bar" class="progress-fill h-full bg-gradient-to-r from-blue-900 to-orange-500 rounded-full" style="width:14%"></div>
+                <div id="progress-bar" class="progress-fill h-full bg-orange-500 rounded-full" style="width:14%"></div>
             </div>
             <p class="text-xs text-gray-400 mt-1 text-right" id="progress-label">Sección 1 de 7</p>
         </div>
@@ -259,7 +277,7 @@
 
             <div class="question-card">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">5. Dependientes económicos</label>
-                <select class="form-input">
+                <select id="in-dependientes" class="form-input">
                     <option value="">Selecciona…</option>
                     <option>0 – Ninguno</option>
                     <option>1</option>
@@ -305,7 +323,7 @@
 
             <div class="question-card">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">2. Programa de posgrado concluido</label>
-                <select class="form-input">
+                <select id="in-programa" class="form-input">
                     <option value="">Selecciona…</option>
                     <option>Maestría en Ciencias en Ingeniería Electrónica</option>
                     <option>Maestría en Ciencias en Ingeniería Industrial</option>
@@ -845,7 +863,7 @@
     <!-- ── SUCCESS SCREEN ── -->
     <div id="success-screen" class="fixed inset-0 bg-white flex-col items-center justify-center z-50 px-4">
         <div class="text-center max-w-md">
-            <div class="w-24 h-24 bg-gradient-to-br from-blue-900 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+            <div class="w-24 h-24 bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
                 <i class="fas fa-check text-white text-4xl"></i>
             </div>
             <h2 class="text-3xl font-bold text-blue-900 mb-3">¡Gracias por tu respuesta!</h2>
@@ -926,14 +944,11 @@
 
         // ── PILL SELECTORS ────────────────────────────────────────
         function selectPill(el, group) {
-            document.querySelectorAll(`input[name="${group}"]`).forEach(inp => {
-                inp.closest('.pill-label').classList.remove('selected');
-            });
-            el.classList.add('selected');
+            // Radio behaves natively, CSS takes care of active style via :has(input:checked)
         }
 
         function toggleCheck(el) {
-            el.classList.toggle('selected');
+            // Checkbox behaves natively, CSS takes care of active style via :has(input:checked)
         }
 
         function toggleSection(id, show) {
@@ -943,8 +958,172 @@
             }
         }
 
+        // ── VALIDATION ────────────────────────────────────────────
+        function validateSection(sec) {
+            let valid = true;
+            let errors = [];
+
+            // Clear previous highlights
+            document.querySelectorAll(`.section-panel[id="section-${sec}"] .question-card`).forEach(card => {
+                card.style.borderColor = '#f0f0f0';
+                const errText = card.querySelector('.err-msg');
+                if (errText) errText.remove();
+            });
+
+            function showError(elementIdOrSelector, msg) {
+                valid = false;
+                errors.push(msg);
+                let element;
+                if (elementIdOrSelector.startsWith('.') || elementIdOrSelector.startsWith('#') || elementIdOrSelector.includes('[')) {
+                    element = document.querySelector(elementIdOrSelector);
+                } else {
+                    element = document.getElementById(elementIdOrSelector);
+                }
+                if (element) {
+                    const card = element.closest('.question-card');
+                    if (card) {
+                        card.style.borderColor = '#ef4444'; // Red border
+                        if (!card.querySelector('.err-msg')) {
+                            const err = document.createElement('p');
+                            err.className = 'err-msg text-red-500 text-xs mt-1 font-semibold';
+                            err.innerHTML = `<i class="fas fa-exclamation-circle mr-1"></i> ${msg}`;
+                            card.appendChild(err);
+                        }
+                    }
+                }
+            }
+
+            if (sec === 1) {
+                if (!getText('in-nombre')) showError('in-nombre', 'El nombre completo es requerido.');
+                if (!getRadio('sexo')) showError('sexo', 'Por favor selecciona tu sexo (pregunta 2).');
+                if (!getRadio('estadocivil')) showError('estadocivil', 'Por favor selecciona tu estado civil (pregunta 3).');
+                const email = getText('in-email');
+                if (!email) {
+                    showError('in-email', 'El correo electrónico es requerido.');
+                } else if (!/\S+@\S+\.\S+/.test(email)) {
+                    showError('in-email', 'Por favor ingresa un correo electrónico válido.');
+                }
+            } else if (sec === 2) {
+                if (getChecks('grp-razones').length === 0) showError('grp-razones', 'Selecciona al menos una razón por la que eligió el ITO.');
+                if (!getText('in-programa')) showError('in-programa', 'Por favor selecciona tu programa de posgrado.');
+                if (!getText('in-linea')) showError('in-linea', 'La línea de investigación es requerida.');
+                
+                const beca = getRadio('beca');
+                if (!beca) {
+                    showError('beca', 'Selecciona si obtuviste beca.');
+                } else if (beca === 'si') {
+                    if (!getText('in-inst-beca')) showError('in-inst-beca', 'Especifica la institución de la beca.');
+                    if (getChecksNearLabel('_beca-tipos-start').length === 0) showError('_beca-tipos-start', 'Selecciona al menos un tipo de beca.');
+                }
+
+                const tiempogrado = getRadio('tiempogrado');
+                if (!tiempogrado) {
+                    showError('tiempogrado', 'Selecciona una opción.');
+                } else if (tiempogrado === 'si') {
+                    if (!getText('in-causa-tiempo')) showError('in-causa-tiempo', 'Describe brevemente las causas.');
+                }
+
+                if (!getRadio('titulacion')) showError('titulacion', 'Por favor selecciona si considera la titulación indispensable.');
+
+                const idioma = getRadio('idioma');
+                if (!idioma) {
+                    showError('idioma', 'Selecciona si domina otro idioma.');
+                } else if (idioma === 'si') {
+                    if (!getText('in-idiomas')) showError('in-idiomas', 'Especifica el o los idiomas.');
+                    if (getChecks('grp-idioma-cert').length === 0) showError('grp-idioma-cert', 'Selecciona al menos una opción.');
+                }
+            } else if (sec === 3) {
+                const empC = getRadio('empleocursando');
+                if (!empC) {
+                    showError('empleocursando', 'Selecciona si tenía empleo al cursar.');
+                } else if (empC === 'si') {
+                    if (!getText('in-puesto-cursando')) showError('in-puesto-cursando', 'Especifica el puesto que desempeñabas.');
+                    if (!getRadio('contrato-cursando')) showError('in-puesto-cursando', 'Selecciona el tipo de contratación.');
+                }
+
+                if (!getRadio('cambioempleo')) showError('cambioempleo', 'Selecciona si cambió de empleo.');
+                if (!getRadio('tiempoempleo')) showError('tiempoempleo', 'Selecciona el tiempo que le tomó conseguir empleo.');
+                if (getChecks('grp-factores').length === 0) showError('grp-factores', 'Selecciona al menos un factor.');
+
+                const labora = getRadio('laboraactual');
+                if (!labora) {
+                    showError('laboraactual', 'Selecciona si labora actualmente.');
+                } else if (labora === 'si') {
+                    if (!getRadio('tipoinst')) showError('laboraactual', 'Selecciona el tipo de institución.');
+                    if (!getRadio('sector')) showError('laboraactual', 'Selecciona el sector económico.');
+                    if (!getRadio('contratoactual')) showError('laboraactual', 'Selecciona el tipo de contratación actual.');
+                    if (!getText('in-actividades')) showError('in-actividades', 'Describe las actividades principales.');
+                }
+
+                ['scale-coincidencia', 'scale-conocimientos', 'scale-impacto', 'scale-pertinencia'].forEach(id => {
+                    if (getScale(id) === null) showError(id, 'Por favor evalúa este aspecto.');
+                });
+            } else if (sec === 4) {
+                const pub = getRadio('publicaciones');
+                if (!pub) {
+                    showError('publicaciones', 'Selecciona si participó en publicaciones.');
+                } else if (pub === 'si') {
+                    if (getChecks('pub-detail').length === 0) showError('pub-detail', 'Selecciona al menos un tipo de publicación.');
+                }
+
+                if (!getRadio('sni')) showError('sni', 'Selecciona una opción.');
+                if (!getRadio('red')) showError('red', 'Selecciona una opción.');
+
+                const premios = getRadio('premios');
+                if (!premios) {
+                    showError('premios', 'Selecciona una opción.');
+                } else if (premios === 'si') {
+                    if (!getText('in-premios-desc')) showError('in-premios-desc', 'Especifica el reconocimiento.');
+                }
+
+                if (!getRadio('academia')) showError('academia', 'Selecciona una opción.');
+                if (!getRadio('postdoc')) showError('postdoc', 'Selecciona una opción.');
+            } else if (sec === 5) {
+                ['scale-contenidos','scale-didacticas','scale-evaluacion','scale-biblio','scale-asesoria','scale-satisfaccion',
+                 'scale-laboratorios','scale-biblioteca','scale-internet','scale-instalaciones'].forEach(id => {
+                    if (getScale(id) === null) showError(id, 'Por favor evalúa este aspecto.');
+                });
+
+                if (!getRadio('expectativas')) showError('expectativas', 'Selecciona una opción.');
+                if (!getRadio('calidad')) showError('calidad', 'Selecciona una opción.');
+            } else if (sec === 6) {
+                const cursos = getRadio('cursosact');
+                if (!cursos) {
+                    showError('cursosact', 'Selecciona una opción.');
+                } else if (cursos === 'si') {
+                    if (!getText('in-cursos-desc')) showError('in-cursos-desc', 'Especifica los temas de interés.');
+                }
+
+                if (!getRadio('tiempoact')) showError('tiempoact', 'Selecciona una opción.');
+                if (!getRadio('empresa')) showError('empresa', 'Selecciona una opción.');
+                if (!getText('in-puesto-5anos')) showError('in-puesto-5anos', 'Este campo es requerido.');
+
+                const cargo = getRadio('cargo');
+                if (!cargo) {
+                    showError('cargo', 'Selecciona una opción.');
+                } else if (cargo === 'si') {
+                    if (!getText('in-cargo-desc')) showError('in-cargo-desc', 'Especifica el cargo.');
+                }
+
+                if (!getRadio('recomienda')) showError('recomienda', 'Selecciona una opción.');
+            }
+
+            return { valid, errors };
+        }
+
         // ── NAVIGATE ──────────────────────────────────────────────
         function changeSection(dir) {
+            if (dir === 1) {
+                const check = validateSection(current);
+                if (!check.valid) {
+                    const firstErr = document.querySelector('.err-msg');
+                    if (firstErr) {
+                        firstErr.closest('.question-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    return;
+                }
+            }
+
             const next = current + dir;
             if (next < 1 || next > TOTAL_SECTIONS) return;
 
@@ -982,28 +1161,26 @@
             return el ? (el.value.trim() || null) : null;
         }
         function getRadio(name) {
-            const pills = document.querySelectorAll(`input[name="${name}"]`);
-            for (const inp of pills) {
+            const inp = document.querySelector(`input[name="${name}"]:checked`);
+            if (inp) {
                 const lbl = inp.closest('.pill-label');
-                if (lbl && lbl.classList.contains('selected')) {
-                    return (inp.value && inp.value !== 'on') ? inp.value : lbl.textContent.trim();
-                }
+                return (inp.value && inp.value !== 'on') ? inp.value : lbl.textContent.trim();
             }
             return null;
         }
         function getChecks(containerId) {
             const el = document.getElementById(containerId);
             if (!el) return [];
-            return Array.from(el.querySelectorAll('.pill-label.selected'))
-                       .map(l => l.textContent.trim()).filter(Boolean);
+            return Array.from(el.querySelectorAll('input[type="checkbox"]:checked'))
+                       .map(inp => inp.closest('.pill-label').textContent.trim()).filter(Boolean);
         }
         function getChecksNearLabel(labelId) {
             const lbl = document.getElementById(labelId);
             if (!lbl) return [];
             const parent = lbl.parentElement;
             if (!parent) return [];
-            return Array.from(parent.querySelectorAll('.pill-label.selected'))
-                       .map(l => l.textContent.trim()).filter(Boolean);
+            return Array.from(parent.querySelectorAll('input[type="checkbox"]:checked'))
+                       .map(inp => inp.closest('.pill-label').textContent.trim()).filter(Boolean);
         }
         function getScale(groupId) {
             const btn = document.querySelector(`.scale-btn.active[data-group="${groupId}"]`);
@@ -1085,6 +1262,16 @@
         }
 
         async function submitForm() {
+            // Validate the last section
+            const check = validateSection(current);
+            if (!check.valid) {
+                const firstErr = document.querySelector('.err-msg');
+                if (firstErr) {
+                    firstErr.closest('.question-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
             const btn  = document.getElementById('btn-submit');
             const orig = btn.innerHTML;
             btn.disabled = true;
@@ -1092,9 +1279,17 @@
 
             const data = collectFormData();
 
-            if (!data.nombre) {
-                alert('Por favor ingresa tu nombre completo (Sección I, pregunta 1).');
-                btn.disabled = false; btn.innerHTML = orig; return;
+            // Vincular con el ID del usuario logueado en la base de datos
+            const activeUser = (typeof currentUser !== 'undefined' ? currentUser : null);
+            if (activeUser && activeUser.id) {
+                data.user_id = activeUser.id;
+            }
+
+            // Convertir campos de tipo array a JSON string (requerido por las columnas de tipo text en Postgres)
+            for (const key in data) {
+                if (Array.isArray(data[key])) {
+                    data[key] = JSON.stringify(data[key]);
+                }
             }
 
             try {
@@ -1102,14 +1297,15 @@
                     .from('egresados')
                     .insert([data]);
                 if (error) throw new Error(error.message);
-            } catch (e) {
-                // Servidor no disponible — pantalla de éxito local de todos modos
-                console.warn('API no disponible:', e.message);
-            }
 
-            btn.disabled = false;
-            btn.innerHTML = orig;
-            document.getElementById('success-screen').classList.add('show');
+                btn.disabled = false;
+                btn.innerHTML = orig;
+                document.getElementById('success-screen').classList.add('show');
+            } catch (e) {
+                alert('Error al guardar el cuestionario: ' + e.message);
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
         }
 
         function resetForm() {
@@ -1149,7 +1345,24 @@
             // Redirigir al cuestionario correcto
             window.location.href = 'cuestionario_organizacion.html';
         } else {
-            // Egresado o admin — mostrar contenido
+            // Egresado o admin — verificar si ya ha respondido
+            try {
+                const { data: existing, error } = await supabaseClient
+                    .from('egresados')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .maybeSingle();
+
+                if (existing) {
+                    // Mostrar pantalla de ya respondido
+                    document.getElementById('already-submitted-screen').classList.remove('hidden');
+                    return;
+                }
+            } catch (err) {
+                console.error('Error al verificar cuestionario previo:', err);
+            }
+
+            // Mostrar contenido si no ha respondido
             const content = document.getElementById('protected-content');
             if (content) content.classList.remove('hidden');
         }
